@@ -1,0 +1,2 @@
+# wscore.repository
+repository interfaces
