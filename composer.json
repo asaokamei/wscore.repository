@@ -1,0 +1,27 @@
+{
+  "name": "wscore/repository",
+  "description": "database repository interfaces and implementations",
+  "keywords": [
+    "orm",
+    "repository",
+    "entity"
+  ],
+  "homepage": "http://github.com/asaokamei/wscore.repository",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Asao Kamei",
+      "email": "asao.kamei@gmail.com",
+      "homepage": "http://www.workspot.jp/"
+    }
+  ],
+  "minimum-stability":"dev",
+  "prefer-stable": true,
+  "require": {
+  },
+  "autoload": {
+    "psr-4": {
+      "WScore\\Repository": "src/"
+    }
+  }
+}
