@@ -21,7 +21,7 @@
   },
   "autoload": {
     "psr-4": {
-      "WScore\\Repository": "src/"
+      "WScore\\Repository\\": "src/"
     }
   }
 }
