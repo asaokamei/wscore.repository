@@ -20,7 +20,7 @@ interface RepositoryInterface
 
     /**
      * @param EntityInterface $entity
-     * @return mixed
+     * @return EntityInterface
      */
     public function insert(EntityInterface $entity);
 

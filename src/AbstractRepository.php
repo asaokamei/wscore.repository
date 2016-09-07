@@ -39,6 +39,18 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * @return string
+     */
+    protected function getKeyColumnName()
+    {
+        $keys = $this->getKeyColumns();
+        if (count($keys) !== 1) {
+            throw new InvalidArgumentException('more than 1 primary key.');
+        }
+        return $keys[0];
+    }
+
+    /**
      * @param string|array $keys
      * @return EntityInterface[]
      */
@@ -58,11 +70,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function findByKey($keys)
     {
         if (!is_array($keys)) {
-            $pKey = $this->getKeyColumns();
-            if (count($pKey) !== 1) {
-                throw new InvalidArgumentException('more than 1 primary key.');
-            }
-            $keys = [$pKey[0] => $keys];
+            $keys = [$this->getKeyColumnName() => $keys];
         }
         $statement = $this->dao->select($keys);
         if (!$statement) {
@@ -75,12 +83,21 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * for auto-increment table, this method returns a new entity
+     * with the new id.
+     *
      * @param EntityInterface $entity
-     * @return bool|string
+     * @return EntityInterface
      */
     public function insert(EntityInterface $entity)
     {
-        return $this->dao->insert($entity->toArray());
+        if (!$id = $this->dao->insert($entity->toArray())) {
+            return null;
+        }
+        if ($id === true) {
+            return $entity;
+        }
+        return $this->findByKey([$this->getKeyColumnName() => $id]);
     }
 
     /**

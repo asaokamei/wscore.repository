@@ -24,6 +24,9 @@ interface DaoInterface
     public function select($keys);
     
     /**
+     * insert a data into a database table.
+     * returns auto-increment id (or true if no such column).
+     *
      * @param array $data
      * @return string|bool
      */

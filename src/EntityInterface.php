@@ -39,4 +39,10 @@ interface EntityInterface
      * @return array
      */
     public function toArray();
+
+    /**
+     * @param EntityInterface $entity
+     * @param array           $convert
+     */
+    public function relate(EntityInterface $entity, $convert = []);
 }

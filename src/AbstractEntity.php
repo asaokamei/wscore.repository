@@ -5,7 +5,12 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * @var array
      */
-    protected $data;
+    protected $data = [];
+
+    /**
+     * @var array
+     */
+    protected $_original_data = [];
 
     /**
      * @var array
@@ -16,12 +21,74 @@ abstract class AbstractEntity implements EntityInterface
     ];
 
     /**
-     * sets value object for each column. 
-     * The value object is constructed as new ValueObject($value)
-     * 
-     * @var array     [ column-name  =>  value-object class name]
+     * sets value object class name for each column.
+     * The value object is constructed as new ValueObject($value),
+     * or a callable that will convert a value to an object.
+     *
+     * [ column-name  =>  value-object class name]
+     *
+     * @var string[]|callable{}
      */
-    protected $valueObjects = [];
+    protected $valueObjectClasses = [];
+
+    /**
+     * this flag turns true before constructor is called,
+     * i.e. it is false during PDO's fetchObject method.
+     *
+     * @var bool
+     */
+    private $isFetchDone = false;
+
+    /**
+     * Entity constructor.
+     *
+     */
+    public function __construct()
+    {
+        $this->isFetchDone = true;
+    }
+
+    /**
+     * @return array
+     */
+    public static function listColumns()
+    {
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getPrimaryKeyColumns()
+    {
+        return ['id'];
+    }
+
+    /**
+     * @param array $data
+     * @return static
+     */
+    public static function create(array $data)
+    {
+        $entity = new static();
+        $entity->data = $entity->_filterInput($data, $entity->listColumns());
+        $entity->_addTimeStamps('created_at');
+        $entity->_addTimeStamps('updated_at');
+        return $entity;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function __set($key, $value)
+    {
+        if (!$this->isFetchDone) {
+            throw new BadMethodCallException('cannot set properties.');
+        }
+        $this->data[$key] = $value;
+        $this->_original_data[$key] = $value;
+    }
 
     /**
      * @param array $input
@@ -67,53 +134,19 @@ abstract class AbstractEntity implements EntityInterface
      */
     protected function _convertToObject($key, $value)
     {
-        if (!isset($this->valueObjects[$key])) {
+        if (!isset($this->valueObjectClasses[$key])) {
             return $value;
         }
         if (in_array($key, $this->timestamps)) {
             return new DateTimeImmutable($value);
         }
-        $class = $this->valueObjects[$key];
-        return new $class($value);
+        $valueObject = $this->valueObjectClasses[$key];
+        if (is_callable($valueObject)) {
+            return $valueObject($value);
+        }
+        return new $valueObject($value);
     }
     
-    /**
-     * Entity constructor.
-     *
-     * @param array $data
-     */
-    public function __construct($data)
-    {
-        $this->data = $this->_filterInput($data, $this->listColumns());
-        $this->_addTimeStamps('created_at');
-        $this->_addTimeStamps('updated_at');
-    }
-
-    /**
-     * @return array
-     */
-    public static function getPrimaryKeyColumns()
-    {
-        return ['id'];
-    }
-
-    /**
-     * @return array
-     */
-    public static function listColumns()
-    {
-        return [];
-    }
-
-    /**
-     * @param array $data
-     * @return static
-     */
-    public static function create(array $data)
-    {
-        return new static($data);
-    }
-
     /**
      * @param string $key
      * @return mixed
@@ -142,7 +175,15 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function toArray()
     {
-        return $this->data;
+        $array = [];
+        // find only the key/value that are modified.
+        foreach($this->data as $key => $value) {
+            if (array_key_exists($key, $this->_original_data) && $value === $this->_original_data) {
+                continue; // value has not changed. so ignore it.
+            }
+            $array[$key] = $value;
+        }
+        return $array;
     }
 
     /**
@@ -151,5 +192,21 @@ abstract class AbstractEntity implements EntityInterface
     public function getKeys()
     {
         return $this->_filterInput($this->data, $this->getPrimaryKeyColumns());
+    }
+
+    /**
+     * @param EntityInterface $entity
+     * @param array           $convert
+     */
+    public function relate(EntityInterface $entity, $convert = [])
+    {
+        $keys = $entity->getKeys();
+        if (!empty($convert)) {
+            foreach($convert as $key => $col) {
+                $keys[$col] = $keys[$key];
+                unset($keys[$key]);
+            }
+        }
+        $this->data = array_merge($this->data, $keys);
     }
 }
