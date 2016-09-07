@@ -126,11 +126,15 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param array $data
+     * @return EntityInterface
      */
     public function fill(array $data)
     {
-        $this->data = array_merge($this->data, $this->_filterInput($data, $this->listColumns()));
-        $this->_addTimeStamps('updated_at');
+        $self = clone($this);
+        $self->data = array_merge($this->data, $this->_filterInput($data, $this->listColumns()));
+        $self->_addTimeStamps('updated_at');
+
+        return $self;
     }
 
     /**

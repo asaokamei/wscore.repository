@@ -5,17 +5,12 @@ interface DaoInterface
     /**
      * @return string
      */
-    public function table();
+    public function getTable();
 
     /**
      * @return mixed
      */
     public function query();
-
-    /**
-     * @return Pdo
-     */
-    public function getPdo();
 
     /**
      * @return array
@@ -26,7 +21,7 @@ interface DaoInterface
      * @param array $keys
      * @return PDOStatement
      */
-    public function read($keys);
+    public function select($keys);
     
     /**
      * @param array $data
@@ -45,4 +40,13 @@ interface DaoInterface
      * @return bool
      */
     public function delete($keys);
+
+    /**
+     * @param string $join
+     * @param array  $keys
+     * @param array  $convert1
+     * @param array  $convert2
+     * @return PDOStatement
+     */
+    public function join($join, $keys, $convert1 = [], $convert2 = []);
 }

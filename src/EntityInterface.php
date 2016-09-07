@@ -31,6 +31,7 @@ interface EntityInterface
     
     /**
      * @param array $data
+     * @return EntityInterface
      */
     public function fill(array $data);
     

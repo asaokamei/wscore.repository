@@ -6,7 +6,12 @@ interface RepositoryInterface
      * @return string|EntityInterface
      */
     public function getEntityClass();
-    
+
+    /**
+     * @return string[]
+     */
+    public function getKeyColumns();
+
     /**
      * @param string|array $keys
      * @return EntityInterface[]
@@ -51,4 +56,20 @@ interface RepositoryInterface
      * @return EntityInterface[]
      */
     public function hasMany(EntityInterface $entity, RepositoryInterface $repo, $convert = []);
+
+    /**
+     * @param EntityInterface $entity
+     * @param RepositoryInterface $repo
+     * @param string|null $joinTable
+     * @param array $convert1
+     * @param array $convert2
+     * @return EntityInterface[]
+     */
+    public function hasJoin(
+        EntityInterface $entity,
+        RepositoryInterface $repo,
+        $joinTable = '',
+        $convert1 = [],
+        $convert2 = []
+    );
 }
