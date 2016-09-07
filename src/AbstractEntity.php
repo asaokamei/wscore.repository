@@ -13,14 +13,6 @@ abstract class AbstractEntity implements EntityInterface
     protected $_original_data = [];
 
     /**
-     * @var array
-     */
-    protected $timestamps = [
-        'create_at' => 'created_at',
-        'update_at' => 'updated_at',
-    ];
-
-    /**
      * sets value object class name for each column.
      * The value object is constructed as new ValueObject($value),
      * or a callable that will convert a value to an object.
@@ -72,8 +64,6 @@ abstract class AbstractEntity implements EntityInterface
     {
         $entity = new static();
         $entity->data = $entity->_filterInput($data, $entity->listColumns());
-        $entity->_addTimeStamps('created_at');
-        $entity->_addTimeStamps('updated_at');
         return $entity;
     }
 
@@ -113,21 +103,6 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * @param string $type
-     */
-    protected function _addTimeStamps($type)
-    {
-        if (!isset($this->timestamps[$type])) {
-            return;
-        }
-        $column = $this->timestamps[$type];
-        if (isset($this->data[$column])) {
-            return;
-        }
-        $this->data[$column] = (new DateTime('now'))->format('Y-m-d H:i:s');
-    }
-
-    /**
      * @param string $key
      * @param string $value
      * @return mixed
@@ -136,9 +111,6 @@ abstract class AbstractEntity implements EntityInterface
     {
         if (!isset($this->valueObjectClasses[$key])) {
             return $value;
-        }
-        if (in_array($key, $this->timestamps)) {
-            return new DateTimeImmutable($value);
         }
         $valueObject = $this->valueObjectClasses[$key];
         if (is_callable($valueObject)) {
@@ -163,11 +135,9 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function fill(array $data)
     {
-        $self = clone($this);
-        $self->data = array_merge($this->data, $this->_filterInput($data, $this->listColumns()));
-        $self->_addTimeStamps('updated_at');
+        $this->data = array_merge($this->data, $this->_filterInput($data, $this->listColumns()));
 
-        return $self;
+        return $this;
     }
 
     /**
