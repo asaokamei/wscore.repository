@@ -5,7 +5,7 @@ interface RelationInterface
 {
     /**
      * @param string $order
-     * @return QueryInterface
+     * @return RelationInterface
      */
     public function orderBy($order);
 
@@ -24,11 +24,11 @@ interface RelationInterface
      * @param EntityInterface $entity
      * @return EntityInterface
      */
-    public function insert(EntityInterface $entity);
+    public function save(EntityInterface $entity);
 
     /**
      * @param EntityInterface $entity
-     * @return mixed
+     * @return bool
      */
     public function delete(EntityInterface $entity);
 }

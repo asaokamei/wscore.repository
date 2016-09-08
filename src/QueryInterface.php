@@ -14,6 +14,12 @@ interface QueryInterface
     public function getTable();
 
     /**
+     * @param array $condition
+     * @return QueryInterface
+     */
+    public function condition(array $condition);
+    
+    /**
      * @param string $order
      * @return QueryInterface
      */
@@ -23,7 +29,7 @@ interface QueryInterface
      * @param array $keys
      * @return PDOStatement
      */
-    public function select($keys);
+    public function select($keys = []);
 
     /**
      * @return int
