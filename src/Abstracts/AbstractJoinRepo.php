@@ -3,7 +3,7 @@
 class AbstractJoinRepo implements JoinRepositoryInterface
 {
     /**
-     * @var DaoInterface
+     * @var QueryInterface
      */
     private $dao;
 

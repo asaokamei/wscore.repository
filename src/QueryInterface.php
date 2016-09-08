@@ -1,27 +1,34 @@
 <?php
 
-interface DaoInterface
+interface QueryInterface
 {
+    /**
+     * @param string $table
+     * @return QueryInterface
+     */
+    public function withTable($table);
+
     /**
      * @return string
      */
     public function getTable();
 
     /**
-     * @return mixed
+     * @param string $order
+     * @return QueryInterface
      */
-    public function query();
-
-    /**
-     * @return array
-     */
-    public function listColumns();
+    public function orderBy($order);
 
     /**
      * @param array $keys
      * @return PDOStatement
      */
     public function select($keys);
+
+    /**
+     * @return int
+     */
+    public function count();
     
     /**
      * insert a data into a database table.

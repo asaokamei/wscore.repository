@@ -49,7 +49,7 @@ interface RepositoryInterface
     public function delete(EntityInterface $entity);
 
     /**
-     * @return DaoInterface
+     * @return QueryInterface
      */
     public function getDao();
 

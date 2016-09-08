@@ -3,7 +3,7 @@
 abstract class AbstractRepository implements RepositoryInterface
 {
     /**
-     * @var DaoInterface
+     * @var QueryInterface
      */
     protected $dao;
 
@@ -11,6 +11,11 @@ abstract class AbstractRepository implements RepositoryInterface
      * @var string|EntityInterface
      */
     protected $entityClass;
+
+    /**
+     * @var string
+     */
+    private $table;
 
     /**
      * @param PDOStatement $statement
@@ -56,7 +61,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function find($keys)
     {
-        $statement = $this->dao->select($keys);
+        $statement = $this->getDao()->select($keys);
         if (!$statement) {
             return null;
         }
@@ -72,7 +77,7 @@ abstract class AbstractRepository implements RepositoryInterface
         if (!is_array($keys)) {
             $keys = [$this->getKeyColumnName() => $keys];
         }
-        $statement = $this->dao->select($keys);
+        $statement = $this->getDao()->select($keys);
         if (!$statement) {
             return null;
         }
@@ -105,7 +110,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function insert(EntityInterface $entity)
     {
-        if (!$id = $this->dao->insert($entity->toArray())) {
+        if (!$id = $this->getDao()->insert($entity->toArray())) {
             return null;
         }
         if ($id !== true) {
@@ -121,7 +126,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function update(EntityInterface $entity)
     {
-        return $this->dao->update($entity->toArray());
+        return $this->getDao()->update($entity->toArray());
     }
 
     /**
@@ -130,15 +135,15 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function delete(EntityInterface $entity)
     {
-        return $this->dao->delete($entity->getKeys());
+        return $this->getDao()->delete($entity->getKeys());
     }
 
     /**
-     * @return DaoInterface
+     * @return QueryInterface
      */
     public function getDao()
     {
-        return $this->dao;
+        return $this->dao->withTable($this->table);
     }
 
     /**
