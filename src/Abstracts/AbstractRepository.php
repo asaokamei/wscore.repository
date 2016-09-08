@@ -51,7 +51,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * @param string|array $keys
+     * @param array $keys
      * @return EntityInterface[]
      */
     public function find($keys)
@@ -83,6 +83,20 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * @param EntityInterface $entity
+     * @return EntityInterface
+     */
+    public function save(EntityInterface $entity)
+    {
+        if ($entity->isFetched()) {
+            $this->update($entity);
+        } else {
+            $entity = $this->insert($entity);
+        }
+        return $entity;
+    }
+
+    /**
      * for auto-increment table, this method returns a new entity
      * with the new id.
      *
@@ -94,10 +108,11 @@ abstract class AbstractRepository implements RepositoryInterface
         if (!$id = $this->dao->insert($entity->toArray())) {
             return null;
         }
-        if ($id === true) {
-            return $entity;
+        if ($id !== true) {
+            $entity->setPrimaryKeyOnCreatedEntity($id);
         }
-        return $this->findByKey([$this->getKeyColumnName() => $id]);
+
+        return $entity;
     }
 
     /**

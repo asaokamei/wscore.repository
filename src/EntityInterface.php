@@ -24,6 +24,16 @@ interface EntityInterface
     public function getKeys();
 
     /**
+     * @return bool
+     */
+    public function isFetched();
+
+    /**
+     * @param string $id
+     */
+    public function setPrimaryKeyOnCreatedEntity($id);
+
+    /**
      * @param string $key
      * @return mixed
      */

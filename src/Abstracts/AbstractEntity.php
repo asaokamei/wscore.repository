@@ -32,6 +32,14 @@ abstract class AbstractEntity implements EntityInterface
     private $isFetchDone = false;
 
     /**
+     * a flag indicating that this entity is fetched
+     * from a database if it is true.
+     *
+     * @var bool
+     */
+    private $isFetched = false;
+
+    /**
      * Entity constructor.
      *
      */
@@ -76,8 +84,20 @@ abstract class AbstractEntity implements EntityInterface
         if (!$this->isFetchDone) {
             throw new BadMethodCallException('cannot set properties.');
         }
+        $this->isFetched  = true;
         $this->data[$key] = $value;
         $this->_original_data[$key] = $value;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setPrimaryKeyOnCreatedEntity($id)
+    {
+        if ($this->isFetched) {
+            throw new BadMethodCallException('cannot set primary key on a fetched entity.');
+        }
+        $this->data[$this::getPrimaryKeyColumns()[0]] = $id;
     }
 
     /**
@@ -126,6 +146,14 @@ abstract class AbstractEntity implements EntityInterface
     public function getKeys()
     {
         return HelperMethods::filterDataByKeys($this->data, $this->getPrimaryKeyColumns());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFetched()
+    {
+        return $this->isFetched;
     }
 
     /**

@@ -19,6 +19,18 @@ interface RepositoryInterface
     public function find($keys);
 
     /**
+     * @param array|string $keys
+     * @return EntityInterface|null
+     */
+    public function findByKey($keys);
+
+    /**
+     * @param EntityInterface $entity
+     * @return EntityInterface
+     */
+    public function save(EntityInterface $entity);
+
+    /**
      * @param EntityInterface $entity
      * @return EntityInterface
      */
