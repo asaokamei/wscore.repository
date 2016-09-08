@@ -5,12 +5,12 @@ interface RepositoryInterface
     /**
      * @return string|EntityInterface
      */
-    public function getEntityClass();
+    public static function getEntityClass();
 
     /**
      * @return string[]
      */
-    public function getKeyColumns();
+    public static function getKeyColumns();
 
     /**
      * @param string|array $keys

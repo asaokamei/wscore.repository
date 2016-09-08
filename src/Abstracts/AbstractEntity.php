@@ -63,7 +63,7 @@ abstract class AbstractEntity implements EntityInterface
     public static function create(array $data)
     {
         $entity = new static();
-        $entity->data = $entity->_filterInput($data, $entity->listColumns());
+        $entity->data = HelperMethods::filterDataByKeys($data, $entity->listColumns());
         return $entity;
     }
 
@@ -81,52 +81,16 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * @param array $input
-     * @param array $filter
-     * @return array
-     */
-    protected function _filterInput(array $input, array $filter)
-    {
-        $output = [];
-        if(empty($filter)) {
-            return $output;
-        }
-        foreach($filter as $key => $column) {
-            if (is_numeric($key)) {
-                $key = $column;
-            }
-            if (array_key_exists($key, $input)) {
-                $output[$column] = $input[$key];
-            }
-        }
-        return $output;
-    }
-
-    /**
-     * @param string $key
-     * @param string $value
-     * @return mixed
-     */
-    protected function _convertToObject($key, $value)
-    {
-        if (!isset($this->valueObjectClasses[$key])) {
-            return $value;
-        }
-        $valueObject = $this->valueObjectClasses[$key];
-        if (is_callable($valueObject)) {
-            return $valueObject($value);
-        }
-        return new $valueObject($value);
-    }
-    
-    /**
      * @param string $key
      * @return mixed
      */
     public function get($key)
     {
         $value = array_key_exists($key, $this->data) ? $this->data[$key] : null;
-        return $this->_convertToObject($key, $value);
+        if (isset($this->valueObjectClasses[$key])) {
+            return HelperMethods::convertToObject($value, $this->valueObjectClasses[$key]);
+        }
+        return $value;
     }
 
     /**
@@ -135,7 +99,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function fill(array $data)
     {
-        $this->data = array_merge($this->data, $this->_filterInput($data, $this->listColumns()));
+        $this->data = array_merge($this->data, HelperMethods::filterDataByKeys($data, $this->listColumns()));
 
         return $this;
     }
@@ -161,7 +125,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function getKeys()
     {
-        return $this->_filterInput($this->data, $this->getPrimaryKeyColumns());
+        return HelperMethods::filterDataByKeys($this->data, $this->getPrimaryKeyColumns());
     }
 
     /**
@@ -171,12 +135,7 @@ abstract class AbstractEntity implements EntityInterface
     public function relate(EntityInterface $entity, $convert = [])
     {
         $keys = $entity->getKeys();
-        if (!empty($convert)) {
-            foreach($convert as $key => $col) {
-                $keys[$col] = $keys[$key];
-                unset($keys[$key]);
-            }
-        }
+        $keys = HelperMethods::convertDataKeys($keys, $convert);
         $this->data = array_merge($this->data, $keys);
     }
 }

@@ -18,23 +18,23 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     protected function fetchObject(PDOStatement $statement)
     {
-        return $statement->fetchObject($this->entityClass);
+        return $statement->fetchObject($this::getEntityClass());
     }
 
     /**
      * @return string|EntityInterface
      */
-    public function getEntityClass()
+    public static function getEntityClass()
     {
-        return $this->entityClass;
+        return EntityInterface::class;
     }
 
     /**
      * @return string[]
      */
-    public function getKeyColumns()
+    public static function getKeyColumns()
     {
-        $class = $this->entityClass;
+        $class = self::getEntityClass();
         return $class::getPrimaryKeyColumns();
     }
 
@@ -134,18 +134,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function hasOne(EntityInterface $entity, RepositoryInterface $repo, $convert = [])
     {
-        $targetKeys = $repo->getKeyColumns();
-        $sourceData = $entity->toArray();
-        $keys       = [];
-        foreach ($targetKeys as $key) {
-            $sourceColumn = isset($convert[$key]) ? $convert[$key] : $key;
-            $keys[$key]   = $sourceData[$sourceColumn];
-        }
-        $found = $repo->find($keys);
-        if ($found) {
-            return $found[0];
-        }
-        return null;
+        return RelationHelper::hasOne($entity, $repo, $convert);
     }
 
     /**
@@ -156,12 +145,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function hasMany(EntityInterface $entity, RepositoryInterface $repo, $convert = [])
     {
-        $keys = $entity->getKeys();
-        foreach ($convert as $key => $col) {
-            $keys[$col] = $keys[$key];
-            unset($keys[$key]);
-        }
-        return $repo->find($keys);
+        return RelationHelper::hasMany($entity, $repo, $convert);
     }
 
     /**
@@ -179,14 +163,8 @@ abstract class AbstractRepository implements RepositoryInterface
         $convert1 = [],
         $convert2 = []
     ) {
-        // create the join-table name if not given.
-        if (!$joinTable) {
-            // two tables in alphabetical order joined with '_'.
-            $list = [$repo->getDao()->getTable(), $this->getDao()->getTable()];
-            sort($list);
-            $joinTable = $joinTable ?: implode('_', $list);
-        }
-        $statement = $repo->getDao()->join($joinTable, $entity->getKeys(), $convert1, $convert2);
+        $joinTable = $joinTable ?: RelationHelper::makeJoinTableName($repo->getDao()->getTable(), $this->getDao()->getTable());
+        $statement = RelationHelper::hasJoin($entity, $repo, $joinTable, $convert1, $convert2);
         return $this->fetchObject($statement);
     }
 }
