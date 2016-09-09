@@ -56,7 +56,7 @@ use WScore\Repository\RepositoryInterface;
     public function create($data)
     {
         /** @var EntityInterface $entity */
-        $entity = new $this->entityClass($this->primaryKeys);
+        $entity = new $this->entityClass($this->primaryKeys, $this->columnList);
         $entity->fill($data);
         return $entity;
     }
@@ -180,10 +180,6 @@ use WScore\Repository\RepositoryInterface;
     {
         return $this->dao
             ->withTable($this->table)
-            ->setFetchMode(
-                \PDO::FETCH_CLASS,
-                $this->entityClass,
-                [$this->primaryKeys]
-            );
+            ->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass, [$this->primaryKeys, $this->columnList]);
     }
 }

@@ -23,6 +23,11 @@ use WScore\Repository\Helpers\HelperMethods;
     protected $primaryKeys = [];
 
     /**
+     * @var string[]
+     */
+    private $columnList = [];
+    
+    /**
      * sets value object class name for each column.
      * The value object is constructed as new ValueObject($value),
      * or a callable that will convert a value to an object.
@@ -53,10 +58,12 @@ use WScore\Repository\Helpers\HelperMethods;
      * Entity constructor.
      *
      * @param array $primaryKeys
+     * @param array $columnList
      */
-    public function __construct(array $primaryKeys)
+    public function __construct(array $primaryKeys, array $columnList = [])
     {
         $this->primaryKeys = $primaryKeys;
+        $this->columnList  = $columnList;
         $this->isFetchDone = true;
     }
 
@@ -66,6 +73,14 @@ use WScore\Repository\Helpers\HelperMethods;
     public function getPrimaryKeyColumns()
     {
         return $this->primaryKeys;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getColumnList()
+    {
+        return $this->columnList;
     }
 
     /**
@@ -112,7 +127,10 @@ use WScore\Repository\Helpers\HelperMethods;
      */
     public function fill(array $data)
     {
-        $this->data = array_merge($this->data, $data);
+        $this->data = array_merge(
+            $this->data, 
+            HelperMethods::filterDataByKeys($data, $this->columnList)
+        );
 
         return $this;
     }

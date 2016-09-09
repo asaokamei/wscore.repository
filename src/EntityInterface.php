@@ -9,6 +9,11 @@ interface EntityInterface
     public function getPrimaryKeyColumns();
 
     /**
+     * @return string[]
+     */
+    public function getColumnList();
+
+    /**
      * @return array
      */
     public function getKeys();
