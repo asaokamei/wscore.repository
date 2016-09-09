@@ -1,5 +1,10 @@
 <?php
-//namespace WScore\Repository\Relation;
+namespace WScore\Repository\Relation;
+
+use WScore\Repository\EntityInterface;
+use WScore\Repository\Helpers\HelperMethods;
+use WScore\Repository\RelationInterface;
+use WScore\Repository\RepositoryInterface;
 
 class HasOne implements RelationInterface
 {
