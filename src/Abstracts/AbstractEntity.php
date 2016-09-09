@@ -5,7 +5,7 @@ use BadMethodCallException;
 use WScore\Repository\EntityInterface;
 use WScore\Repository\Helpers\HelperMethods;
 
-abstract class AbstractEntity implements EntityInterface
+/* abstract */ class AbstractEntity implements EntityInterface
 {
     /**
      * @var array
@@ -51,9 +51,12 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * Entity constructor.
+     *
+     * @param array $primaryKeys
      */
-    public function __construct()
+    public function __construct(array $primaryKeys)
     {
+        $this->primaryKeys = $primaryKeys;
         $this->isFetchDone = true;
     }
 
@@ -66,23 +69,12 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * @param array $data
-     * @return static
-     */
-    public static function create(array $data)
-    {
-        $entity = new static();
-        $entity->data = $data;
-        return $entity;
-    }
-
-    /**
      * @param string $key
      * @param mixed  $value
      */
     public function __set($key, $value)
     {
-        if (!$this->isFetchDone) {
+        if ($this->isFetchDone) {
             throw new BadMethodCallException('cannot set properties.');
         }
         $this->isFetched  = true;

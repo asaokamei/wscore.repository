@@ -6,7 +6,7 @@ use WScore\Repository\EntityInterface;
 use WScore\Repository\QueryInterface;
 use WScore\Repository\RepositoryInterface;
 
-abstract class AbstractRepository implements RepositoryInterface
+/* abstract */ class AbstractRepository implements RepositoryInterface
 {
     /**
      * @var QueryInterface
@@ -47,6 +47,18 @@ abstract class AbstractRepository implements RepositoryInterface
     public function getEntityClass()
     {
         return $this->entityClass;
+    }
+
+    /**
+     * @param array $data
+     * @return EntityInterface
+     */
+    public function create($data)
+    {
+        /** @var EntityInterface $entity */
+        $entity = new $this->entityClass($this->primaryKeys);
+        $entity->fill($data);
+        return $entity;
     }
 
     /**
@@ -166,6 +178,12 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function query()
     {
-        return $this->dao->withTable($this->table)->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass);
+        return $this->dao
+            ->withTable($this->table)
+            ->setFetchMode(
+                \PDO::FETCH_CLASS,
+                $this->entityClass,
+                [$this->primaryKeys]
+            );
     }
 }

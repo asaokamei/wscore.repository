@@ -4,12 +4,6 @@ namespace WScore\Repository;
 interface EntityInterface
 {
     /**
-     * @param array $data
-     * @return static
-     */
-    public static function create(array $data);
-
-    /**
      * @return array
      */
     public function getPrimaryKeyColumns();

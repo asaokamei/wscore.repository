@@ -24,6 +24,12 @@ interface RepositoryInterface
     public function getColumnList();
 
     /**
+     * @param array $data
+     * @return EntityInterface
+     */
+    public function create($data);
+
+    /**
      * @param string|array $keys
      * @return EntityInterface[]
      */

@@ -9,7 +9,7 @@ use WScore\Repository\JoinRepositoryInterface;
 use WScore\Repository\QueryInterface;
 use WScore\Repository\RepositoryInterface;
 
-class AbstractJoinRepo implements JoinRepositoryInterface
+/* abstract */ class AbstractJoinRepo implements JoinRepositoryInterface
 {
     /**
      * @var QueryInterface
@@ -39,6 +39,18 @@ class AbstractJoinRepo implements JoinRepositoryInterface
     private $to_repo;
 
     private $to_convert = [];
+
+    /**
+     * @param array $data
+     * @return JoinEntityInterface
+     */
+    public function create($data)
+    {
+        /** @var JoinEntityInterface $entity */
+        $entity = new $this->entity_class($this->primaryKeys);
+        $entity->fill($data);
+        return $entity;
+    }
 
     /**
      * @param EntityInterface $entity
@@ -95,12 +107,11 @@ class AbstractJoinRepo implements JoinRepositoryInterface
         if (!$id = $this->dao->insert($data)) {
             return null; // failed to insert...
         }
-        $class = $this->entity_class;
         if ($id !== true) {
             // returned some id value. add the primary key to the data.
             $data[$this->primaryKeys[0]] = $id;
         }
-        return $class::create($data);
+        return $this->create($data);
     }
 
     /**
