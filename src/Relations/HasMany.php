@@ -7,7 +7,7 @@ use WScore\Repository\QueryInterface;
 use WScore\Repository\RelationInterface;
 use WScore\Repository\RepositoryInterface;
 
-class HasOne implements RelationInterface
+class HasMany implements RelationInterface
 {
     /**
      * @var RepositoryInterface
@@ -52,9 +52,9 @@ class HasOne implements RelationInterface
      */
     public function query()
     {
-        $primaryKeys = $this->getPrimaryKeys();
+        $primaryKeys = $this->sourceEntity->getKeys();
         return $this->targetRepo->query()
-                                ->condition($primaryKeys);
+            ->condition($primaryKeys);
     }
 
     /**
@@ -89,7 +89,7 @@ class HasOne implements RelationInterface
      */
     public function relate(EntityInterface $entity)
     {
-        $this->sourceEntity->relate($entity, $this->convert);
+        $entity->relate($this->sourceEntity, $this->convert);
 
         return $entity;
     }
@@ -100,23 +100,13 @@ class HasOne implements RelationInterface
      */
     public function delete(EntityInterface $entity)
     {
-        $keys = $entity->getKeys();
-        $keys = HelperMethods::convertDataKeys($keys, $this->convert);
-        $this->sourceEntity->fill($keys);
+        $primaryKeys = $this->sourceEntity->getKeys();
+        foreach($primaryKeys as $key => $val) {
+            $primaryKeys[$key] = null;
+        }
+        $primaryKeys = HelperMethods::convertDataKeys($primaryKeys, $this->convert);
+        $entity->fill($primaryKeys);
 
         return true;
-    }
-
-    /**
-     * @return array
-     */
-    private function getPrimaryKeys()
-    {
-        $targetKeys  = $this->targetRepo->getKeyColumns();
-        $sourceData  = $this->sourceEntity->toArray();
-        $primaryKeys = HelperMethods::filterDataByKeys($sourceData, $targetKeys);
-        $primaryKeys = HelperMethods::convertDataKeys($primaryKeys, $this->convert);
-
-        return $primaryKeys;
     }
 }

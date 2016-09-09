@@ -2,9 +2,7 @@
 namespace WScore\Repository\Abstracts;
 
 use InvalidArgumentException;
-use PDOStatement;
 use WScore\Repository\EntityInterface;
-use WScore\Repository\Helpers\RelationHelper;
 use WScore\Repository\QueryInterface;
 use WScore\Repository\RepositoryInterface;
 
@@ -16,39 +14,55 @@ abstract class AbstractRepository implements RepositoryInterface
     protected $dao;
 
     /**
-     * @var string|EntityInterface
-     */
-    protected $entityClass;
-
-    /**
      * @var string
      */
     private $table;
 
     /**
-     * @param PDOStatement $statement
-     * @return EntityInterface[]
+     * @var string[]
      */
-    protected function fetchObject(PDOStatement $statement)
+    private $primaryKeys = [];
+
+    /**
+     * @var string[]
+     */
+    private $columnList = [];
+
+    /**
+     * @var string|EntityInterface
+     */
+    protected $entityClass;
+
+    /**
+     * @return string
+     */
+    public function getTable()
     {
-        return $statement->fetchObject($this::getEntityClass());
+        return $this->table;
     }
 
     /**
      * @return string|EntityInterface
      */
-    public static function getEntityClass()
+    public function getEntityClass()
     {
-        return EntityInterface::class;
+        return $this->entityClass;
     }
 
     /**
      * @return string[]
      */
-    public static function getKeyColumns()
+    public function getKeyColumns()
     {
-        $class = self::getEntityClass();
-        return $class::getPrimaryKeyColumns();
+        return $this->primaryKeys;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getColumnList()
+    {
+        return $this->columnList;
     }
 
     /**
@@ -69,11 +83,11 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function find($keys)
     {
-        $statement = $this->getDao()->select($keys);
+        $statement = $this->query()->select($keys);
         if (!$statement) {
             return null;
         }
-        return $this->fetchObject($statement);
+        return $statement->fetchAll();
     }
 
     /**
@@ -85,14 +99,15 @@ abstract class AbstractRepository implements RepositoryInterface
         if (!is_array($keys)) {
             $keys = [$this->getKeyColumnName() => $keys];
         }
-        $statement = $this->getDao()->select($keys);
+        $statement = $this->query()->select($keys);
         if (!$statement) {
             return null;
         }
         if ($statement->rowCount() !== 1) {
             throw new InvalidArgumentException('more than 1 found for findByKey.');
         }
-        return $this->fetchObject($statement)[0];
+
+        return $statement->fetch();
     }
 
     /**
@@ -118,7 +133,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function insert(EntityInterface $entity)
     {
-        if (!$id = $this->getDao()->insert($entity->toArray())) {
+        if (!$id = $this->query()->insert($entity->toArray())) {
             return null;
         }
         if ($id !== true) {
@@ -134,7 +149,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function update(EntityInterface $entity)
     {
-        return $this->getDao()->update($entity->toArray());
+        return $this->query()->update($entity->toArray());
     }
 
     /**
@@ -143,56 +158,14 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function delete(EntityInterface $entity)
     {
-        return $this->getDao()->delete($entity->getKeys());
+        return $this->query()->delete($entity->getKeys());
     }
 
     /**
      * @return QueryInterface
      */
-    public function getDao()
+    public function query()
     {
-        return $this->dao->withTable($this->table);
-    }
-
-    /**
-     * @param EntityInterface     $entity
-     * @param RepositoryInterface $repo
-     * @param array               $convert
-     * @return EntityInterface|null
-     */
-    public function hasOne(EntityInterface $entity, RepositoryInterface $repo, $convert = [])
-    {
-        return RelationHelper::hasOne($entity, $repo, $convert);
-    }
-
-    /**
-     * @param EntityInterface     $entity
-     * @param RepositoryInterface $repo
-     * @param array               $convert
-     * @return EntityInterface[]
-     */
-    public function hasMany(EntityInterface $entity, RepositoryInterface $repo, $convert = [])
-    {
-        return RelationHelper::hasMany($entity, $repo, $convert);
-    }
-
-    /**
-     * @param EntityInterface     $entity
-     * @param RepositoryInterface $repo
-     * @param string|null         $joinTable
-     * @param array               $convert1
-     * @param array               $convert2
-     * @return EntityInterface[]
-     */
-    public function hasJoin(
-        EntityInterface $entity,
-        RepositoryInterface $repo,
-        $joinTable = '',
-        $convert1 = [],
-        $convert2 = []
-    ) {
-        $joinTable = $joinTable ?: RelationHelper::makeJoinTableName($repo->getDao()->getTable(), $this->getDao()->getTable());
-        $statement = RelationHelper::hasJoin($entity, $repo, $joinTable, $convert1, $convert2);
-        return $this->fetchObject($statement);
+        return $this->dao->withTable($this->table)->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass);
     }
 }

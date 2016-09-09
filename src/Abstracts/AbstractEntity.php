@@ -18,6 +18,11 @@ abstract class AbstractEntity implements EntityInterface
     protected $_original_data = [];
 
     /**
+     * @var string[]
+     */
+    protected $primaryKeys = [];
+
+    /**
      * sets value object class name for each column.
      * The value object is constructed as new ValueObject($value),
      * or a callable that will convert a value to an object.
@@ -46,7 +51,6 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * Entity constructor.
-     *
      */
     public function __construct()
     {
@@ -56,17 +60,9 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * @return array
      */
-    public static function listColumns()
+    public function getPrimaryKeyColumns()
     {
-        return [];
-    }
-
-    /**
-     * @return array
-     */
-    public static function getPrimaryKeyColumns()
-    {
-        return ['id'];
+        return $this->primaryKeys;
     }
 
     /**
@@ -76,7 +72,7 @@ abstract class AbstractEntity implements EntityInterface
     public static function create(array $data)
     {
         $entity = new static();
-        $entity->data = HelperMethods::filterDataByKeys($data, $entity->listColumns());
+        $entity->data = $data;
         return $entity;
     }
 
@@ -124,7 +120,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function fill(array $data)
     {
-        $this->data = array_merge($this->data, HelperMethods::filterDataByKeys($data, $this->listColumns()));
+        $this->data = array_merge($this->data, $data);
 
         return $this;
     }

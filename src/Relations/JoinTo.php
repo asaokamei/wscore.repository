@@ -3,11 +3,13 @@ namespace WScore\Repository\Relation;
 
 use WScore\Repository\EntityInterface;
 use WScore\Repository\Helpers\HelperMethods;
+use WScore\Repository\JoinEntityInterface;
+use WScore\Repository\JoinRelationInterface;
+use WScore\Repository\JoinRepositoryInterface;
 use WScore\Repository\QueryInterface;
-use WScore\Repository\RelationInterface;
 use WScore\Repository\RepositoryInterface;
 
-class HasOne implements RelationInterface
+class JoinTo implements JoinRelationInterface
 {
     /**
      * @var RepositoryInterface
@@ -20,6 +22,11 @@ class HasOne implements RelationInterface
     private $targetRepo;
 
     /**
+     * @var JoinRepositoryInterface
+     */
+    private $joinRepo;
+
+    /**
      * @var EntityInterface
      */
     private $sourceEntity;
@@ -30,19 +37,22 @@ class HasOne implements RelationInterface
     private $convert;
 
     /**
-     * @param RepositoryInterface $sourceRepo
-     * @param RepositoryInterface $targetRepo
-     * @param EntityInterface     $sourceEntity
-     * @param array               $convert
+     * @param RepositoryInterface     $sourceRepo
+     * @param RepositoryInterface     $targetRepo
+     * @param JoinRepositoryInterface $joinRepo
+     * @param EntityInterface         $sourceEntity
+     * @param array                   $convert
      */
     public function __construct(
         RepositoryInterface $sourceRepo,
         RepositoryInterface $targetRepo,
+        JoinRepositoryInterface $joinRepo,
         EntityInterface $sourceEntity,
         $convert = []
     ) {
         $this->sourceRepo   = $sourceRepo;
         $this->targetRepo   = $targetRepo;
+        $this->joinRepo     = $joinRepo;
         $this->sourceEntity = $sourceEntity;
         $this->convert      = $convert;
     }
@@ -52,14 +62,18 @@ class HasOne implements RelationInterface
      */
     public function query()
     {
-        $primaryKeys = $this->getPrimaryKeys();
-        return $this->targetRepo->query()
-                                ->condition($primaryKeys);
+        $primaryKeys = $this->sourceEntity->getKeys();
+        $primaryKeys = HelperMethods::convertDataKeys($primaryKeys, $this->convert);
+        $targetTable = $this->targetRepo->getTable();
+        return $this->targetRepo
+            ->query()
+            ->join($targetTable, $this->convert)
+            ->condition($primaryKeys);
     }
 
     /**
      * @param string $order
-     * @return RelationInterface
+     * @return JoinRelationInterface
      */
     public function orderBy($order)
     {
@@ -72,7 +86,7 @@ class HasOne implements RelationInterface
      */
     public function find($keys = [])
     {
-        return $this->query()->select($keys)->fetchAll();
+        return $this->query()->condition($keys)->select()->fetchAll();
     }
 
     /**
@@ -89,7 +103,7 @@ class HasOne implements RelationInterface
      */
     public function relate(EntityInterface $entity)
     {
-        $this->sourceEntity->relate($entity, $this->convert);
+        $this->joinRepo->insert($this->sourceEntity, $entity);
 
         return $entity;
     }
@@ -100,23 +114,22 @@ class HasOne implements RelationInterface
      */
     public function delete(EntityInterface $entity)
     {
-        $keys = $entity->getKeys();
-        $keys = HelperMethods::convertDataKeys($keys, $this->convert);
-        $this->sourceEntity->fill($keys);
-
-        return true;
+        return $this->joinRepo->delete($this->sourceEntity, $entity);
     }
 
     /**
-     * @return array
+     * @return bool
      */
-    private function getPrimaryKeys()
+    public function clear()
     {
-        $targetKeys  = $this->targetRepo->getKeyColumns();
-        $sourceData  = $this->sourceEntity->toArray();
-        $primaryKeys = HelperMethods::filterDataByKeys($sourceData, $targetKeys);
-        $primaryKeys = HelperMethods::convertDataKeys($primaryKeys, $this->convert);
+        return $this->joinRepo->delete($this->sourceEntity, null);
+    }
 
-        return $primaryKeys;
+    /**
+     * @return JoinEntityInterface[]
+     */
+    public function getJoinEntities()
+    {
+        return $this->joinRepo->selectFrom($this->sourceEntity);
     }
 }

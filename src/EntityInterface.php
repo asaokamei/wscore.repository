@@ -12,13 +12,8 @@ interface EntityInterface
     /**
      * @return array
      */
-    public static function getPrimaryKeyColumns();
+    public function getPrimaryKeyColumns();
 
-    /**
-     * @return array
-     */
-    public static function listColumns();
-    
     /**
      * @return array
      */

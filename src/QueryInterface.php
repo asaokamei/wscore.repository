@@ -17,6 +17,14 @@ interface QueryInterface
     public function getTable();
 
     /**
+     * @param int   $mode
+     * @param string $fetch_args
+     * @param array $ctor_args
+     * @return QueryInterface
+     */
+    public function setFetchMode($mode, $fetch_args = null, $ctor_args = []);
+
+    /**
      * @param array $condition
      * @return QueryInterface
      */
@@ -64,8 +72,7 @@ interface QueryInterface
      * @param string $join
      * @param array  $keys
      * @param array  $convert1
-     * @param array  $convert2
-     * @return PDOStatement
+     * @return QueryInterface
      */
-    public function join($join, $keys, $convert1 = [], $convert2 = []);
+    public function join($join, $keys, $convert1 = []);
 }

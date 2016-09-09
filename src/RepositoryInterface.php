@@ -4,14 +4,24 @@ namespace WScore\Repository;
 interface RepositoryInterface
 {
     /**
+     * @return string
+     */
+    public function getTable();
+
+    /**
      * @return string|EntityInterface
      */
-    public static function getEntityClass();
+    public function getEntityClass();
 
     /**
      * @return string[]
      */
-    public static function getKeyColumns();
+    public function getKeyColumns();
+
+    /**
+     * @return string[]
+     */
+    public function getColumnList();
 
     /**
      * @param string|array $keys
@@ -52,37 +62,5 @@ interface RepositoryInterface
     /**
      * @return QueryInterface
      */
-    public function getDao();
-
-    /**
-     * @param EntityInterface     $entity
-     * @param RepositoryInterface $repo
-     * @param array               $convert
-     * @return EntityInterface|null
-     */
-    public function hasOne(EntityInterface $entity, RepositoryInterface $repo, $convert = []);
-
-    /**
-     * @param EntityInterface     $entity
-     * @param RepositoryInterface $repo
-     * @param array               $convert
-     * @return EntityInterface[]
-     */
-    public function hasMany(EntityInterface $entity, RepositoryInterface $repo, $convert = []);
-
-    /**
-     * @param EntityInterface $entity
-     * @param RepositoryInterface $repo
-     * @param string|null $joinTable
-     * @param array $convert1
-     * @param array $convert2
-     * @return EntityInterface[]
-     */
-    public function hasJoin(
-        EntityInterface $entity,
-        RepositoryInterface $repo,
-        $joinTable = '',
-        $convert1 = [],
-        $convert2 = []
-    );
+    public function query();
 }

@@ -17,6 +17,11 @@ class AbstractJoinRepo implements JoinRepositoryInterface
     private $dao;
 
     /**
+     * @var array
+     */
+    private $primaryKeys = [];
+
+    /**
      * @var string|JoinEntityInterface
      */
     private $entity_class;
@@ -41,11 +46,11 @@ class AbstractJoinRepo implements JoinRepositoryInterface
      */
     public function select($entity)
     {
-        $class = ($this->from_repo)::getEntityClass();
+        $class = $this->from_repo->getEntityClass();
         if ($entity instanceof $class) {
             return $this->selectFrom($entity);
         }
-        $class = ($this->to_repo)::getEntityClass();
+        $class = $this->to_repo->getEntityClass();
         if ($entity instanceof $class) {
             return $this->selectTo($entity);
         }
@@ -93,7 +98,7 @@ class AbstractJoinRepo implements JoinRepositoryInterface
         $class = $this->entity_class;
         if ($id !== true) {
             // returned some id value. add the primary key to the data.
-            $data[$class::getPrimaryKeyColumns()[0]] = $id;
+            $data[$this->primaryKeys[0]] = $id;
         }
         return $class::create($data);
     }

@@ -4,6 +4,11 @@ namespace WScore\Repository;
 interface RelationInterface
 {
     /**
+     * @return QueryInterface
+     */
+    public function query();
+
+    /**
      * @param string $order
      * @return RelationInterface
      */
@@ -11,7 +16,7 @@ interface RelationInterface
 
     /**
      * @param array $keys
-     * @return EntityInterface
+     * @return EntityInterface[]
      */
     public function find($keys = []);
 
@@ -24,7 +29,7 @@ interface RelationInterface
      * @param EntityInterface $entity
      * @return EntityInterface
      */
-    public function save(EntityInterface $entity);
+    public function relate(EntityInterface $entity);
 
     /**
      * @param EntityInterface $entity
