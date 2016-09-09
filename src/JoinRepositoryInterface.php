@@ -4,6 +4,12 @@ namespace WScore\Repository;
 interface JoinRepositoryInterface
 {
     /**
+     * @param array $data
+     * @return JoinEntityInterface
+     */
+    public function create($data);
+
+    /**
      * @param EntityInterface $entity
      * @return JoinEntityInterface[]
      */
