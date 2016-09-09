@@ -1,4 +1,10 @@
 <?php
+namespace WScore\Repository\Helpers;
+
+use PDOStatement;
+use WScore\Repository\EntityInterface;
+use WScore\Repository\JoinRepositoryInterface;
+use WScore\Repository\RepositoryInterface;
 
 class RelationHelper
 {

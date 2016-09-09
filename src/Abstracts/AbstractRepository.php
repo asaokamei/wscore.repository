@@ -1,4 +1,12 @@
 <?php
+namespace WScore\Repository\Abstracts;
+
+use InvalidArgumentException;
+use PDOStatement;
+use WScore\Repository\EntityInterface;
+use WScore\Repository\Helpers\RelationHelper;
+use WScore\Repository\QueryInterface;
+use WScore\Repository\RepositoryInterface;
 
 abstract class AbstractRepository implements RepositoryInterface
 {

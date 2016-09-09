@@ -1,4 +1,13 @@
 <?php
+namespace WScore\Repository\Abstracts;
+
+use InvalidArgumentException;
+use WScore\Repository\EntityInterface;
+use WScore\Repository\Helpers\HelperMethods;
+use WScore\Repository\JoinEntityInterface;
+use WScore\Repository\JoinRepositoryInterface;
+use WScore\Repository\QueryInterface;
+use WScore\Repository\RepositoryInterface;
 
 class AbstractJoinRepo implements JoinRepositoryInterface
 {

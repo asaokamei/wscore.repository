@@ -1,6 +1,7 @@
 <?php
+namespace WScore\Repository;
 
-interface EntityCollectionInterface extends ArrayAccess, IteratorAggregate
+interface EntityCollectionInterface extends \ArrayAccess, \IteratorAggregate
 {
     /**
      * @return array

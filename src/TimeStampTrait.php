@@ -1,4 +1,5 @@
 <?php
+namespace WScore\Repository;
 
 trait TimeStampTrait
 {
@@ -29,7 +30,7 @@ trait TimeStampTrait
         if (isset($data[$column])) {
             return $data;
         }
-        $data[$column] = (new DateTime('now'))->format($this->getTimeStampFormat());
+        $data[$column] = (new \DateTime('now'))->format($this->getTimeStampFormat());
 
         return $data;
     }

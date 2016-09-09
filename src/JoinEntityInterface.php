@@ -1,4 +1,5 @@
 <?php
+namespace WScore\Repository;
 
 interface JoinEntityInterface extends EntityInterface
 {

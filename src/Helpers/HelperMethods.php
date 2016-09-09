@@ -1,4 +1,7 @@
 <?php
+namespace WScore\Repository\Helpers;
+
+use InvalidArgumentException;
 
 class HelperMethods
 {

@@ -1,10 +1,11 @@
 <?php
+namespace WScore\Repository;
 
 interface EntityInterface
 {
     /**
      * @param array $data
-     * @return self
+     * @return static
      */
     public static function create(array $data);
 

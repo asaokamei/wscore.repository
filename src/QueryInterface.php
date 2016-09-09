@@ -1,4 +1,7 @@
 <?php
+namespace WScore\Repository;
+
+use PDOStatement;
 
 interface QueryInterface
 {
