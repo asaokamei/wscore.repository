@@ -34,27 +34,27 @@ class JoinTo implements JoinRelationInterface
     /**
      * @var array
      */
-    private $convert;
+    private $join_on;
 
     /**
      * @param RepositoryInterface     $sourceRepo
      * @param RepositoryInterface     $targetRepo
      * @param JoinRepositoryInterface $joinRepo
      * @param EntityInterface         $sourceEntity
-     * @param array                   $convert
+     * @param array                   $join_on
      */
     public function __construct(
         RepositoryInterface $sourceRepo,
         RepositoryInterface $targetRepo,
         JoinRepositoryInterface $joinRepo,
         EntityInterface $sourceEntity,
-        $convert = []
+        $join_on = []
     ) {
         $this->sourceRepo   = $sourceRepo;
         $this->targetRepo   = $targetRepo;
         $this->joinRepo     = $joinRepo;
         $this->sourceEntity = $sourceEntity;
-        $this->convert      = $convert;
+        $this->join_on      = $join_on;
     }
 
     /**
@@ -63,11 +63,11 @@ class JoinTo implements JoinRelationInterface
     public function query()
     {
         $primaryKeys = $this->sourceEntity->getKeys();
-        $primaryKeys = HelperMethods::convertDataKeys($primaryKeys, $this->convert);
+        $primaryKeys = HelperMethods::convertDataKeys($primaryKeys, $this->join_on);
         $targetTable = $this->targetRepo->getTable();
         return $this->targetRepo
             ->query()
-            ->join($targetTable, $this->convert)
+            ->join($targetTable, $this->join_on)
             ->condition($primaryKeys);
     }
 

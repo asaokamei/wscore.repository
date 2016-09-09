@@ -161,7 +161,7 @@ use WScore\Repository\RepositoryInterface;
      */
     public function update(EntityInterface $entity)
     {
-        return $this->query()->update($entity->toArray());
+        return $this->query()->update($entity->getKeys(), $entity->toArray());
     }
 
     /**
