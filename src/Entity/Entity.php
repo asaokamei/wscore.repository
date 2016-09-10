@@ -1,7 +1,7 @@
 <?php
-namespace WScore\Repository\Generic;
+namespace WScore\Repository\Entity;
 
-use WScore\Repository\Abstracts\AbstractEntity;
+use WScore\Repository\Entity\AbstractEntity;
 
 class Entity extends AbstractEntity 
 {

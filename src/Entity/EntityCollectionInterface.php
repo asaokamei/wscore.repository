@@ -1,5 +1,7 @@
 <?php
-namespace WScore\Repository;
+namespace WScore\Repository\Entity;
+
+use WScore\Repository\Repository\RepositoryInterface;
 
 interface EntityCollectionInterface extends \ArrayAccess, \IteratorAggregate
 {

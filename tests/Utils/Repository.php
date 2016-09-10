@@ -1,7 +1,7 @@
 <?php
 namespace tests\Utils;
 
-use WScore\Repository\Abstracts\AbstractRepository;
+use WScore\Repository\Repository\AbstractRepository;
 
 class Repository extends AbstractRepository
 {

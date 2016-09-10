@@ -1,5 +1,7 @@
 <?php
-namespace WScore\Repository;
+namespace WScore\Repository\Relations;
+
+use WScore\Repository\Entity\EntityInterface;
 
 interface JoinRepositoryInterface
 {

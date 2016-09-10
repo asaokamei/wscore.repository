@@ -1,7 +1,7 @@
 <?php
-namespace WScore\Repository\Generic;
+namespace WScore\Repository\Repository;
 
-use WScore\Repository\Abstracts\AbstractRepository;
+use WScore\Repository\Entity\Entity;
 use WScore\Repository\QueryInterface;
 use WScore\Repository\Repo;
 

@@ -1,5 +1,5 @@
 <?php
-namespace WScore\Repository;
+namespace WScore\Repository\Entity;
 
 interface EntityInterface
 {

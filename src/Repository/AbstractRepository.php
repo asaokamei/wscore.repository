@@ -1,12 +1,11 @@
 <?php
-namespace WScore\Repository\Abstracts;
+namespace WScore\Repository\Repository;
 
 use InvalidArgumentException;
-use WScore\Repository\EntityInterface;
-use WScore\Repository\Generic\Entity;
+use WScore\Repository\Entity\EntityInterface;
+use WScore\Repository\Entity\Entity;
 use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\QueryInterface;
-use WScore\Repository\RepositoryInterface;
 
 /* abstract */ class AbstractRepository implements RepositoryInterface
 {

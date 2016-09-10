@@ -1,13 +1,10 @@
 <?php
-namespace WScore\Repository\Relation;
+namespace WScore\Repository\Relations;
 
-use WScore\Repository\EntityInterface;
+use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Helpers\HelperMethods;
-use WScore\Repository\JoinEntityInterface;
-use WScore\Repository\JoinRelationInterface;
-use WScore\Repository\JoinRepositoryInterface;
 use WScore\Repository\QueryInterface;
-use WScore\Repository\RepositoryInterface;
+use WScore\Repository\Repository\RepositoryInterface;
 
 class JoinTo implements JoinRelationInterface
 {

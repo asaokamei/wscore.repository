@@ -2,8 +2,8 @@
 namespace tests\Repository;
 
 use tests\Utils\Container;
-use WScore\Repository\Generic\Entity;
-use WScore\Repository\Generic\Repository;
+use WScore\Repository\Entity\Entity;
+use WScore\Repository\Repository\Repository;
 use WScore\Repository\QueryInterface;
 use WScore\Repository\Repo;
 

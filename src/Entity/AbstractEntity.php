@@ -1,8 +1,7 @@
 <?php
-namespace WScore\Repository\Abstracts;
+namespace WScore\Repository\Entity;
 
 use BadMethodCallException;
-use WScore\Repository\EntityInterface;
 use WScore\Repository\Helpers\HelperMethods;
 
 /* abstract */ class AbstractEntity implements EntityInterface

@@ -2,10 +2,13 @@
 namespace WScore\Repository;
 
 use Interop\Container\ContainerInterface;
-use WScore\Repository\Generic\Repository;
-use WScore\Repository\Relation\HasMany;
-use WScore\Repository\Relation\HasOne;
-use WScore\Repository\Relation\JoinTo;
+use WScore\Repository\Entity\EntityInterface;
+use WScore\Repository\Relations\JoinRepositoryInterface;
+use WScore\Repository\Repository\Repository;
+use WScore\Repository\Relations\HasMany;
+use WScore\Repository\Relations\HasOne;
+use WScore\Repository\Relations\JoinTo;
+use WScore\Repository\Repository\RepositoryInterface;
 
 class Repo
 {
@@ -31,7 +34,7 @@ class Repo
 
     /**
      * @param string $key
-     * @return RepositoryInterface
+     * @return RepositoryInterface|JoinRepositoryInterface
      */
     public function get($key)
     {
