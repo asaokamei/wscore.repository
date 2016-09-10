@@ -3,6 +3,7 @@ namespace WScore\Repository\Abstracts;
 
 use InvalidArgumentException;
 use WScore\Repository\EntityInterface;
+use WScore\Repository\Generic\Entity;
 use WScore\Repository\QueryInterface;
 use WScore\Repository\RepositoryInterface;
 
@@ -11,28 +12,41 @@ use WScore\Repository\RepositoryInterface;
     /**
      * @var QueryInterface
      */
-    protected $dao;
+    protected $query;
 
     /**
      * @var string
      */
-    private $table;
+    protected $table;
 
     /**
      * @var string[]
      */
-    private $primaryKeys = [];
+    protected $primaryKeys = [];
 
     /**
      * @var string[]
      */
-    private $columnList = [];
+    protected $columnList = [];
 
     /**
      * @var string|EntityInterface
      */
-    protected $entityClass;
+    protected $entityClass = Entity::class;
 
+    /**
+     * @var string[]
+     */
+    protected $timeStamps = [
+        'created_at' => null,
+        'updated_at' => null,
+    ];
+
+    /**
+     * @var string
+     */
+    protected $timeStampFormat = 'Y-m-d H:i:s';
+    
     /**
      * @return string
      */
@@ -145,7 +159,10 @@ use WScore\Repository\RepositoryInterface;
      */
     public function insert(EntityInterface $entity)
     {
-        if (!$id = $this->query()->insert($entity->toArray())) {
+        $data = $entity->toArray();
+        $data = $this->_addTimeStamps($data, 'created_at');
+        $data = $this->_addTimeStamps($data, 'updated_at');
+        if (!$id = $this->query()->insert($data)) {
             return null;
         }
         if ($id !== true) {
@@ -161,7 +178,9 @@ use WScore\Repository\RepositoryInterface;
      */
     public function update(EntityInterface $entity)
     {
-        return $this->query()->update($entity->getKeys(), $entity->toArray());
+        $data = $entity->toArray();
+        $data = $this->_addTimeStamps($data, 'updated_at');
+        return $this->query()->update($entity->getKeys(), $data);
     }
 
     /**
@@ -178,8 +197,27 @@ use WScore\Repository\RepositoryInterface;
      */
     public function query()
     {
-        return $this->dao
+        return $this->query
             ->withTable($this->table)
             ->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass, [$this->primaryKeys, $this->columnList]);
+    }
+
+    /**
+     * @param array  $data
+     * @param string $type
+     * @return array
+     */
+    protected function _addTimeStamps(array $data, $type)
+    {
+        if (!isset($this->timeStamps[$type])) {
+            return $data;
+        }
+        $column = $this->timeStamps[$type];
+        if (isset($data[$column])) {
+            return $data;
+        }
+        $data[$column] = (new \DateTime('now'))->format($this->timeStampFormat);
+
+        return $data;
     }
 }
