@@ -2,6 +2,7 @@
 namespace WScore\Repository;
 
 use Interop\Container\ContainerInterface;
+use WScore\Repository\Generic\Repository;
 use WScore\Repository\Relation\HasMany;
 use WScore\Repository\Relation\HasOne;
 use WScore\Repository\Relation\JoinTo;
@@ -14,15 +15,37 @@ class Repo
     private $container;
 
     /**
+     * @var RepositoryInterface[]
+     */
+    private $repositories = [];
+
+    /**
+     * Repo constructor.
+     *
+     * @param ContainerInterface $container
+     */
+    public function __construct($container)
+    {
+        $this->container = $container;
+    }
+
+    /**
      * @param string $key
-     * @return mixed|null
+     * @return RepositoryInterface
      */
     public function get($key)
     {
-        if ($this->container->has($key)) {
-            return $this->container->get($key);
+        if (isset($this->repositories[$key])) {
+            return $this->repositories[$key];
         }
-        return null;
+        if ($this->container->has($key)) {
+            return $this->repositories[$key] = $this->container->get($key);
+        }
+        $table = strpos($key, '\\') === false ? $key : (substr($key, strrpos($key, '\\') + 1));
+        if (isset($this->repositories[$table])) {
+            return $this->repositories[$table];
+        }
+        return $this->repositories[$table] = new Repository($this, $table);
     }
     
     /**

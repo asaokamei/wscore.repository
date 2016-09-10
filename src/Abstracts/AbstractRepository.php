@@ -4,6 +4,7 @@ namespace WScore\Repository\Abstracts;
 use InvalidArgumentException;
 use WScore\Repository\EntityInterface;
 use WScore\Repository\Generic\Entity;
+use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\QueryInterface;
 use WScore\Repository\RepositoryInterface;
 
@@ -126,7 +127,7 @@ use WScore\Repository\RepositoryInterface;
             $keys = [$this->getKeyColumnName() => $keys];
         }
         $statement = $this->query()->select($keys);
-        if (!$statement) {
+        if (!$statement->rowCount()) {
             return null;
         }
         if ($statement->rowCount() !== 1) {
@@ -179,6 +180,7 @@ use WScore\Repository\RepositoryInterface;
     public function update(EntityInterface $entity)
     {
         $data = $entity->toArray();
+        $data = HelperMethods::removeDataByKeys($data, $this->getKeyColumns());
         $data = $this->_addTimeStamps($data, 'updated_at');
         return $this->query()->update($entity->getKeys(), $data);
     }

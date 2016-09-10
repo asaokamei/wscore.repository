@@ -25,7 +25,7 @@ use WScore\Repository\Helpers\HelperMethods;
     /**
      * @var string[]
      */
-    private $columnList = [];
+    protected $columnList = [];
     
     /**
      * sets value object class name for each column.
@@ -44,7 +44,7 @@ use WScore\Repository\Helpers\HelperMethods;
      *
      * @var bool
      */
-    private $isFetchDone = false;
+    protected $isFetchDone = false;
 
     /**
      * a flag indicating that this entity is fetched
@@ -52,20 +52,7 @@ use WScore\Repository\Helpers\HelperMethods;
      *
      * @var bool
      */
-    private $isFetched = false;
-
-    /**
-     * Entity constructor.
-     *
-     * @param array $primaryKeys
-     * @param array $columnList
-     */
-    public function __construct(array $primaryKeys, array $columnList = [])
-    {
-        $this->primaryKeys = $primaryKeys;
-        $this->columnList  = $columnList;
-        $this->isFetchDone = true;
-    }
+    protected $isFetched = false;
 
     /**
      * @return array

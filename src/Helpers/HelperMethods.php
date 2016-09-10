@@ -23,6 +23,21 @@ class HelperMethods
 
     /**
      * @param array $input
+     * @param array $keys
+     * @return array
+     */
+    public static function removeDataByKeys(array $input, array $keys)
+    {
+        foreach($keys as $key) {
+            if (array_key_exists($key, $input)) {
+                unset($input[$key]);
+            }
+        }
+        return $input;
+    }
+
+    /**
+     * @param array $input
      * @param array $convert
      * @return array
      */
