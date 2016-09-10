@@ -1,6 +1,7 @@
 <?php
 namespace WScore\Repository;
 
+use Interop\Container\ContainerInterface;
 use WScore\Repository\Relation\HasMany;
 use WScore\Repository\Relation\HasOne;
 use WScore\Repository\Relation\JoinTo;
@@ -8,21 +9,33 @@ use WScore\Repository\Relation\JoinTo;
 class Repo
 {
     /**
-     * @var RelationInterface[]|JoinRepositoryInterface[]
+     * @var ContainerInterface
      */
     private $container;
 
     /**
+     * @param string $key
+     * @return mixed|null
+     */
+    public function get($key)
+    {
+        if ($this->container->has($key)) {
+            return $this->container->get($key);
+        }
+        return null;
+    }
+    
+    /**
      * @param RepositoryInterface $sourceRepo
-     * @param EntityInterface     $entity
      * @param RepositoryInterface $repo
+     * @param EntityInterface     $entity
      * @param array               $convert
      * @return HasOne
      */
     public function hasOne(
         RepositoryInterface $sourceRepo,
-        EntityInterface $entity,
         RepositoryInterface $repo,
+        EntityInterface $entity,
         $convert = []
     ) {
         return new HasOne($sourceRepo, $repo, $entity, $convert);
@@ -30,15 +43,15 @@ class Repo
 
     /**
      * @param RepositoryInterface $sourceRepo
-     * @param EntityInterface     $entity
      * @param RepositoryInterface $repo
+     * @param EntityInterface     $entity
      * @param array               $convert
      * @return HasMany
      */
     public function hasMany(
         RepositoryInterface $sourceRepo,
-        EntityInterface $entity,
         RepositoryInterface $repo,
+        EntityInterface $entity,
         $convert = []
     ) {
         return new HasMany($sourceRepo, $repo, $entity, $convert);
@@ -60,7 +73,7 @@ class Repo
         $convert = []
     ) {
         $joinTable = $joinTable ?: $this->makeJoinTableName($targetRepo, $sourceRepo);
-        $join      = $this->container[$joinTable];
+        $join      = $this->get($joinTable);
         return new JoinTo($sourceRepo, $targetRepo, $join, $entity, $convert);
     }
 
