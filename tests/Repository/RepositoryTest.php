@@ -4,7 +4,7 @@ namespace tests\Repository;
 use tests\Utils\Query;
 use tests\Utils\Repository;
 use WScore\Repository\Entity\Entity;
-use WScore\Repository\QueryInterface;
+use WScore\Repository\Query\QueryInterface;
 
 class RepositoryTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,7 +2,7 @@
 namespace WScore\Repository\Relations;
 
 use WScore\Repository\Entity\EntityInterface;
-use WScore\Repository\QueryInterface;
+use WScore\Repository\Query\QueryInterface;
 
 interface RelationInterface
 {

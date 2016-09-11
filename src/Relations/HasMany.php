@@ -3,7 +3,7 @@ namespace WScore\Repository\Relations;
 
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Helpers\HelperMethods;
-use WScore\Repository\QueryInterface;
+use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
 class HasMany implements RelationInterface

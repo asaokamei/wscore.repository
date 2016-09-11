@@ -5,7 +5,7 @@ use InvalidArgumentException;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Helpers\HelperMethods;
-use WScore\Repository\QueryInterface;
+use WScore\Repository\Query\QueryInterface;
 
 /* abstract */ class AbstractRepository implements RepositoryInterface
 {

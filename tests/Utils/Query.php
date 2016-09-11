@@ -2,7 +2,7 @@
 namespace tests\Utils;
 
 use PDOStatement;
-use WScore\Repository\QueryInterface;
+use WScore\Repository\Query\QueryInterface;
 
 class Query implements QueryInterface 
 {

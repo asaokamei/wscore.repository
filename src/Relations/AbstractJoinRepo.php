@@ -4,7 +4,7 @@ namespace WScore\Repository\Relations;
 use InvalidArgumentException;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Helpers\HelperMethods;
-use WScore\Repository\QueryInterface;
+use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
 /* abstract */ class AbstractJoinRepo implements JoinRepositoryInterface

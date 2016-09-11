@@ -4,7 +4,7 @@ namespace WScore\Repository\Entity;
 use BadMethodCallException;
 use WScore\Repository\Helpers\HelperMethods;
 
-/* abstract */ class AbstractEntity implements EntityInterface
+abstract class AbstractEntity implements EntityInterface
 {
     /**
      * @var array
@@ -92,6 +92,7 @@ use WScore\Repository\Helpers\HelperMethods;
             throw new BadMethodCallException('cannot set primary key on a fetched entity.');
         }
         $this->data[$this::getPrimaryKeyColumns()[0]] = $id;
+        $this->isFetched = true;
     }
 
     /**
