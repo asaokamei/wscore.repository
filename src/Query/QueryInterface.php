@@ -1,5 +1,5 @@
 <?php
-namespace WScore\Repository;
+namespace WScore\Repository\Query;
 
 use PDOStatement;
 
@@ -69,13 +69,19 @@ interface QueryInterface
     
     /**
      * insert a data into a database table.
-     * returns the new ID of auto-increment column if exists,
-     * or true if no such column.
      *
      * @param array $data
-     * @return string|bool
+     * @return bool
      */
     public function insert(array $data);
+
+    /**
+     * returns the last inserted ID.
+     * 
+     * @param array $keys
+     * @return string
+     */
+    public function lastId(array $keys);
 
     /**
      * updates the value as $data for rows selected by $keys.

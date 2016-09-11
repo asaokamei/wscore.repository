@@ -15,26 +15,31 @@ use WScore\Repository\Query\QueryInterface;
     protected $query;
 
     /**
+     * @Override
      * @var string
      */
     protected $table;
 
     /**
+     * @Override
      * @var string[]
      */
     protected $primaryKeys = [];
 
     /**
+     * @Override
      * @var string[]
      */
     protected $columnList = [];
 
     /**
+     * @Override
      * @var string|EntityInterface
      */
     protected $entityClass = Entity::class;
 
     /**
+     * @Override
      * @var string[]
      */
     protected $timeStamps = [
@@ -43,10 +48,17 @@ use WScore\Repository\Query\QueryInterface;
     ];
 
     /**
+     * @Override
      * @var string
      */
     protected $timeStampFormat = 'Y-m-d H:i:s';
-    
+
+    /**
+     * @Override
+     * @var bool
+     */
+    private $useAutoInsertId = false;
+
     /**
      * @return string
      */
@@ -165,7 +177,7 @@ use WScore\Repository\Query\QueryInterface;
         if (!$id = $this->query()->insert($data)) {
             return null;
         }
-        if ($id !== true) {
+        if ($this->useAutoInsertId && $id = $this->query()->lastId($this->getKeyColumnName())) {
             $entity->setPrimaryKeyOnCreatedEntity($id);
         }
 
