@@ -13,7 +13,7 @@
 >
     <testsuites>
         <testsuite name="testing repositories">
-            <directory>./tests/</directory>
+            <directory>./tests/Repository</directory>
         </testsuite>
     </testsuites>
     <filter>

@@ -155,4 +155,15 @@ class Query implements QueryInterface
     {
         throw new \BadMethodCallException('not ready');
     }
+
+    /**
+     * returns the last inserted ID.
+     *
+     * @param array $keys
+     * @return string
+     */
+    public function lastId(array $keys)
+    {
+        return 1;
+    }
 }
