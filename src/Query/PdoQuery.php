@@ -32,6 +32,16 @@ class PdoQuery implements QueryInterface
     private $orderBy = [];
 
     /**
+     * PdoQuery constructor.
+     *
+     * @param PDO $pdo
+     */
+    public function __construct($pdo)
+    {
+        $this->pdo = $pdo;
+    }
+
+    /**
      * @return SqlBuilder
      */
     private function sql()

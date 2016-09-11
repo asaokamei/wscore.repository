@@ -2,7 +2,10 @@
 namespace WScore\Repository;
 
 use Interop\Container\ContainerInterface;
+use PDO;
 use WScore\Repository\Entity\EntityInterface;
+use WScore\Repository\Query\PdoQuery;
+use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Relations\JoinRepositoryInterface;
 use WScore\Repository\Repository\Repository;
 use WScore\Repository\Relations\HasMany;
@@ -26,10 +29,16 @@ class Repo
      * Repo constructor.
      *
      * @param ContainerInterface $container
+     * @param PDO|null           $pdo
      */
-    public function __construct($container)
+    public function __construct($container, $pdo = null)
     {
         $this->container = $container;
+        // use default classes if not set. 
+        if (!$this->container->has(QueryInterface::class)) {
+            $pdo = $pdo ?: $this->container->get(PDO::class);
+            $this->repositories[QueryInterface::class] = new PdoQuery($pdo);
+        }
     }
 
     /**
