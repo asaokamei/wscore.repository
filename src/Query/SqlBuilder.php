@@ -4,6 +4,14 @@ namespace WScore\Repository\Query;
 use PDO;
 use PDOStatement;
 
+/**
+ * Class SqlBuilder
+ * 
+ * Simple Sql builder that has restricted feature. 
+ * Only for WScore/Repository use. 
+ *
+ * @package WScore\Repository\Query
+ */
 class SqlBuilder
 {
     /**
@@ -37,7 +45,7 @@ class SqlBuilder
         $where = $this->makeWhere();
         $order = $this->makeOrder();
 
-        $sql       = "SELECT * FROM {$table} WHERE {$where} ORDER BY {$order}";
+        $sql       = "SELECT * FROM {$table}{$where}{$order}";
         $statement = $this->pdo->prepare($sql);
         $statement->execute($this->params);
 
@@ -54,7 +62,7 @@ class SqlBuilder
         $where = $this->makeWhere();
         $order = $this->makeOrder();
 
-        $sql       = "SELECT COUNT(*) AS count FROM {$table} WHERE {$where} ORDER BY {$order}";
+        $sql       = "SELECT COUNT(*) AS count FROM {$table}{$where}{$order}";
         $statement = $this->pdo->prepare($sql);
         $statement->execute($this->params);
 
@@ -99,18 +107,10 @@ class SqlBuilder
         $sets  = implode(', ', $sets);
         $where = $this->makeWhere();
 
-        $sql       = "UPDATE {$table} SET ({$sets}) WHERE {$where};";
+        $sql       = "UPDATE {$table} SET {$sets}{$where};";
         $statement = $this->pdo->prepare($sql);
 
         return $statement->execute($this->params);
-    }
-
-    /**
-     * @return array
-     */
-    public function getParameters()
-    {
-        return $this->params;
     }
 
     private function cleanUp()
@@ -158,16 +158,16 @@ class SqlBuilder
      */
     private function makeWhere()
     {
-        $conditions = $this->get('conditions');
+        $conditions = $this->get('conditions', []);
         $where      = [];
-        foreach ($conditions as $spec) {
-            $column = $spec[0];
-            $value  = $spec[1];
-            // $ope = $spec[2];
+        foreach ($conditions as $column => $value) {
             $where[] = "{$column} = " . $this->getHolderName($value);
         }
 
-        return implode(' AND ', $where);
+        if (empty($where)) {
+            return '';
+        }
+        return ' WHERE ' . implode(' AND ', $where);
     }
 
     /**
@@ -175,7 +175,7 @@ class SqlBuilder
      */
     private function makeOrder()
     {
-        $orderBy = $this->get('orderBy');
+        $orderBy = $this->get('orderBy', []);
         $order   = [];
         foreach ($orderBy as $spec) {
             $column  = $spec[0];
@@ -183,6 +183,9 @@ class SqlBuilder
             $order[] = "{$column} {$dir}";
         }
 
-        return implode(', ', $order);
+        if (empty($order)) {
+            return '';
+        }
+        return ' ORDER BY ' . implode(', ', $order);
     }
 }
