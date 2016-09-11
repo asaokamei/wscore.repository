@@ -59,7 +59,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Entity::class, $dao->getEntityClass());
         $entity = $dao->create([]);
         $this->assertEquals(Entity::class, get_class($entity));
-        $this->assertEquals($dao->getKeyColumns(), $entity->getPrimaryKeyColumns());
+        $this->assertEquals($dao->getKeyColumns(), $entity->getKeyColumns());
     }
 
     /**

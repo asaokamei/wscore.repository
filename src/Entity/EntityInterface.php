@@ -6,7 +6,7 @@ interface EntityInterface
     /**
      * @return array
      */
-    public function getPrimaryKeyColumns();
+    public function getKeyColumns();
 
     /**
      * @return string[]

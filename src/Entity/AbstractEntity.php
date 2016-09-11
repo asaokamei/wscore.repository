@@ -56,7 +56,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * @return array
      */
-    public function getPrimaryKeyColumns()
+    public function getKeyColumns()
     {
         return $this->primaryKeys;
     }
@@ -91,8 +91,8 @@ abstract class AbstractEntity implements EntityInterface
         if ($this->isFetched) {
             throw new BadMethodCallException('cannot set primary key on a fetched entity.');
         }
-        $this->data[$this::getPrimaryKeyColumns()[0]] = $id;
-        $this->isFetched = true;
+        $this->data[$this::getKeyColumns()[0]] = $id;
+        $this->isFetched                       = true;
     }
 
     /**
@@ -143,7 +143,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function getKeys()
     {
-        return HelperMethods::filterDataByKeys($this->data, $this->getPrimaryKeyColumns());
+        return HelperMethods::filterDataByKeys($this->data, $this->getKeyColumns());
     }
 
     /**
