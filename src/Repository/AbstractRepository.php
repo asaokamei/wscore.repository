@@ -138,14 +138,12 @@ use WScore\Repository\Query\QueryInterface;
             $keys = [$this->getKeyColumnName() => $keys];
         }
         $statement = $this->query()->select($keys);
-        if (!$statement->rowCount()) {
-            return null;
-        }
-        if ($statement->rowCount() !== 1) {
+        $entity    = $statement->fetch();
+        if ($statement->fetch()) {
             throw new InvalidArgumentException('more than 1 found for findByKey.');
         }
 
-        return $statement->fetch();
+        return $entity;
     }
 
     /**

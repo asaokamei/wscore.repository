@@ -46,7 +46,7 @@ class Fixture
         $create  /** @lang SQLite */
             =<<<SQL
 CREATE TABLE users (
-    user_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    users_id     INTEGER PRIMARY KEY AUTOINCREMENT,
     name        VARCHAR(64) NOT NULL UNIQUE,
     gender      INTEGER,
     created_at  DATETIME,

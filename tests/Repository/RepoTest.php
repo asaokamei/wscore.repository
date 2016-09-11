@@ -1,6 +1,8 @@
 <?php
 namespace tests\Repository;
 
+use PDO;
+use tests\Fixture;
 use tests\Utils\Container;
 use tests\Utils\Query;
 use WScore\Repository\Entity\Entity;
@@ -14,7 +16,17 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      * @var Repo
      */
     private $repo;
-    
+
+    /**
+     * @var PDO
+     */
+    private $pdo;
+
+    /**
+     * @var Fixture
+     */
+    private $fix;
+
     function setup()
     {
         class_exists(Container::class);
@@ -22,7 +34,9 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         class_exists(Repository::class);
         class_exists(Query::class);
         
-        $this->repo = new Repo();
+        $this->pdo  = new PDO('sqlite::memory:');
+        $this->fix  = new Fixture($this->pdo);
+        $this->repo = new Repo(null, $this->pdo);
     }
 
     /**
@@ -61,5 +75,20 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('tested', $repo->getRepository('testing'));
         $query = $repo->getRepository('query')->query();
         $this->assertEquals('query', $query->getTable());
+    }
+    
+    function test0()
+    {
+        $this->fix->createUsers();
+        $this->fix->insertUsers(2);
+        $users = $this->repo->getRepository('users');
+        
+        $user1 = $users->findByKey(1);
+        $this->assertEquals(['users_id' => 1], $user1->getKeys());
+        $this->assertEquals('name-1', $user1->get('name'));
+        
+        $user2 = $users->find(['name' => 'name-2'])[0];
+        $this->assertEquals(['users_id' => 2], $user2->getKeys());
+        $this->assertEquals('name-2', $user2->get('name'));
     }
 }

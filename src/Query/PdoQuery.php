@@ -46,7 +46,11 @@ class PdoQuery implements QueryInterface
      */
     private function sql()
     {
-        $info = get_object_vars($this);
+        $info = [
+            'table'      => $this->table,
+            'conditions' => $this->conditions,
+            'orderBy'    => $this->orderBy,
+        ];
         return new SqlBuilder($this->pdo, $info);
     }
     
@@ -59,8 +63,9 @@ class PdoQuery implements QueryInterface
      */
     public function withTable($table)
     {
-        $this->table = $table;
-        return $this;
+        $self = clone($this);
+        $self->table = $table;
+        return $self;
     }
 
     /**
@@ -100,7 +105,7 @@ class PdoQuery implements QueryInterface
      */
     public function condition(array $condition)
     {
-        $this->conditions[] = $condition;
+        $this->conditions = array_merge($this->conditions, $condition);
         return $this;
     }
 
@@ -126,6 +131,7 @@ class PdoQuery implements QueryInterface
      */
     public function select($keys = [])
     {
+        $this->condition($keys);
         $stmt = $this->sql()->execSelect();
         /** @noinspection PhpMethodParametersCountMismatchInspection */
         $stmt->setFetchMode(

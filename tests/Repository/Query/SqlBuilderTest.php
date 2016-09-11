@@ -78,7 +78,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
 
         $sql = new SqlBuilder($this->pdo, [
             'table' => 'users',
-            'conditions' => ['user_id' => 2]
+            'conditions' => ['users_id' => 2]
         ]);
         $sql->execUpdate([
             'name' => 'test-update'
@@ -104,7 +104,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
         $sql = new SqlBuilder($this->pdo, [
             'table' => 'users',
             'orderBy' => [ 
-                ['user_id', 'DESC' ]
+                ['users_id', 'DESC' ]
             ],
         ]);
         $stmt = $sql->execSelect();
@@ -150,7 +150,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
 
         $sql = new SqlBuilder($this->pdo, [
             'table' => 'users',
-            'conditions' => ['user_id' => '1'],
+            'conditions' => ['users_id' => '1'],
         ]);
         $sql->execDelete();
 
