@@ -134,4 +134,32 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(3, $sql->execCount());
     }
+
+    /**
+     * @test
+     */
+    function execDelete()
+    {
+        $this->fix->createUsers();
+        $this->fix->insertUsers(2);
+        $sql = new SqlBuilder($this->pdo, [
+            'table' => 'users',
+        ]);
+
+        $this->assertEquals(2, $sql->execCount());
+
+        $sql = new SqlBuilder($this->pdo, [
+            'table' => 'users',
+            'conditions' => ['user_id' => '1'],
+        ]);
+        $sql->execDelete();
+
+        $sql = new SqlBuilder($this->pdo, [
+            'table' => 'users',
+        ]);
+        $this->assertEquals(1, $sql->execCount());
+        $stmt = $sql->execSelect();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->assertEquals('name-2', $data['name']);
+    }
 }

@@ -188,7 +188,8 @@ class PdoQuery implements QueryInterface
      */
     public function delete($keys)
     {
-        // TODO: Implement delete() method.
+        $this->condition($keys);
+        return $this->sql()->execDelete();
     }
 
     /**

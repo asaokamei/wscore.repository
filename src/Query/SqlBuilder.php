@@ -113,6 +113,21 @@ class SqlBuilder
         return $statement->execute($this->params);
     }
 
+    /**
+     * @return bool
+     */
+    public function execDelete()
+    {
+        $this->cleanUp();
+        $table = $this->makeTable();
+        $where = $this->makeWhere();
+
+        $sql       = "DELETE FROM {$table}{$where};";
+        $statement = $this->pdo->prepare($sql);
+
+        return $statement->execute($this->params);
+    }
+
     private function cleanUp()
     {
         $this->params      = [];
