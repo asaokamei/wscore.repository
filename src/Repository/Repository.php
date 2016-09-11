@@ -18,6 +18,6 @@ class Repository extends AbstractRepository
         $this->table       = $table;
         $this->primaryKeys = $primaryKeys ?: ["{$table}_id"];
         $this->entityClass = $entityClass ?: Entity::class;
-        $this->query       = $this->repo->get(QueryInterface::class);
+        $this->query       = $this->repo->getRepository(QueryInterface::class);
     }
 }

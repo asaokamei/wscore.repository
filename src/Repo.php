@@ -6,6 +6,7 @@ use PDO;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Query\QueryInterface;
+use WScore\Repository\Relations\GenericJoinRepo;
 use WScore\Repository\Relations\JoinRepositoryInterface;
 use WScore\Repository\Repository\Repository;
 use WScore\Repository\Relations\HasMany;
@@ -21,7 +22,7 @@ class Repo
     private $container;
 
     /**
-     * @var RepositoryInterface[]
+     * @var RepositoryInterface[]|JoinRepositoryInterface[]
      */
     private $repositories = [];
 
@@ -31,33 +32,64 @@ class Repo
      * @param ContainerInterface $container
      * @param PDO|null           $pdo
      */
-    public function __construct($container, $pdo = null)
+    public function __construct($container = null, $pdo = null)
     {
         $this->container = $container;
         // use default classes if not set. 
-        if (!$this->container->has(QueryInterface::class)) {
-            $pdo = $pdo ?: $this->container->get(PDO::class);
+        if (!$this->_has(QueryInterface::class)) {
+            $pdo = $pdo ?: $this->_get(PDO::class);
             $this->repositories[QueryInterface::class] = new PdoQuery($pdo);
         }
     }
 
     /**
      * @param string $key
-     * @return RepositoryInterface|JoinRepositoryInterface
+     * @return RepositoryInterface
      */
-    public function get($key)
+    public function getRepository($key)
+    {
+        if ($repo = $this->_get($key)) {
+            return $repo;
+        }
+        return $this->repositories[$key] = new Repository($this, $key);
+    }
+
+    /**
+     * @param $key
+     * @return null|JoinRepositoryInterface|RepositoryInterface
+     */
+    private function _get($key)
     {
         if (isset($this->repositories[$key])) {
             return $this->repositories[$key];
         }
-        if ($this->container->has($key)) {
+        if ($this->container && $this->container->has($key)) {
             return $this->repositories[$key] = $this->container->get($key);
         }
-        $table = strpos($key, '\\') === false ? $key : (substr($key, strrpos($key, '\\') + 1));
-        if (isset($this->repositories[$table])) {
-            return $this->repositories[$table];
+        return null;
+    }
+    
+    private function _has($key)
+    {
+        if (isset($this->repositories[$key])) {
+            return true;
         }
-        return $this->repositories[$table] = new Repository($this, $table);
+        if ($this->container && $this->container->has($key)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param string $key
+     * @return JoinRepositoryInterface
+     */
+    public function getJoinRepository($key)
+    {
+        if ($repo = $this->_get($key)) {
+            return $repo;
+        }
+        return $this->repositories[$key] = new GenericJoinRepo();
     }
     
     /**
@@ -108,7 +140,7 @@ class Repo
         $convert = []
     ) {
         $joinTable = $joinTable ?: $this->makeJoinTableName($targetRepo, $sourceRepo);
-        $join      = $this->get($joinTable);
+        $join      = $this->getJoinRepository($joinTable);
         return new JoinTo($sourceRepo, $targetRepo, $join, $entity, $convert);
     }
 
