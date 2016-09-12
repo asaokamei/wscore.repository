@@ -167,7 +167,9 @@ class RepoTest extends \PHPUnit_Framework_TestCase
             'name' => 'test-insert',
             'gender' => 'T',
                        ]);
+        $this->assertFalse($userN->isFetched());
         $users->insert($userN);
+        $this->assertTrue($userN->isFetched());
 
         $user2 = $users->findByKey(2);
         $this->assertEquals($userN->getKeys(), $user2->getKeys());
