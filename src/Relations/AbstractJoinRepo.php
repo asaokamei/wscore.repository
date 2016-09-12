@@ -10,106 +10,277 @@ use WScore\Repository\Repository\RepositoryInterface;
 /* abstract */ class AbstractJoinRepo implements JoinRepositoryInterface
 {
     /**
+     * @var string
+     */
+    protected $table;
+    
+    /**
      * @var QueryInterface
      */
-    private $dao;
+    protected $query;
 
     /**
      * @var array
      */
-    private $primaryKeys = [];
+    protected $primaryKeys = [];
 
     /**
-     * @var string|JoinEntityInterface
+     * @Override
+     * @var string[]
      */
-    private $entity_class;
+    protected $columnList = [];
+    
+    /**
+     * @Override
+     * @var string|EntityInterface
+     */
+    protected $entityClass;
 
     /**
-     * @var string|RepositoryInterface
+     * @Override
+     * @var string
      */
-    private $from_repo;
+    protected $from_table;
 
-    private $from_convert = [];
+    protected $from_convert = [];
 
     /**
-     * @var string|RepositoryInterface
+     * @Override
+     * @var RepositoryInterface
      */
-    private $to_repo;
+    protected $from_repo;
+    
+    /**
+     * @Override
+     * @var string
+     */
+    protected $to_table;
 
-    private $to_convert = [];
+    protected $to_convert = [];
+
+    /**
+     * @Override
+     * @var RepositoryInterface
+     */
+    protected $to_repo;
+
+    /**
+     * AbstractJoinRepo constructor.
+     *
+     * @param RepositoryInterface $fromRepo
+     * @param RepositoryInterface $toRepo
+     */
+    public function __construct($fromRepo, $toRepo)
+    {
+        $tabs = [$fromRepo->getTable(), $toRepo->getTable()];
+        $repo = [$fromRepo->getTable() => $fromRepo, $toRepo->getTable() => $toRepo];
+        sort($tabs);
+        ksort($repo);
+        $this->from_table = $tabs[0];
+        $this->from_repo  = $repo[$this->from_table];
+        foreach($this->from_repo->getKeyColumns() as $key) {
+            $this->from_convert[$key] = $this->from_table . '_' . $key;
+        }
+        $this->to_table = $tabs[1];
+        $this->to_repo  = $repo[$this->to_table];
+        foreach($this->to_repo->getKeyColumns() as $key) {
+            $this->to_convert[$key] = $this->to_table . '_' . $key;
+        }
+        $this->table = "{$this->from_table}_{$this->to_table}";
+        $this->primaryKeys = [$this->table . '_id'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @return string|EntityInterface
+     */
+    public function getEntityClass()
+    {
+        return $this->entityClass;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getKeyColumns()
+    {
+        return $this->primaryKeys;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getColumnList()
+    {
+        return $this->columnList;
+    }
 
     /**
      * @param array $data
-     * @return JoinEntityInterface
+     * @return EntityInterface
      */
     public function create($data)
     {
-        /** @var JoinEntityInterface $entity */
-        $entity = new $this->entity_class($this->primaryKeys);
+        /** @var EntityInterface $entity */
+        $entity = new $this->entityClass($this->table, $this->primaryKeys, $this->columnList);
         $entity->fill($data);
         return $entity;
     }
 
     /**
      * @param EntityInterface $entity
-     * @return JoinEntityInterface[]
+     * @param bool            $getOpposite
+     * @return string
+     */
+    private function getFromOrTo($entity, $getOpposite = false)
+    {
+        if ($entity->getTable() === $this->from_table) {
+            $target = ['to', 'from'];
+        } elseif ($entity->getTable() === $this->from_table) {
+            $target = ['from', 'to'];
+        } else {
+            throw new InvalidArgumentException('entity not from nor to table.');
+        }
+        if ($getOpposite) {
+            return $target[1];
+        }
+        return $target[0];
+    }
+
+    /**
+     * @param EntityInterface $entity
+     * @return array
+     */
+    private function getConvert($entity)
+    {
+        $fromTo = $this->getFromOrTo($entity);
+        return $fromTo === 'from' ? $this->from_convert : $this->to_convert;
+    }
+
+    /**
+     * @param EntityInterface $entity
+     * @return array
+     */
+    private function getConvertedKeys($entity)
+    {
+        return HelperMethods::convertDataKeys($entity->getKeys(), $this->getConvert($entity));
+    }
+
+    /**
+     * returns QueryInterface on join table.
+     * 
+     * @param EntityInterface|null $entity1
+     * @param EntityInterface|null $entity2
+     * @return QueryInterface
+     */
+    public function queryJoin($entity1 = null, $entity2 = null)
+    {
+        $keys = [];
+        if ($entity1) {
+            $keys = $this->getConvertedKeys($entity1);
+        }
+        if ($entity2) {
+            $keys = array_merge(
+                $keys,
+                $this->getConvertedKeys($entity2)
+            );
+        }
+        return $this->query
+            ->withTable($this->table)
+            ->condition($keys)
+            ->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass, [$this->table, $this->primaryKeys, []]);
+    }
+
+    /**
+     * returns QueryInterface on targeted table, opposite of $entity's table. 
+     * 
+     * @param EntityInterface $entity
+     * @return QueryInterface
+     */
+    public function queryTarget($entity)
+    {
+        $fromTo = $this->getFromOrTo($entity, false);
+        $method = "query" . $fromTo;
+        return $this->$method($entity);
+    }
+    
+    /**
+     * @param EntityInterface|null $entity
+     * @return QueryInterface
+     */
+    protected function queryFrom($entity = null)
+    {
+        $keys = $entity
+            ? $this->getConvertedKeys($entity)
+            : [];
+
+        return $this->from_repo
+            ->query()
+            ->condition($keys)
+            ->join($this->table, $this->from_convert);
+    }
+
+    /**
+     * @param EntityInterface|null $entity
+     * @return QueryInterface
+     */
+    protected function queryTo($entity = null)
+    {
+        $keys = $entity
+            ? $this->getConvertedKeys($entity)
+            : [];
+
+        return $this->to_repo
+            ->query()
+            ->condition($keys)
+            ->join($this->table, $this->from_convert);
+    }
+
+    /**
+     * @param string $key
+     * @return EntityInterface
+     */
+    public function findByKey($key)
+    {
+        $primaryKey = $this->primaryKeys[0];
+        return $this->queryJoin()
+            ->select([$primaryKey => $key])
+            ->fetch();
+    }
+
+    /**
+     * @param EntityInterface $entity
+     * @return EntityInterface[]
      */
     public function select($entity)
     {
-        $class = $this->from_repo->getEntityClass();
-        if ($entity instanceof $class) {
-            return $this->selectFrom($entity);
-        }
-        $class = $this->to_repo->getEntityClass();
-        if ($entity instanceof $class) {
-            return $this->selectTo($entity);
-        }
-        throw new InvalidArgumentException('entity class is not either from or to.');
+        return $this->queryTarget($entity)
+            ->select()
+            ->fetchAll();
     }
-
-    /**
-     * @param EntityInterface $entity
-     * @return JoinEntityInterface[]
-     */
-    public function selectFrom($entity)
-    {
-        $keys = $this->makeKeys($entity);
-        $stmt = $this->dao->select($keys);
-
-        return $stmt->fetchObject($this->entity_class);
-    }
-
-    /**
-     * @param EntityInterface $entity
-     * @return JoinEntityInterface[]
-     */
-    public function selectTo($entity)
-    {
-        $keys = $this->makeKeys(null, $entity);
-        $stmt = $this->dao->select($keys);
-
-        return $stmt->fetchObject($this->entity_class);
-    }
-
+    
     /**
      * @param EntityInterface $entity1
      * @param EntityInterface $entity2
-     * @return bool|JoinEntityInterface
+     * @return bool|string
      */
     public function insert($entity1, $entity2)
     {
-        $keys1 = HelperMethods::convertDataKeys($entity1->getKeys(), $this->from_convert);
-        $keys2 = HelperMethods::convertDataKeys($entity2->getKeys(), $this->to_convert);
-        $data  = array_merge($keys1, $keys2);
-
-        if (!$id = $this->dao->insert($data)) {
-            return null; // failed to insert...
+        $data = array_merge(
+            HelperMethods::convertDataKeys($entity1->getKeys(), $this->getConvert($entity1)),
+            HelperMethods::convertDataKeys($entity2->getKeys(), $this->getConvert($entity2))
+        );
+        if (!$id = $this->queryJoin()->insert($data)) {
+            return false; // failed to insert...
         }
-        if ($id !== true) {
-            // returned some id value. add the primary key to the data.
-            $data[$this->primaryKeys[0]] = $id;
-        }
-        return $this->create($data);
+        return $id;
     }
 
     /**
@@ -119,30 +290,8 @@ use WScore\Repository\Repository\RepositoryInterface;
      */
     public function delete($entity1, $entity2 = null)
     {
-        $keys = $this->makeKeys($entity1, $entity2);
-        return $this->dao->delete($keys);
-    }
-
-    /**
-     * @param EntityInterface      $entity_from
-     * @param EntityInterface|null $entity_to
-     * @return array
-     */
-    private function makeKeys($entity_from = null, $entity_to = null)
-    {
-        $keys = [];
-        if ($entity_from) {
-            $keys = array_merge(
-                $keys,
-                HelperMethods::convertDataKeys($entity_from->getKeys(), $this->from_convert)
-            );
-        }
-        if ($entity_to) {
-            $keys = array_merge(
-                $keys,
-                HelperMethods::convertDataKeys($entity_to->getKeys(), $this->to_convert)
-            );
-        }
-        return $keys;
+        return $this
+            ->queryJoin($entity1, $entity2)
+            ->delete([]);
     }
 }

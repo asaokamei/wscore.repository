@@ -106,7 +106,9 @@ class PdoQuery implements QueryInterface
      */
     public function condition(array $condition)
     {
-        $this->conditions = array_merge($this->conditions, $condition);
+        if (!empty($condition)) {
+            $this->conditions = array_merge($this->conditions, $condition);
+        }
         return $this;
     }
     /**

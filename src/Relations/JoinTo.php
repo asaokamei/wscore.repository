@@ -2,22 +2,10 @@
 namespace WScore\Repository\Relations;
 
 use WScore\Repository\Entity\EntityInterface;
-use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
-use WScore\Repository\Repository\RepositoryInterface;
 
 class JoinTo implements JoinRelationInterface
 {
-    /**
-     * @var RepositoryInterface
-     */
-    private $sourceRepo;
-
-    /**
-     * @var RepositoryInterface
-     */
-    private $targetRepo;
-
     /**
      * @var JoinRepositoryInterface
      */
@@ -29,29 +17,15 @@ class JoinTo implements JoinRelationInterface
     private $sourceEntity;
 
     /**
-     * @var array
-     */
-    private $join_on;
-
-    /**
-     * @param RepositoryInterface     $sourceRepo
-     * @param RepositoryInterface     $targetRepo
      * @param JoinRepositoryInterface $joinRepo
      * @param EntityInterface         $sourceEntity
-     * @param array                   $join_on
      */
     public function __construct(
-        RepositoryInterface $sourceRepo,
-        RepositoryInterface $targetRepo,
         JoinRepositoryInterface $joinRepo,
-        EntityInterface $sourceEntity,
-        $join_on = []
+        EntityInterface $sourceEntity
     ) {
-        $this->sourceRepo   = $sourceRepo;
-        $this->targetRepo   = $targetRepo;
         $this->joinRepo     = $joinRepo;
         $this->sourceEntity = $sourceEntity;
-        $this->join_on      = $join_on;
     }
 
     /**
@@ -59,13 +33,8 @@ class JoinTo implements JoinRelationInterface
      */
     public function query()
     {
-        $primaryKeys = $this->sourceEntity->getKeys();
-        $primaryKeys = HelperMethods::convertDataKeys($primaryKeys, $this->join_on);
-        $targetTable = $this->targetRepo->getTable();
-        return $this->targetRepo
-            ->query()
-            ->join($targetTable, $this->join_on)
-            ->condition($primaryKeys);
+        return $this->joinRepo
+            ->queryTarget($this->sourceEntity);
     }
 
     /**
@@ -74,7 +43,10 @@ class JoinTo implements JoinRelationInterface
      */
     public function find($keys = [])
     {
-        return $this->query()->condition($keys)->select()->fetchAll();
+        return $this->joinRepo
+            ->queryTarget($this->sourceEntity)
+            ->select($keys)
+            ->fetchAll();
     }
 
     /**
@@ -82,7 +54,9 @@ class JoinTo implements JoinRelationInterface
      */
     public function count()
     {
-        return $this->query()->count();
+        return $this->joinRepo
+            ->queryTarget($this->sourceEntity)
+            ->count();
     }
 
     /**
@@ -102,7 +76,8 @@ class JoinTo implements JoinRelationInterface
      */
     public function delete(EntityInterface $entity)
     {
-        return $this->joinRepo->delete($this->sourceEntity, $entity);
+        return $this->joinRepo
+            ->delete($this->sourceEntity, $entity);
     }
 
     /**
@@ -110,14 +85,16 @@ class JoinTo implements JoinRelationInterface
      */
     public function clear()
     {
-        return $this->joinRepo->delete($this->sourceEntity, null);
+        return $this->joinRepo
+            ->delete($this->sourceEntity, null);
     }
 
     /**
-     * @return JoinEntityInterface[]
+     * @param EntityInterface|null $entity
+     * @return EntityInterface[]
      */
-    public function getJoinEntities()
+    public function getJoinEntities($entity = null)
     {
-        return $this->joinRepo->selectFrom($this->sourceEntity);
+        return $this->joinRepo->queryJoin($this->sourceEntity, $entity);
     }
 }
