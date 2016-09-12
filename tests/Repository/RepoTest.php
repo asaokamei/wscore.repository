@@ -87,11 +87,11 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         $users = $this->repo->getRepository('users');
         
         $user1 = $users->findByKey(1);
-        $this->assertEquals(['users_id' => 1], $user1->getKeys());
+        $this->assertEquals(1, $user1->getIdValue());
         $this->assertEquals('name-1', $user1->get('name'));
         
         $user2 = $users->find(['name' => 'name-2'])[0];
-        $this->assertEquals(['users_id' => 2], $user2->getKeys());
+        $this->assertEquals(2, $user2->getIdValue());
         $this->assertEquals('name-2', $user2->get('name'));
     }
 

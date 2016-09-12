@@ -91,8 +91,8 @@ abstract class AbstractEntity implements EntityInterface
         if ($this->isFetched) {
             throw new BadMethodCallException('cannot set primary key on a fetched entity.');
         }
-        $this->data[$this::getKeyColumns()[0]] = $id;
-        $this->isFetched                       = true;
+        $this->data[$this->getIdName()] = $id;
+        $this->isFetched                = true;
     }
 
     /**
