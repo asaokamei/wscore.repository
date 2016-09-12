@@ -4,11 +4,12 @@ namespace WScore\Repository;
 use Interop\Container\ContainerInterface;
 use PDO;
 use WScore\Repository\Entity\EntityInterface;
+use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Relations\GenericJoinRepo;
 use WScore\Repository\Relations\JoinRepositoryInterface;
-use WScore\Repository\Repository\Repository;
+use WScore\Repository\Repository\GenericRepository;
 use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Relations\HasOne;
 use WScore\Repository\Relations\JoinTo;
@@ -27,6 +28,11 @@ class Repo
     private $repositories = [];
 
     /**
+     * @var QueryInterface
+     */
+    private $query;
+
+    /**
      * Repo constructor.
      *
      * @param ContainerInterface $container
@@ -35,11 +41,30 @@ class Repo
     public function __construct($container = null, $pdo = null)
     {
         $this->container = $container;
-        // use default classes if not set. 
-        if (!$this->_has(QueryInterface::class)) {
-            $pdo = $pdo ?: $this->_get(PDO::class);
-            $this->repositories[QueryInterface::class] = new PdoQuery($pdo);
+        // use default classes if not set.
+        $this->query = $this->_has(QueryInterface::class)
+            ? $this->_get(QueryInterface::class)
+            : new PdoQuery($pdo ?: $this->_get(PDO::class));
+    }
+
+    /**
+     * @return QueryInterface
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+    /**
+     * @return CurrentDateTime
+     */
+    public function getCurrentDateTime()
+    {
+        $key = CurrentDateTime::class;
+        if ($now = $this->_get($key)) {
+            return $now;
         }
+        return $this->repositories[$key] = new CurrentDateTime();
     }
 
     /**
@@ -51,12 +76,12 @@ class Repo
         if ($repo = $this->_get($key)) {
             return $repo;
         }
-        return $this->repositories[$key] = new Repository($this, $key);
+        return $this->repositories[$key] = new GenericRepository($this, $key);
     }
 
     /**
-     * @param $key
-     * @return null|JoinRepositoryInterface|RepositoryInterface
+     * @param string $key
+     * @return mixed
      */
     private function _get($key)
     {
@@ -68,7 +93,11 @@ class Repo
         }
         return null;
     }
-    
+
+    /**
+     * @param string $key
+     * @return bool
+     */
     private function _has($key)
     {
         if (isset($this->repositories[$key])) {

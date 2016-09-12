@@ -159,10 +159,10 @@ class Query implements QueryInterface
     /**
      * returns the last inserted ID.
      *
-     * @param array $keys
+     * @param string $id_name
      * @return string
      */
-    public function lastId(array $keys)
+    public function lastId($id_name = '')
     {
         return 1;
     }

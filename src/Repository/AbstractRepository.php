@@ -1,18 +1,30 @@
 <?php
 namespace WScore\Repository\Repository;
 
+use DateTimeImmutable;
 use InvalidArgumentException;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
+use WScore\Repository\Repo;
 
-/* abstract */ class AbstractRepository implements RepositoryInterface
+abstract class AbstractRepository implements RepositoryInterface
 {
+    /**
+     * @var Repo
+     */
+    protected $repo;
+
     /**
      * @var QueryInterface
      */
     protected $query;
+
+    /**
+     * @var DateTimeImmutable
+     */
+    protected $now;
 
     /**
      * @Override
@@ -57,7 +69,7 @@ use WScore\Repository\Query\QueryInterface;
      * @Override
      * @var bool
      */
-    private $useAutoInsertId = false;
+    protected $useAutoInsertId = false;
 
     /**
      * @return string
@@ -106,7 +118,7 @@ use WScore\Repository\Query\QueryInterface;
     /**
      * @return string
      */
-    protected function getKeyColumnName()
+    protected function getIdName()
     {
         $keys = $this->getKeyColumns();
         if (count($keys) !== 1) {
@@ -135,7 +147,7 @@ use WScore\Repository\Query\QueryInterface;
     public function findByKey($keys)
     {
         if (!is_array($keys)) {
-            $keys = [$this->getKeyColumnName() => $keys];
+            $keys = [$this->getIdName() => $keys];
         }
         $statement = $this->query()->select($keys);
         $entity    = $statement->fetch();
@@ -175,7 +187,7 @@ use WScore\Repository\Query\QueryInterface;
         if (!$id = $this->query()->insert($data)) {
             return null;
         }
-        if ($this->useAutoInsertId && $id = $this->query()->lastId($this->getKeyColumnName())) {
+        if ($this->useAutoInsertId && $id = $this->query()->lastId($this->getIdName())) {
             $entity->setPrimaryKeyOnCreatedEntity($id);
         }
 
@@ -224,10 +236,10 @@ use WScore\Repository\Query\QueryInterface;
             return $data;
         }
         $column = $this->timeStamps[$type];
-        if (isset($data[$column])) {
-            return $data;
+        if (!$this->now) {
+            $this->now = new DateTimeImmutable();
         }
-        $data[$column] = (new \DateTime('now'))->format($this->timeStampFormat);
+        $data[$column] = $this->now->format($this->timeStampFormat);
 
         return $data;
     }

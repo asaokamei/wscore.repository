@@ -19,6 +19,16 @@ interface EntityInterface
     public function getKeys();
 
     /**
+     * @return string
+     */
+    public function getIdValue();
+
+    /**
+     * @return string
+     */
+    public function getIdName();
+
+    /**
      * @return bool
      */
     public function isFetched();

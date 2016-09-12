@@ -12,6 +12,9 @@ class HelperMethods
      */
     public static function filterDataByKeys(array $input, array $keys)
     {
+        if (empty($keys)) {
+            return $input;
+        }
         $output = [];
         foreach($keys as $key) {
             if (array_key_exists($key, $input)) {

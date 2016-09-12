@@ -147,6 +147,29 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
+     * @return string
+     */
+    public function getIdValue()
+    {
+        return $this->get($this->getIdName());
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdName()
+    {
+        $keys = $this->getKeyColumns();
+        if (!$keys) {
+            throw new \BadMethodCallException('keys not set.');
+        }
+        if (count($keys) !== 1) {
+            throw new \BadMethodCallException('multiple keys set.');
+        }
+        return $keys[0];
+    }
+
+    /**
      * @return bool
      */
     public function isFetched()
