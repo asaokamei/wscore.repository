@@ -122,52 +122,70 @@ class Repo
     }
     
     /**
-     * @param RepositoryInterface $sourceRepo
-     * @param RepositoryInterface $repo
+     * @param RepositoryInterface|string $sourceRepo
+     * @param RepositoryInterface|string $repo
      * @param EntityInterface     $entity
      * @param array               $convert
      * @return HasOne
      */
     public function hasOne(
-        RepositoryInterface $sourceRepo,
-        RepositoryInterface $repo,
+        $sourceRepo,
+        $repo,
         EntityInterface $entity,
         $convert = []
     ) {
+        if (is_string($sourceRepo)) {
+            $sourceRepo = $this->getRepository($sourceRepo);
+        }
+        if (is_string($repo)) {
+            $repo = $this->getRepository($repo);
+        }
         return new HasOne($sourceRepo, $repo, $entity, $convert);
     }
 
     /**
-     * @param RepositoryInterface $sourceRepo
-     * @param RepositoryInterface $repo
+     * @param RepositoryInterface|string $sourceRepo
+     * @param RepositoryInterface|string $repo
      * @param EntityInterface     $entity
      * @param array               $convert
      * @return HasMany
      */
     public function hasMany(
-        RepositoryInterface $sourceRepo,
-        RepositoryInterface $repo,
+        $sourceRepo,
+        $repo,
         EntityInterface $entity,
         $convert = []
     ) {
+        if (is_string($sourceRepo)) {
+            $sourceRepo = $this->getRepository($sourceRepo);
+        }
+        if (is_string($repo)) {
+            $repo = $this->getRepository($repo);
+        }
         return new HasMany($sourceRepo, $repo, $entity, $convert);
     }
 
     /**
-     * @param RepositoryInterface $sourceRepo
-     * @param RepositoryInterface $targetRepo
+     * @param RepositoryInterface|string $sourceRepo
+     * @param RepositoryInterface|string $targetRepo
      * @param EntityInterface     $entity
      * @param string|null         $joinTable
      * @param array               $convert
      * @return JoinTo
      */
     public function hasJoin(
-        RepositoryInterface $sourceRepo,
-        RepositoryInterface $targetRepo,
+        $sourceRepo,
+        $targetRepo,
         EntityInterface $entity,
         $joinTable = '',
         $convert = []
     ) {
+        if (is_string($sourceRepo)) {
+            $sourceRepo = $this->getRepository($sourceRepo);
+        }
+        if (is_string($targetRepo)) {
+            $targetRepo = $this->getRepository($targetRepo);
+        }
         $joinTable = $joinTable ?: $this->makeJoinTableName($targetRepo, $sourceRepo);
         $join      = $this->getJoinRepository($joinTable);
         return new JoinTo($sourceRepo, $targetRepo, $join, $entity, $convert);

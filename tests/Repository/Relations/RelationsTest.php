@@ -131,7 +131,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
          * put $post2 as $user1's post.
          */
         // relate them.
-        $hasMany = $repo->hasMany($users, $posts, $user1);
+        $hasMany = $repo->hasMany('users', 'posts', $user1);
         $this->assertEquals(1, $hasMany->count());
 
         $hasMany->relate($post2);
@@ -146,7 +146,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
          */
         // put $post1 to user2
         $post1 = $posts->findByKey(1); // should belong to user1
-        $hasOne = $repo->hasOne($posts, $users, $post1);
+        $hasOne = $repo->hasOne('posts', 'users', $post1);
         $hasOne->relate($user2);
         $this->assertEquals(2, $post1->get('users_id'));
         $posts->save($post1);
