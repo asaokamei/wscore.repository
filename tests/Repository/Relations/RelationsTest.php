@@ -29,7 +29,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     {
         $c    = new Container();
         $c->set(PDO::class, function () {
-            return new PDO('sqlite::memory:');
+            $pdo = new PDO('sqlite::memory:');
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return $pdo;
         });
         $c->set(Fixture::class, function (ContainerInterface $c) {
             return new Fixture($c->get(PDO::class));

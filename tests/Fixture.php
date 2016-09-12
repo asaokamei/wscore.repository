@@ -27,6 +27,8 @@ class Fixture
     {
         $this->createUsers();
         $this->createPosts();
+        $this->createTags();
+        $this->createPostsTags();
     }
 
     /**
@@ -38,6 +40,8 @@ class Fixture
     {
         $this->insertUsers($count);
         $this->insertPosts($count);
+        $this->insertTags($count);
+        $this->insertPostsTags($count);
     }
 
     /**
@@ -55,7 +59,7 @@ CREATE TABLE users (
     updated_at  DATETIME
 );
 SQL;
-        $stmt = $this->pdo->exec($create);
+        $this->pdo->exec($create);
     }
 
     /**
@@ -74,7 +78,7 @@ CREATE TABLE posts (
     updated_at  DATETIME
 );
 SQL;
-        $stmt = $this->pdo->exec($create);
+        $this->pdo->exec($create);
     }
 
     /**
@@ -116,7 +120,88 @@ SQL;
                 $now,
             ];
             $stmt = $this->pdo->prepare($insert);
-            $stmt = $stmt->execute($rec);
+            $stmt->execute($rec);
+        }
+    }
+
+    /**
+     * ------------------------------------------------------------------------
+     * create posts table
+     */
+    public function createTags()
+    {
+        $create  /** @lang SQLite */
+              =<<<SQL
+CREATE TABLE tags (
+    tag_id      VARCHAR(32),
+    tag         VARCHAR(64),
+    created_at  DATETIME,
+    updated_at  DATETIME
+);
+SQL;
+        $this->pdo->exec($create);
+    }
+
+    private $tags = ['test', 'tag', 'blog'];
+
+    /**
+     * @param int $count
+     */
+    public function insertTags($count = 4)
+    {
+        $insert =<<<SQL
+INSERT INTO tags (tag_id, tag, created_at, updated_at) VALUES (?, ?, ?, ?);
+SQL;
+        $now  = (new \DateTime())->format('Y-m-d H:i:s');
+        $tags = [
+            ['test', 'test tag', $now, $now],
+            ['tag',  'tagged', $now, $now],
+            ['blog', 'blogging', $now, $now],
+            ['post', 'posting', $now, $now],
+        ];
+        $stmt = $this->pdo->prepare($insert);
+        foreach($tags as $rec) {
+            $stmt->execute($rec);
+        }
+    }
+
+    /**
+     * ------------------------------------------------------------------------
+     * create posts table
+     */
+    public function createPostsTags()
+    {
+        $create  /** @lang SQLite */
+              =<<<SQL
+CREATE TABLE posts_tags (
+    posts_tags_id      VARCHAR(32),
+    posts_post_id INTEGER,
+    tags_tag_id INTEGER,
+    created_at  DATETIME
+);
+SQL;
+        $this->pdo->exec($create);
+    }
+
+    /**
+     * @param int $count
+     */
+    public function insertPostsTags($count = 4)
+    {
+        $insert =<<<SQL
+INSERT INTO posts_tags (posts_tags_id, posts_post_id, tags_tag_id, created_at) VALUES (?, ?, ?, ?);
+SQL;
+        $now  = (new \DateTime())->format('Y-m-d H:i:s');
+        foreach(range(1, $count) as $idx) {
+            $tag_id = $this->tags[$idx % 3];
+            $post_id = $idx % 2;
+            $rec = [
+                $tag_id,
+                $post_id,
+                $now,
+            ];
+            $stmt = $this->pdo->prepare($insert);
+            $stmt->execute($rec);
         }
     }
 }
