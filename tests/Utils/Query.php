@@ -64,6 +64,15 @@ class Query implements QueryInterface
     }
 
     /**
+     * @param array $keys
+     * @return array
+     */
+    public function find($keys = [])
+    {
+        return $this->select($keys)->fetchAll();
+    }
+
+    /**
      * sets the order by clause when select.
      *
      * @param string $order

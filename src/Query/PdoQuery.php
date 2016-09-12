@@ -3,6 +3,7 @@ namespace WScore\Repository\Query;
 
 use PDO;
 use PDOStatement;
+use WScore\Repository\Entity\EntityInterface;
 
 class PdoQuery implements QueryInterface 
 {
@@ -108,6 +109,18 @@ class PdoQuery implements QueryInterface
         $this->conditions = array_merge($this->conditions, $condition);
         return $this;
     }
+    /**
+     * selects and returns as indicated by fetch mode.
+     * most likely returns some EntityInterface objects.
+     *
+     * @param array $keys
+     * @return mixed[]
+     */
+    public function find($keys = [])
+    {
+        return $this->select($keys)->fetchAll();
+    }
+
 
     /**
      * sets the order by clause when select.

@@ -26,6 +26,7 @@ class Fixture
     public function createTables()
     {
         $this->createUsers();
+        $this->createPosts();
     }
 
     /**
@@ -36,10 +37,11 @@ class Fixture
     public function fillTables($count = 4)
     {
         $this->insertUsers($count);
+        $this->insertPosts($count);
     }
 
     /**
-     * 
+     * create users table
      */
     public function createUsers()
     {
@@ -53,8 +55,26 @@ CREATE TABLE users (
     updated_at  DATETIME
 );
 SQL;
-        $stmt = $this->pdo->prepare($create);
-        $stmt->execute();
+        $stmt = $this->pdo->exec($create);
+    }
+
+    /**
+     * create posts table
+     */
+    public function createPosts()
+    {
+        $create  /** @lang SQLite */
+              =<<<SQL
+CREATE TABLE posts (
+    post_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    users_id    INTEGER,
+    publish_at  DATETIME,
+    contents    VARCHAR(256),
+    created_at  DATETIME,
+    updated_at  DATETIME
+);
+SQL;
+        $stmt = $this->pdo->exec($create);
     }
 
     /**
@@ -76,6 +96,27 @@ SQL;
             ];
             $stmt = $this->pdo->prepare($insert);
             $stmt->execute($rec);
+        }
+    }
+
+    /**
+     * @param int $count
+     */
+    public function insertPosts($count = 4)
+    {
+        $insert =<<<SQL
+INSERT INTO posts (users_id, contents, created_at, updated_at) VALUES (?, ?, ?, ?);
+SQL;
+        $now  = (new \DateTime())->format('Y-m-d H:i:s');
+        foreach(range(1, $count) as $idx) {
+            $rec = [
+                (int) (($idx/2) + 1),
+                'contents for post #'.$idx,
+                $now,
+                $now,
+            ];
+            $stmt = $this->pdo->prepare($insert);
+            $stmt = $stmt->execute($rec);
         }
     }
 }

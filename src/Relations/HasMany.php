@@ -57,15 +57,6 @@ class HasMany implements RelationInterface
     }
 
     /**
-     * @param string $order
-     * @return RelationInterface
-     */
-    public function orderBy($order)
-    {
-        throw new \BadMethodCallException('not implemented yet.');
-    }
-
-    /**
      * @param array $keys
      * @return EntityInterface[]
      */
@@ -91,21 +82,5 @@ class HasMany implements RelationInterface
         $entity->relate($this->sourceEntity, $this->convert);
 
         return $entity;
-    }
-
-    /**
-     * @param EntityInterface $entity
-     * @return bool
-     */
-    public function delete(EntityInterface $entity)
-    {
-        $primaryKeys = $this->sourceEntity->getKeys();
-        foreach($primaryKeys as $key => $val) {
-            $primaryKeys[$key] = null;
-        }
-        $primaryKeys = HelperMethods::convertDataKeys($primaryKeys, $this->convert);
-        $entity->fill($primaryKeys);
-
-        return true;
     }
 }

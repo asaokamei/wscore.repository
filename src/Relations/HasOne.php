@@ -57,15 +57,6 @@ class HasOne implements RelationInterface
     }
 
     /**
-     * @param string $order
-     * @return RelationInterface
-     */
-    public function orderBy($order)
-    {
-        throw new \BadMethodCallException('not implemented yet.');
-    }
-
-    /**
      * @param array $keys
      * @return EntityInterface[]
      */
@@ -91,19 +82,6 @@ class HasOne implements RelationInterface
         $this->sourceEntity->relate($entity, $this->convert);
 
         return $entity;
-    }
-
-    /**
-     * @param EntityInterface $entity
-     * @return bool
-     */
-    public function delete(EntityInterface $entity)
-    {
-        $keys = $entity->getKeys();
-        $keys = HelperMethods::convertDataKeys($keys, $this->convert);
-        $this->sourceEntity->fill($keys);
-
-        return true;
     }
 
     /**

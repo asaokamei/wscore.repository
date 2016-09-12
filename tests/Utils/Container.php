@@ -4,6 +4,8 @@ namespace tests\Utils;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Interop\Container\Exception\NotFoundException;
+use tests\Fixture;
+use WScore\Repository\Repo;
 
 class Container implements ContainerInterface 
 {
@@ -58,5 +60,21 @@ class Container implements ContainerInterface
             return true;
         }
         return array_key_exists($id, $this->factories);
+    }
+
+    /**
+     * @return Repo
+     */
+    public function getRepo()
+    {
+        return $this->get(Repo::class);
+    }
+
+    /**
+     * @return Fixture
+     */
+    public function getFix()
+    {
+        return $this->get(Fixture::class);
     }
 }

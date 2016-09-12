@@ -12,12 +12,6 @@ interface RelationInterface
     public function query();
 
     /**
-     * @param string $order
-     * @return RelationInterface
-     */
-    public function orderBy($order);
-
-    /**
      * @param array $keys
      * @return EntityInterface[]
      */
@@ -33,10 +27,4 @@ interface RelationInterface
      * @return EntityInterface
      */
     public function relate(EntityInterface $entity);
-
-    /**
-     * @param EntityInterface $entity
-     * @return bool
-     */
-    public function delete(EntityInterface $entity);
 }

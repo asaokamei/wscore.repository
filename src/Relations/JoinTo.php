@@ -69,15 +69,6 @@ class JoinTo implements JoinRelationInterface
     }
 
     /**
-     * @param string $order
-     * @return JoinRelationInterface
-     */
-    public function orderBy($order)
-    {
-        throw new \BadMethodCallException('not implemented yet.');
-    }
-
-    /**
      * @param array $keys
      * @return EntityInterface[]
      */

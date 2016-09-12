@@ -50,6 +50,15 @@ interface QueryInterface
     public function orderBy($order, $direction = 'ASC');
 
     /**
+     * selects and returns as indicated by fetch mode.
+     * most likely returns some EntityInterface objects.
+     *
+     * @param array $keys
+     * @return mixed[]
+     */
+    public function find($keys = []);
+
+    /**
      * execute select statement with $keys as condition.
      * returns PDOStatement reflecting the self::setFetchMode().
      *
