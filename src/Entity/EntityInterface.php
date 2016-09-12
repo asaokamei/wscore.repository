@@ -3,6 +3,12 @@ namespace WScore\Repository\Entity;
 
 interface EntityInterface
 {
+
+    /**
+     * @return string
+     */
+    public function getTable();
+    
     /**
      * @return array
      */

@@ -7,6 +7,11 @@ use WScore\Repository\Helpers\HelperMethods;
 abstract class AbstractEntity implements EntityInterface
 {
     /**
+     * @var string
+     */
+    protected $table;
+
+    /**
      * @var array
      */
     protected $data = [];
@@ -53,6 +58,14 @@ abstract class AbstractEntity implements EntityInterface
      */
     protected $isFetched = false;
 
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+    
     /**
      * @return array
      */

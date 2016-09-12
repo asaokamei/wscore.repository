@@ -94,7 +94,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function create($data)
     {
         /** @var EntityInterface $entity */
-        $entity = new $this->entityClass($this->primaryKeys, $this->columnList);
+        $entity = new $this->entityClass($this->table, $this->primaryKeys, $this->columnList);
         $entity->fill($data);
         return $entity;
     }
@@ -223,7 +223,7 @@ abstract class AbstractRepository implements RepositoryInterface
     {
         return $this->query
             ->withTable($this->table)
-            ->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass, [$this->primaryKeys, $this->columnList]);
+            ->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass, [$this->table, $this->primaryKeys, $this->columnList]);
     }
 
     /**
