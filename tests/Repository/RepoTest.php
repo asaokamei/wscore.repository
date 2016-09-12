@@ -33,6 +33,16 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         class_exists(GenericRepository::class);
         class_exists(Query::class);
 
+        $pdo  = new PDO('sqlite::memory:');
+        $this->fix  = new Fixture($pdo);
+        $this->repo = new Repo(null, $pdo);
+    }
+
+    /**
+     * @return Container
+     */
+    function getFullContainer()
+    {
         $c    = new Container();
         $c->set(PDO::class, function () {
             return new PDO('sqlite::memory:');
@@ -40,18 +50,14 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         $c->set(Fixture::class, function (ContainerInterface $c) {
             return new Fixture($c->get(PDO::class));
         });
-        $c->set(QueryInterface::class, function(ContainerInterface $c) {
-            return new PdoQuery($c->get(PDO::class));
-        });
         $c->set('users', function(ContainerInterface $c ) {
-            new Users($c->get(Repo::class), $c->get(QueryInterface::class));
+            return new Users($c->get(Repo::class));
         });
         $c->set(Repo::class, function(ContainerInterface $c) {
             return new Repo($c);
         });
-        $this->repo = $c->get(Repo::class);
-        $this->fix  = $c->get(Fixture::class);
 
+        return $c;
     }
 
     /**
@@ -108,9 +114,20 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      */
     function Repo_retrieves_entities_from_database()
     {
-        $this->fix->createUsers();
-        $this->fix->insertUsers(2);
-        $users = $this->repo->getRepository('users');
+        $this->do_Repo_retrieves_entities_from_database($this->fix, $this->repo);
+        $c = $this->getFullContainer();
+        $this->do_Repo_retrieves_entities_from_database($c->get(Fixture::class), $c->get(Repo::class));
+    }
+
+    /**
+     * @param Fixture $fix
+     * @param Repo    $repo
+     */
+    function do_Repo_retrieves_entities_from_database($fix, $repo)
+    {
+        $fix->createUsers();
+        $fix->insertUsers(2);
+        $users = $repo->getRepository('users');
         
         $user1 = $users->findByKey(1);
         $this->assertEquals(1, $user1->getIdValue());
@@ -126,9 +143,20 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      */
     function Repo_inserts_entity_and_sets_auto_increment_key()
     {
-        $this->fix->createUsers();
-        $this->fix->insertUsers(1);
-        $users = $this->repo->getRepository('users');
+        $this->do_Repo_inserts_entity_and_sets_auto_increment_key($this->fix, $this->repo);
+        $c = $this->getFullContainer();
+        $this->do_Repo_inserts_entity_and_sets_auto_increment_key($c->get(Fixture::class), $c->get(Repo::class));
+    }
+
+    /**
+     * @param Fixture $fix
+     * @param Repo    $repo
+     */
+    function do_Repo_inserts_entity_and_sets_auto_increment_key($fix, $repo)
+    {
+        $fix->createUsers();
+        $fix->insertUsers(1);
+        $users = $repo->getRepository('users');
         // magic: make repository auto-inserted-id aware!
         $auto = new \ReflectionProperty($users, 'useAutoInsertId');
         $auto->setAccessible(true);
@@ -151,9 +179,20 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      */
     function Repo_updates_only_the_entity_data()
     {
-        $this->fix->createUsers();
-        $this->fix->insertUsers(2);
-        $users = $this->repo->getRepository('users');
+        $this->do_Repo_updates_only_the_entity_data($this->fix, $this->repo);
+        $c = $this->getFullContainer();
+        $this->do_Repo_updates_only_the_entity_data($c->get(Fixture::class), $c->get(Repo::class));
+    }
+
+    /**
+     * @param Fixture $fix
+     * @param Repo    $repo
+     */
+    function do_Repo_updates_only_the_entity_data($fix, $repo)
+    {
+        $fix->createUsers();
+        $fix->insertUsers(2);
+        $users = $repo->getRepository('users');
 
         $user2 = $users->findByKey(2);
         $user2->fill(['name' => 'test-update']);
@@ -173,9 +212,20 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      */
     function Repo_save_insert_or_update_depending_on_entity_is_fetched()
     {
-        $this->fix->createUsers();
-        $this->fix->insertUsers(1);
-        $users = $this->repo->getRepository('users');
+        $this->do_Repo_save_insert_or_update_depending_on_entity_is_fetched($this->fix, $this->repo);
+        $c = $this->getFullContainer();
+        $this->do_Repo_save_insert_or_update_depending_on_entity_is_fetched($c->get(Fixture::class), $c->get(Repo::class));
+    }
+
+    /**
+     * @param Fixture $fix
+     * @param Repo    $repo
+     */
+    function do_Repo_save_insert_or_update_depending_on_entity_is_fetched($fix, $repo)
+    {
+        $fix->createUsers();
+        $fix->insertUsers(1);
+        $users = $repo->getRepository('users');
 
         $user1 = $users->findByKey(1);
         $user1->fill(['name' => 'test-update']);
@@ -197,9 +247,20 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      */
     function Repo_deletes_entity()
     {
-        $this->fix->createUsers();
-        $this->fix->insertUsers(3);
-        $users = $this->repo->getRepository('users');
+        $this->do_Repo_deletes_entity($this->fix, $this->repo);
+        $c = $this->getFullContainer();
+        $this->do_Repo_deletes_entity($c->get(Fixture::class), $c->get(Repo::class));
+    }
+
+    /**
+     * @param Fixture $fix
+     * @param Repo    $repo
+     */
+    function do_Repo_deletes_entity($fix, $repo)
+    {
+        $fix->createUsers();
+        $fix->insertUsers(3);
+        $users = $repo->getRepository('users');
 
         $user2 = $users->findByKey(2);
         $users->delete($user2);

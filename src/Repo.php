@@ -23,7 +23,7 @@ class Repo
     private $container;
 
     /**
-     * @var RepositoryInterface[]|JoinRepositoryInterface[]
+     * @var mixed[]
      */
     private $repositories = [];
 
@@ -61,8 +61,8 @@ class Repo
     public function getCurrentDateTime()
     {
         $key = CurrentDateTime::class;
-        if ($now = $this->_get($key)) {
-            return $now;
+        if ($this->_has($key)) {
+            return $this->_get($key);
         }
         return $this->repositories[$key] = new CurrentDateTime();
     }
@@ -73,8 +73,8 @@ class Repo
      */
     public function getRepository($key)
     {
-        if ($repo = $this->_get($key)) {
-            return $repo;
+        if ($this->_has($key)) {
+            return $this->_get($key);
         }
         return $this->repositories[$key] = new GenericRepository($this, $key);
     }
@@ -115,8 +115,8 @@ class Repo
      */
     public function getJoinRepository($key)
     {
-        if ($repo = $this->_get($key)) {
-            return $repo;
+        if ($this->_has($key)) {
+            return $this->_get($key);
         }
         return $this->repositories[$key] = new GenericJoinRepo();
     }

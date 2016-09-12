@@ -13,15 +13,19 @@ class Users extends AbstractRepository
 
     protected $useAutoInsertId = true;
 
+    protected $timeStamps = [
+        'created_at' => 'created_at',
+        'updated_at' => 'updated_at',
+    ];
     /**
      * Users constructor.
      *
      * @param Repo $repo
-     * @param QueryInterface $query
      */
-    public function __construct($repo, $query)
+    public function __construct($repo)
     {
         $this->repo = $repo;
-        $this->query = $query;
+        $this->query       = $repo->getQuery();
+        $this->now         = $repo->getCurrentDateTime();
     }
 }

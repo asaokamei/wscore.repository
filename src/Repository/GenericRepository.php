@@ -21,7 +21,7 @@ class GenericRepository extends AbstractRepository
         $this->table       = $table;
         $this->primaryKeys = $primaryKeys ?: ["{$table}_id"];
         $this->entityClass = $entityClass ?: Entity::class;
-        $this->query       = $this->repo->getQuery();
+        $this->query       = $repo->getQuery();
         $this->now         = $repo->getCurrentDateTime();
     }
 }
