@@ -7,6 +7,7 @@ use Interop\Container\Exception\NotFoundException;
 
 class Container implements ContainerInterface 
 {
+    private $container = [];
     private $factories = [];
 
     /**
@@ -30,8 +31,15 @@ class Container implements ContainerInterface
      */
     public function get($id)
     {
-        if ($this->has($id)) {
-            return $this->factories[$id];
+        if (array_key_exists($id, $this->container)) {
+            return $this->container[$id];
+        }
+        if (array_key_exists($id, $this->factories)) {
+            $factory = $this->factories[$id];
+            if (is_callable($factory)) {
+                $factory = $factory($this);
+            }
+            return $this->container[$id] = $factory;
         }
         return null;
     }
@@ -46,6 +54,9 @@ class Container implements ContainerInterface
      */
     public function has($id)
     {
+        if (array_key_exists($id, $this->container)) {
+            return true;
+        }
         return array_key_exists($id, $this->factories);
     }
 }

@@ -1,11 +1,15 @@
 <?php
 namespace tests\Repository;
 
+use Interop\Container\ContainerInterface;
 use PDO;
 use tests\Fixture;
 use tests\Utils\Container;
 use tests\Utils\Query;
+use tests\Utils\Users;
 use WScore\Repository\Entity\Entity;
+use WScore\Repository\Helpers\CurrentDateTime;
+use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Repository\GenericRepository;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repo;
@@ -18,11 +22,6 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     private $repo;
 
     /**
-     * @var PDO
-     */
-    private $pdo;
-
-    /**
      * @var Fixture
      */
     private $fix;
@@ -33,10 +32,26 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         class_exists(Repo::class);
         class_exists(GenericRepository::class);
         class_exists(Query::class);
-        
-        $this->pdo  = new PDO('sqlite::memory:');
-        $this->fix  = new Fixture($this->pdo);
-        $this->repo = new Repo(null, $this->pdo);
+
+        $c    = new Container();
+        $c->set(PDO::class, function () {
+            return new PDO('sqlite::memory:');
+        });
+        $c->set(Fixture::class, function (ContainerInterface $c) {
+            return new Fixture($c->get(PDO::class));
+        });
+        $c->set(QueryInterface::class, function(ContainerInterface $c) {
+            return new PdoQuery($c->get(PDO::class));
+        });
+        $c->set('users', function(ContainerInterface $c ) {
+            new Users($c->get(Repo::class), $c->get(QueryInterface::class));
+        });
+        $c->set(Repo::class, function(ContainerInterface $c) {
+            return new Repo($c);
+        });
+        $this->repo = $c->get(Repo::class);
+        $this->fix  = $c->get(Fixture::class);
+
     }
 
     /**
@@ -65,16 +80,27 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function Repo_uses_container_to_retrieve_repository()
+    function Repo_uses_container_to_retrieve_various_objects()
     {
         $c    = new Container();
         $c->set('testing', 'tested');
-        $c->set(QueryInterface::class, new Query());
+        $c->set(QueryInterface::class, new PdoQuery(null));
+        $c->set(CurrentDateTime::class, 'test-now');
         $repo = new Repo($c);
-        
+
+        // retrieve repository, 'tested'.
         $this->assertEquals('tested', $repo->getRepository('testing'));
-        $query = $repo->getRepository('query')->query();
-        $this->assertEquals('query', $query->getTable());
+
+        // retrieve QueryInterface
+        $query = $repo->getQuery();
+        $this->assertTrue($query instanceof QueryInterface);
+
+        // retrieve query-table repository, which has query object with table 'query-table'
+        $query = $repo->getRepository('query-table')->query();
+        $this->assertEquals('query-table', $query->getTable());
+
+        // retrieve CurrentDateTime
+        $this->assertEquals('test-now', $repo->getCurrentDateTime());
     }
 
     /**
@@ -164,5 +190,22 @@ class RepoTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('test-update', $users->findByKey(1)->get('name'));
         $this->assertEquals('test-insert', $users->findByKey(2)->get('name'));
+    }
+
+    /**
+     * @test
+     */
+    function Repo_deletes_entity()
+    {
+        $this->fix->createUsers();
+        $this->fix->insertUsers(3);
+        $users = $this->repo->getRepository('users');
+
+        $user2 = $users->findByKey(2);
+        $users->delete($user2);
+
+        $this->assertEquals(null, $users->findByKey(2));
+        $this->assertEquals(1, $users->findByKey(1)->getIdValue());
+        $this->assertEquals(3, $users->findByKey(3)->getIdValue());
     }
 }

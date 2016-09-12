@@ -168,15 +168,14 @@ class PdoQuery implements QueryInterface
     }
 
     /**
-     * @param string $id_name
+     * @param string $idName
      * @return string
      */
-    public function lastId($id_name = '')
+    public function lastId($idName = '')
     {
-        $idName = '';
         if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
-            if ($id_name) {
-                $idName = implode( '_', [ $this->table, $id_name, 'seq' ] );
+            if (!$idName) {
+                $idName = implode( '_', [$this->table, $idName, 'seq' ] );
             }
         }
         

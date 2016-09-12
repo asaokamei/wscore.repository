@@ -6,7 +6,7 @@ use tests\Utils\Repository;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Query\QueryInterface;
 
-class RepositoryTest extends \PHPUnit_Framework_TestCase
+class RepositoryTestX extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Repository
