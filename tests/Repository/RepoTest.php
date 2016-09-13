@@ -156,11 +156,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     {
         $fix->createUsers();
         $fix->insertUsers(1);
-        $users = $repo->getRepository('users');
-        // magic: make repository auto-inserted-id aware!
-        $auto = new \ReflectionProperty($users, 'useAutoInsertId');
-        $auto->setAccessible(true);
-        $auto->setValue($users, true);
+        $users = $repo->getRepository('users', ['users_id'], true);
 
         $this->assertEquals(null, $users->findByKey(2));
         $userN = $users->create([

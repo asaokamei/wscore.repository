@@ -69,14 +69,16 @@ class Repo
 
     /**
      * @param string $key
+     * @param array  $primaryKeys
+     * @param bool   $autoIncrement
      * @return RepositoryInterface
      */
-    public function getRepository($key)
+    public function getRepository($key, $primaryKeys = [], $autoIncrement = false)
     {
         if ($this->_has($key)) {
             return $this->_get($key);
         }
-        return $this->repositories[$key] = new GenericRepository($this, $key);
+        return $this->repositories[$key] = new GenericRepository($this, $key, $primaryKeys, $autoIncrement);
     }
 
     /**
@@ -111,14 +113,16 @@ class Repo
 
     /**
      * @param string $key
+     * @param null|RepositoryInterface   $sourceRepo
+     * @param null|RepositoryInterface   $targetRepo
      * @return JoinRepositoryInterface
      */
-    public function getJoinRepository($key)
+    public function getJoinRepository($key, $sourceRepo = null, $targetRepo = null)
     {
         if ($this->_has($key)) {
             return $this->_get($key);
         }
-        return $this->repositories[$key] = new GenericJoinRepo();
+        return $this->repositories[$key] = new GenericJoinRepo($sourceRepo, $targetRepo);
     }
     
     /**
@@ -187,7 +191,7 @@ class Repo
             $targetRepo = $this->getRepository($targetRepo);
         }
         $joinTable = $joinTable ?: $this->makeJoinTableName($targetRepo, $sourceRepo);
-        $join      = $this->getJoinRepository($joinTable);
+        $join      = $this->getJoinRepository($joinTable, $sourceRepo, $targetRepo);
         return new JoinTo($sourceRepo, $targetRepo, $join, $entity, $convert);
     }
 
