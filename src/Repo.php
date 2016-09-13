@@ -122,7 +122,7 @@ class Repo
         if ($this->_has($key)) {
             return $this->_get($key);
         }
-        return $this->repositories[$key] = new GenericJoinRepo($sourceRepo, $targetRepo);
+        return $this->repositories[$key] = new GenericJoinRepo($this, $key, $sourceRepo, $targetRepo);
     }
     
     /**
@@ -192,7 +192,7 @@ class Repo
         }
         $joinTable = $joinTable ?: $this->makeJoinTableName($targetRepo, $sourceRepo);
         $join      = $this->getJoinRepository($joinTable, $sourceRepo, $targetRepo);
-        return new JoinTo($sourceRepo, $targetRepo, $join, $entity, $convert);
+        return new JoinTo($join, $entity);
     }
 
 

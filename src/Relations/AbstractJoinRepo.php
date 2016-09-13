@@ -2,9 +2,12 @@
 namespace WScore\Repository\Relations;
 
 use InvalidArgumentException;
+use WScore\Repository\Entity\Entity;
 use WScore\Repository\Entity\EntityInterface;
+use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
+use WScore\Repository\Repo;
 use WScore\Repository\Repository\RepositoryInterface;
 
 /* abstract */ class AbstractJoinRepo implements JoinRepositoryInterface
@@ -18,6 +21,11 @@ use WScore\Repository\Repository\RepositoryInterface;
      * @var QueryInterface
      */
     protected $query;
+
+    /**
+     * @var CurrentDateTime
+     */
+    protected $now;
 
     /**
      * @var array
@@ -34,7 +42,7 @@ use WScore\Repository\Repository\RepositoryInterface;
      * @Override
      * @var string|EntityInterface
      */
-    protected $entityClass;
+    protected $entityClass = Entity::class;
 
     /**
      * @Override
@@ -67,11 +75,18 @@ use WScore\Repository\Repository\RepositoryInterface;
     /**
      * AbstractJoinRepo constructor.
      *
+     * @param Repo                $repo
+     * @param string              $table
      * @param RepositoryInterface $fromRepo
      * @param RepositoryInterface $toRepo
      */
-    public function __construct($fromRepo, $toRepo)
+    public function __construct($repo, $table, $fromRepo, $toRepo)
     {
+        $this->table = $table;
+        $this->primaryKeys = [$this->table . '_id'];
+        $this->query       = $repo->getQuery();
+        $this->now         = $repo->getCurrentDateTime();
+
         $tabs = [$fromRepo->getTable(), $toRepo->getTable()];
         $repo = [$fromRepo->getTable() => $fromRepo, $toRepo->getTable() => $toRepo];
         sort($tabs);
@@ -86,8 +101,6 @@ use WScore\Repository\Repository\RepositoryInterface;
         foreach($this->to_repo->getKeyColumns() as $key) {
             $this->to_convert[$key] = $this->to_table . '_' . $key;
         }
-        $this->table = "{$this->from_table}_{$this->to_table}";
-        $this->primaryKeys = [$this->table . '_id'];
     }
 
     /**
@@ -142,9 +155,9 @@ use WScore\Repository\Repository\RepositoryInterface;
     private function getFromOrTo($entity, $getOpposite = false)
     {
         if ($entity->getTable() === $this->from_table) {
-            $target = ['to', 'from'];
-        } elseif ($entity->getTable() === $this->from_table) {
-            $target = ['from', 'to'];
+            $target = ['from','to', ];
+        } elseif ($entity->getTable() === $this->to_table) {
+            $target = ['to', 'from', ];
         } else {
             throw new InvalidArgumentException('entity not from nor to table.');
         }
@@ -206,7 +219,7 @@ use WScore\Repository\Repository\RepositoryInterface;
      */
     public function queryTarget($entity)
     {
-        $fromTo = $this->getFromOrTo($entity, false);
+        $fromTo = $this->getFromOrTo($entity, true);
         $method = "query" . $fromTo;
         return $this->$method($entity);
     }
@@ -240,7 +253,7 @@ use WScore\Repository\Repository\RepositoryInterface;
         return $this->to_repo
             ->query()
             ->condition($keys)
-            ->join($this->table, $this->from_convert);
+            ->join($this->table, $this->to_convert);
     }
 
     /**
@@ -274,8 +287,8 @@ use WScore\Repository\Repository\RepositoryInterface;
     public function insert($entity1, $entity2)
     {
         $data = array_merge(
-            HelperMethods::convertDataKeys($entity1->getKeys(), $this->getConvert($entity1)),
-            HelperMethods::convertDataKeys($entity2->getKeys(), $this->getConvert($entity2))
+            $this->getConvertedKeys($entity1),
+            $this->getConvertedKeys($entity2)
         );
         if (!$id = $this->queryJoin()->insert($data)) {
             return false; // failed to insert...

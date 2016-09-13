@@ -44,8 +44,9 @@ class SqlBuilder
         $table = $this->makeTable();
         $where = $this->makeWhere();
         $order = $this->makeOrder();
+        $joins = $this->makeJoin();
 
-        $sql       = "SELECT * FROM {$table}{$where}{$order}";
+        $sql       = "SELECT * FROM {$table}{$joins}{$where}{$order}";
         $statement = $this->pdo->prepare($sql);
         $statement->execute($this->params);
 
@@ -61,8 +62,9 @@ class SqlBuilder
         $table = $this->makeTable();
         $where = $this->makeWhere();
         $order = $this->makeOrder();
+        $joins = $this->makeJoin();
 
-        $sql       = "SELECT COUNT(*) AS count FROM {$table}{$where}{$order}";
+        $sql       = "SELECT COUNT(*) AS count FROM {$table}{$joins}{$where}{$order}";
         $statement = $this->pdo->prepare($sql);
         $statement->execute($this->params);
 
@@ -202,5 +204,29 @@ class SqlBuilder
             return '';
         }
         return ' ORDER BY ' . implode(', ', $order);
+    }
+
+    /**
+     * @return string
+     */
+    private function makeJoin()
+    {
+        $sql = [];
+        $joins = $this->get('join', []);
+        foreach($joins as $join) {
+            $table = $join[0];
+            $using = [];
+            foreach($join[1] as $col1 => $col2) {
+                $using[] = "{$col1}={$col2}";
+            }
+            $using = implode(', ', $using);
+            $sql[] = "JOIN {$table} ON( {$using} )";
+        }
+        $sql = implode(' ', $sql);
+        if ($sql) {
+            $sql = ' ' . $sql . ' ';
+        }
+        
+        return $sql;
     }
 }

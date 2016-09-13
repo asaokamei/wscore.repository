@@ -33,6 +33,11 @@ class PdoQuery implements QueryInterface
     private $orderBy = [];
 
     /**
+     * @var
+     */
+    private $join = [];
+
+    /**
      * PdoQuery constructor.
      *
      * @param PDO $pdo
@@ -51,6 +56,7 @@ class PdoQuery implements QueryInterface
             'table'      => $this->table,
             'conditions' => $this->conditions,
             'orderBy'    => $this->orderBy,
+            'join'       => $this->join,
         ];
         return new SqlBuilder($this->pdo, $info);
     }
@@ -233,6 +239,7 @@ class PdoQuery implements QueryInterface
      */
     public function join($join, $join_on)
     {
-        // TODO: Implement join() method.
+        $this->join[] = [$join, $join_on];
+        return $this;
     }
 }
