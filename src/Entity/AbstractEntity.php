@@ -131,7 +131,7 @@ abstract class AbstractEntity implements EntityInterface
     {
         $this->data = array_merge(
             $this->data, 
-            HelperMethods::filterDataByKeys($data, $this->columnList)
+            HelperMethods::filterDataByKeys($data, $this->getColumnList())
         );
 
         return $this;
