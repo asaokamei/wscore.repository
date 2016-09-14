@@ -136,4 +136,78 @@ class JoinTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, count($tags));
         $this->assertEquals('blog', $tags[2]->getIdValue());
     }
+
+    /**
+     * @test
+     */
+    function delete_removes_existing_relation()
+    {
+        $repo = $this->repo;
+
+        // this is the post entity to join from.
+        $post1 = $repo->getJoinRepository('posts')->findByKey(1);
+        $join  = $repo->hasJoin('posts', 'tags', $post1);
+        $this->assertEquals(2, $join->count());
+
+        // delete one tag.
+        $joinTags = $join->find();
+        $join->delete($joinTags[0]);
+        $this->assertEquals(1, $join->count());
+
+        // find the rest of the related tags.
+        $joinTag2 = $join->find();
+        $this->assertEquals($joinTags[1]->getIdValue(), $joinTag2[0]->getIdValue());
+    }
+
+    /**
+     * @test
+     */
+    function clear()
+    {
+        $repo = $this->repo;
+
+        // this is the post entity to join from.
+        $post1 = $repo->getJoinRepository('posts')->findByKey(1);
+        $join  = $repo->hasJoin('posts', 'tags', $post1);
+        $this->assertEquals(2, $join->count());
+
+        $join->clear();
+        $this->assertEquals(0, $join->count());
+    }
+
+    /**
+     * @test
+     */
+    function query_works_on_target_table()
+    {
+        $repo = $this->repo;
+
+        // this is the post entity to join from.
+        $post1 = $repo->getJoinRepository('posts')->findByKey(1);
+        $join  = $repo->hasJoin('posts', 'tags', $post1);
+
+        $joinTags = $join->query()
+            ->find(['tag' => 'tagged']);
+        $this->assertEquals(1, count($joinTags));
+        $tag1 = $joinTags[0];
+        $this->assertEquals('tag', $tag1->get('tags_tag_id'));
+        $this->assertEquals('tagged', $tag1->get('tag'));
+    }
+
+    /**
+     * @test
+     */
+    function queryJoin_works_on_join_table()
+    {
+        $repo = $this->repo;
+
+        // this is the post entity to join from.
+        $post1 = $repo->getJoinRepository('posts')->findByKey(1);
+        $join  = $repo->hasJoin('posts', 'tags', $post1);
+
+        $joinTags = $join->queryJoin()->find(['tags_tag_id' => 'test']);
+        $this->assertEquals(1, count($joinTags));
+        $tag1 = $joinTags[0];
+        $this->assertEquals('test', $tag1->get('tags_tag_id'));
+    }
 }

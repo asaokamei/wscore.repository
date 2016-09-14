@@ -2,6 +2,7 @@
 namespace WScore\Repository\Query;
 
 use PDOStatement;
+use WScore\Repository\Entity\EntityInterface;
 
 interface QueryInterface
 {
@@ -54,7 +55,7 @@ interface QueryInterface
      * most likely returns some EntityInterface objects.
      *
      * @param array $keys
-     * @return mixed[]
+     * @return mixed[]|EntityInterface[]
      */
     public function find($keys = []);
 
