@@ -90,10 +90,10 @@ class JoinTo implements JoinRelationInterface
     }
 
     /**
-     * @param EntityInterface|null $entity
-     * @return EntityInterface[]
+     * @param null|EntityInterface $entity
+     * @return QueryInterface
      */
-    public function getJoinEntities($entity = null)
+    public function queryJoin($entity = null)
     {
         return $this->joinRepo->queryJoin($this->sourceEntity, $entity);
     }
