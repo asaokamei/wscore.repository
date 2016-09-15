@@ -9,10 +9,10 @@ use tests\Utils\Posts;
 use tests\Utils\Users;
 use WScore\Repository\Entity\AbstractEntity;
 use WScore\Repository\Query\PdoQuery;
-use WScore\Repository\Relations\GenericJoinRepo;
-use WScore\Repository\Relations\JoinTo;
+use WScore\Repository\Relations\JoinRepository;
+use WScore\Repository\Relations\HasJoin;
 use WScore\Repository\Repo;
-use WScore\Repository\Repository\GenericRepository;
+use WScore\Repository\Repository\Repository;
 
 class JoinTest extends \PHPUnit_Framework_TestCase 
 {
@@ -25,10 +25,10 @@ class JoinTest extends \PHPUnit_Framework_TestCase
     {
         class_exists(Container::class);
         class_exists(Repo::class);
-        class_exists(GenericRepository::class);
-        class_exists(GenericJoinRepo::class);
+        class_exists(Repository::class);
+        class_exists(JoinRepository::class);
         class_exists(PdoQuery::class);
-        class_exists(JoinTo::class);
+        class_exists(HasJoin::class);
         class_exists(AbstractEntity::class);
 
         $c   = $this->getFullContainer();

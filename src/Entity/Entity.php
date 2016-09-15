@@ -1,11 +1,12 @@
 <?php
 namespace WScore\Repository\Entity;
 
-class Entity extends AbstractEntity 
+class Entity extends AbstractEntity
 {
     /**
      * Entity constructor.
      *
+     * @param string $table
      * @param array $primaryKeys
      * @param array $columnList
      */

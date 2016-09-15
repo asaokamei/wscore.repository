@@ -5,7 +5,7 @@ use WScore\Repository\Entity\Entity;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repo;
 
-class GenericRepository extends AbstractRepository
+class Repository extends AbstractRepository
 {
     /**
      * GenericRepository constructor.

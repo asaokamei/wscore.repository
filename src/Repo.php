@@ -7,12 +7,12 @@ use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Query\QueryInterface;
-use WScore\Repository\Relations\GenericJoinRepo;
+use WScore\Repository\Relations\JoinRepository;
 use WScore\Repository\Relations\JoinRepositoryInterface;
-use WScore\Repository\Repository\GenericRepository;
+use WScore\Repository\Repository\Repository;
 use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Relations\HasOne;
-use WScore\Repository\Relations\JoinTo;
+use WScore\Repository\Relations\HasJoin;
 use WScore\Repository\Repository\RepositoryInterface;
 
 class Repo
@@ -78,7 +78,7 @@ class Repo
         if ($this->_has($key)) {
             return $this->_get($key);
         }
-        return $this->repositories[$key] = new GenericRepository($this, $key, $primaryKeys, $autoIncrement);
+        return $this->repositories[$key] = new Repository($this, $key, $primaryKeys, $autoIncrement);
     }
 
     /**
@@ -122,7 +122,7 @@ class Repo
         if ($this->_has($key)) {
             return $this->_get($key);
         }
-        return $this->repositories[$key] = new GenericJoinRepo($this, $key, $sourceRepo, $targetRepo);
+        return $this->repositories[$key] = new JoinRepository($this, $key, $sourceRepo, $targetRepo);
     }
     
     /**
@@ -174,15 +174,13 @@ class Repo
      * @param RepositoryInterface|string $targetRepo
      * @param EntityInterface     $entity
      * @param string|null         $joinTable
-     * @param array               $convert
-     * @return JoinTo
+     * @return HasJoin
      */
     public function hasJoin(
         $sourceRepo,
         $targetRepo,
         EntityInterface $entity,
-        $joinTable = '',
-        $convert = []
+        $joinTable = ''
     ) {
         if (is_string($sourceRepo)) {
             $sourceRepo = $this->getRepository($sourceRepo);
@@ -192,7 +190,7 @@ class Repo
         }
         $joinTable = $joinTable ?: $this->makeJoinTableName($targetRepo, $sourceRepo);
         $join      = $this->getJoinRepository($joinTable, $sourceRepo, $targetRepo);
-        return new JoinTo($join, $entity);
+        return new HasJoin($join, $entity);
     }
 
 

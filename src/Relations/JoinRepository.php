@@ -10,13 +10,13 @@ use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\RepositoryInterface;
 
-/* abstract */ class AbstractJoinRepo implements JoinRepositoryInterface
+class JoinRepository implements JoinRepositoryInterface
 {
     /**
      * @var string
      */
     protected $table;
-    
+
     /**
      * @var QueryInterface
      */
@@ -37,7 +37,7 @@ use WScore\Repository\Repository\RepositoryInterface;
      * @var string[]
      */
     protected $columnList = [];
-    
+
     /**
      * @Override
      * @var string|EntityInterface
@@ -57,7 +57,7 @@ use WScore\Repository\Repository\RepositoryInterface;
      * @var RepositoryInterface
      */
     protected $from_repo;
-    
+
     /**
      * @Override
      * @var string
@@ -82,7 +82,7 @@ use WScore\Repository\Repository\RepositoryInterface;
      */
     public function __construct($repo, $table, $fromRepo, $toRepo)
     {
-        $this->table = $table;
+        $this->table       = $table;
         $this->primaryKeys = [$this->table . '_id'];
         $this->query       = $repo->getQuery();
         $this->now         = $repo->getCurrentDateTime();
@@ -93,12 +93,12 @@ use WScore\Repository\Repository\RepositoryInterface;
         ksort($repo);
         $this->from_table = $tabs[0];
         $this->from_repo  = $repo[$this->from_table];
-        foreach($this->from_repo->getKeyColumns() as $key) {
+        foreach ($this->from_repo->getKeyColumns() as $key) {
             $this->from_convert[$key] = $this->from_table . '_' . $key;
         }
         $this->to_table = $tabs[1];
         $this->to_repo  = $repo[$this->to_table];
-        foreach($this->to_repo->getKeyColumns() as $key) {
+        foreach ($this->to_repo->getKeyColumns() as $key) {
             $this->to_convert[$key] = $this->to_table . '_' . $key;
         }
     }
@@ -155,9 +155,9 @@ use WScore\Repository\Repository\RepositoryInterface;
     private function getFromOrTo($entity, $getOpposite = false)
     {
         if ($entity->getTable() === $this->from_table) {
-            $target = ['from','to', ];
+            $target = ['from', 'to',];
         } elseif ($entity->getTable() === $this->to_table) {
-            $target = ['to', 'from', ];
+            $target = ['to', 'from',];
         } else {
             throw new InvalidArgumentException('entity not from nor to table.');
         }
@@ -188,7 +188,7 @@ use WScore\Repository\Repository\RepositoryInterface;
 
     /**
      * returns QueryInterface on join table.
-     * 
+     *
      * @param EntityInterface|null $entity1
      * @param EntityInterface|null $entity2
      * @return QueryInterface
@@ -212,8 +212,8 @@ use WScore\Repository\Repository\RepositoryInterface;
     }
 
     /**
-     * returns QueryInterface on targeted table, opposite of $entity's table. 
-     * 
+     * returns QueryInterface on targeted table, opposite of $entity's table.
+     *
      * @param EntityInterface $entity
      * @return QueryInterface
      */
@@ -223,7 +223,7 @@ use WScore\Repository\Repository\RepositoryInterface;
         $method = "query" . $fromTo;
         return $this->$method($entity);
     }
-    
+
     /**
      * @param EntityInterface|null $entity
      * @return QueryInterface
@@ -264,8 +264,8 @@ use WScore\Repository\Repository\RepositoryInterface;
     {
         $primaryKey = $this->primaryKeys[0];
         return $this->queryJoin()
-            ->select([$primaryKey => $key])
-            ->fetch();
+                    ->select([$primaryKey => $key])
+                    ->fetch();
     }
 
     /**
@@ -275,10 +275,10 @@ use WScore\Repository\Repository\RepositoryInterface;
     public function select($entity)
     {
         return $this->queryTarget($entity)
-            ->select()
-            ->fetchAll();
+                    ->select()
+                    ->fetchAll();
     }
-    
+
     /**
      * @param EntityInterface $entity1
      * @param EntityInterface $entity2

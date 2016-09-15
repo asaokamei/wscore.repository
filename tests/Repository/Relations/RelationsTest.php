@@ -10,7 +10,7 @@ use tests\Utils\Users;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Repo;
-use WScore\Repository\Repository\GenericRepository;
+use WScore\Repository\Repository\Repository;
 
 class RelationsTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +18,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     {
         class_exists(Container::class);
         class_exists(Repo::class);
-        class_exists(GenericRepository::class);
+        class_exists(Repository::class);
         class_exists(PdoQuery::class);
     }
 

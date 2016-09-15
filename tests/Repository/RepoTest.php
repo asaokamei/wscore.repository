@@ -10,7 +10,7 @@ use tests\Utils\Users;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Query\PdoQuery;
-use WScore\Repository\Repository\GenericRepository;
+use WScore\Repository\Repository\Repository;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repo;
 
@@ -30,7 +30,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     {
         class_exists(Container::class);
         class_exists(Repo::class);
-        class_exists(GenericRepository::class);
+        class_exists(Repository::class);
         class_exists(Query::class);
 
         $pdo  = new PDO('sqlite::memory:');
@@ -66,7 +66,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     function repo_returns_generic_repository()
     {
         $dao = $this->repo->getRepository('testing');
-        $this->assertEquals(GenericRepository::class, get_class($dao));
+        $this->assertEquals(Repository::class, get_class($dao));
         $this->assertEquals('testing', $dao->getTable());
         $this->assertEquals(['testing_id'], $dao->getKeyColumns());
     }
