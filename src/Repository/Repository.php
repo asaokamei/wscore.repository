@@ -1,8 +1,6 @@
 <?php
 namespace WScore\Repository\Repository;
 
-use WScore\Repository\Entity\Entity;
-use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repo;
 
 class Repository extends AbstractRepository

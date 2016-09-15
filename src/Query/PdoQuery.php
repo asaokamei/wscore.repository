@@ -3,7 +3,6 @@ namespace WScore\Repository\Query;
 
 use PDO;
 use PDOStatement;
-use WScore\Repository\Entity\EntityInterface;
 
 class PdoQuery implements QueryInterface 
 {
