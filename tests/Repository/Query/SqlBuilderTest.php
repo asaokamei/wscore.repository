@@ -24,11 +24,20 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $sql
+     * @return SqlBuilder
+     */
+    function getBuilder(array $sql)
+    {
+        return new SqlBuilder($this->pdo, $sql);
+    }
+    
+    /**
      * @test
      */
     function execSelect_gets_a_row_from_database_table()
     {
-        $sql = new SqlBuilder($this->pdo, [
+        $sql = $this->getBuilder([
             'table' => 'users',
         ]);
         $this->fix->createUsers();
@@ -44,7 +53,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
      */
     function execInsert_inserts_data_into_database_table()
     {
-        $sql = new SqlBuilder($this->pdo, [
+        $sql = $this->getBuilder([
             'table' => 'users',
         ]);
         $this->fix->createUsers();
@@ -64,7 +73,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
      */
     function execUpdate()
     {
-        $sql = new SqlBuilder($this->pdo, [
+        $sql = $this->getBuilder([
             'table' => 'users',
         ]);
         $this->fix->createUsers();
@@ -76,7 +85,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
         $this->assertEquals('name-2', $data['name']);
 
-        $sql = new SqlBuilder($this->pdo, [
+        $sql = $this->getBuilder([
             'table' => 'users',
             'conditions' => ['users_id' => 2]
         ]);
@@ -84,7 +93,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
             'name' => 'test-update'
         ]);
 
-        $sql = new SqlBuilder($this->pdo, [
+        $sql = $this->getBuilder([
             'table' => 'users',
         ]);
         $stmt = $sql->execSelect();
@@ -101,7 +110,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->fix->createUsers();
         $this->fix->insertUsers(2);
-        $sql = new SqlBuilder($this->pdo, [
+        $sql = $this->getBuilder([
             'table' => 'users',
             'orderBy' => [ 
                 ['users_id', 'DESC' ]
@@ -121,7 +130,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->fix->createUsers();
         $this->fix->insertUsers(2);
-        $sql = new SqlBuilder($this->pdo, [
+        $sql = $this->getBuilder([
             'table' => 'users',
         ]);
 
@@ -142,19 +151,19 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->fix->createUsers();
         $this->fix->insertUsers(2);
-        $sql = new SqlBuilder($this->pdo, [
+        $sql = $this->getBuilder([
             'table' => 'users',
         ]);
 
         $this->assertEquals(2, $sql->execCount());
 
-        $sql = new SqlBuilder($this->pdo, [
+        $sql = $this->getBuilder([
             'table' => 'users',
             'conditions' => ['users_id' => '1'],
         ]);
         $sql->execDelete();
 
-        $sql = new SqlBuilder($this->pdo, [
+        $sql = $this->getBuilder([
             'table' => 'users',
         ]);
         $this->assertEquals(1, $sql->execCount());
