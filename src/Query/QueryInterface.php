@@ -87,11 +87,12 @@ interface QueryInterface
 
     /**
      * returns the last inserted ID.
-     * 
+     *
+     * @param string $table
      * @param string $idName
      * @return string
      */
-    public function lastId($idName = '');
+    public function lastId($table = '', $idName = '');
 
     /**
      * updates the value as $data for rows selected by $keys.

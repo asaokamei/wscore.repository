@@ -161,18 +161,18 @@ class AuraQuery implements QueryInterface
     /**
      * returns the last inserted ID.
      *
+     * @param string $table
      * @param string $idName
      * @return string
      */
-    public function lastId($idName = '')
+    public function lastId($table = '', $idName = '')
     {
+        $name = null;
         if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
-            if (!$idName) {
-                $idName = implode( '_', [$this->builder->get('table'), $idName, 'seq' ] );
-            }
+            $name = implode( '_', [$table, $idName, 'seq' ] );
         }
 
-        return $this->pdo->lastInsertId($idName);
+        return $this->pdo->lastInsertId($name);
     }
 
     /**
