@@ -1,12 +1,6 @@
 <?php
 namespace WScore\Repository\Relations;
 
-use InvalidArgumentException;
-use WScore\Repository\Entity\Entity;
-use WScore\Repository\Entity\EntityInterface;
-use WScore\Repository\Helpers\CurrentDateTime;
-use WScore\Repository\Helpers\HelperMethods;
-use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\RepositoryInterface;
 

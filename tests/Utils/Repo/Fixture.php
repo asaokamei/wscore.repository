@@ -40,8 +40,8 @@ class Fixture
     {
         $this->insertUsers($count);
         $this->insertPosts($count);
-        $this->insertTags($count);
-        $this->insertPostsTags($count);
+        $this->insertTags();
+        $this->insertPostsTags();
     }
 
     /**
@@ -142,12 +142,10 @@ SQL;
         $this->pdo->exec($create);
     }
 
-    private $tags = ['test', 'tag', 'blog'];
-
     /**
-     * @param int $count
+     * 
      */
-    public function insertTags($count = 4)
+    public function insertTags()
     {
         $insert =<<<SQL
 INSERT INTO tags (tag_id, tag, created_at, updated_at) VALUES (?, ?, ?, ?);
@@ -184,9 +182,9 @@ SQL;
     }
 
     /**
-     * @param int $count
+     * 
      */
-    public function insertPostsTags($count = 4)
+    public function insertPostsTags()
     {
         $insert =<<<SQL
 INSERT INTO posts_tags (posts_post_id, tags_tag_id, created_at) VALUES (?, ?, ?);
