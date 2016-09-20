@@ -104,14 +104,14 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     function hasOne_returns_related_entity()
     {
         /** @var Order $order */
-        $order = $this->repo->getRepository('order');
+        $order         = $this->repo->getRepository('order');
         $order_11_2015 = $order->findByKey([
             'member_type' => '1',
             'member_code' => '1',
             'fee_year'    => '2015',
             'fee_code'    => '1'
         ]);
-        $member11 = $order->member($order_11_2015)->find()[0];
+        $member11      = $order->member($order_11_2015)->find()[0];
         $this->assertEquals(1, $member11->get('type'));
         $this->assertEquals(1, $member11->get('code'));
     }
@@ -125,9 +125,25 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $members = $this->repo->getRepository('member');
         $main    = $members->findByKey(['type' => 1, 'code' => 1]);
         $this->assertEquals('Main Member', $main->get('name'));
-        
+
         $feeJoined = $members->fees($main);
         $fees      = $feeJoined->find();
         $this->assertEquals(3, count($fees));
+    }
+
+    /**
+     * @test
+     */
+    function hasJoin_returns_related_entities_other_way()
+    {
+        /** @var Fee $fees */
+        $fees   = $this->repo->getRepository('fee');
+        $feeSub = $fees->findByKey(['year' => 2016, 'type' => 2, 'code' => 1]);
+        $this->assertEquals('sub-member fee', $feeSub->get('name'));
+
+        $subJoined  = $fees->members($feeSub);
+        $subMembers = $subJoined->find();
+        $this->assertEquals(1, count($subMembers));
+        $this->assertEquals('Sub Member', $subMembers[0]->get('name'));
     }
 }
