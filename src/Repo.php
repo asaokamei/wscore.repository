@@ -28,9 +28,9 @@ class Repo
     private $repositories = [];
 
     /**
-     * @var QueryInterface
+     * @var null|PDO
      */
-    private $query;
+    private $pdo;
 
     /**
      * Repo constructor.
@@ -41,10 +41,7 @@ class Repo
     public function __construct($container = null, $pdo = null)
     {
         $this->container = $container;
-        // use default classes if not set.
-        $this->query = $this->_has(QueryInterface::class)
-            ? $this->_get(QueryInterface::class)
-            : new AuraQuery($pdo ?: $this->_get(PDO::class));
+        $this->pdo       = $pdo;
     }
 
     /**
@@ -52,7 +49,11 @@ class Repo
      */
     public function getQuery()
     {
-        return $this->query;
+        if ($this->_has(QueryInterface::class)) {
+            return $this->_get(QueryInterface::class);
+        }
+        return $this->repositories[QueryInterface::class] 
+            = new AuraQuery($this->pdo ?: $this->_get(PDO::class));
     }
 
     /**
