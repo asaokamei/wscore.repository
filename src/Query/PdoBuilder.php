@@ -12,7 +12,7 @@ use PDOStatement;
  *
  * @package WScore\Repository\Query
  */
-class SqlBuilder
+class PdoBuilder
 {
     /**
      * @var array

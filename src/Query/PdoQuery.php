@@ -48,7 +48,7 @@ class PdoQuery implements QueryInterface
     }
 
     /**
-     * @return SqlBuilder
+     * @return PdoBuilder
      */
     private function sql()
     {
@@ -58,7 +58,7 @@ class PdoQuery implements QueryInterface
             'orderBy'    => $this->orderBy,
             'join'       => $this->join,
         ];
-        return new SqlBuilder($this->pdo, $info);
+        return new PdoBuilder($this->pdo, $info);
     }
     
     /**

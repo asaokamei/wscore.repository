@@ -3,9 +3,9 @@ namespace tests\Repository\Query;
 
 use PDO;
 use tests\Fixture;
-use WScore\Repository\Query\SqlBuilder;
+use WScore\Repository\Query\PdoBuilder;
 
-class SqlBuilderTest extends \PHPUnit_Framework_TestCase 
+class PdoBuilderTest extends \PHPUnit_Framework_TestCase 
 {
     /**
      * @var PDO
@@ -25,11 +25,11 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $sql
-     * @return SqlBuilder
+     * @return PdoBuilder
      */
     function getBuilder(array $sql)
     {
-        return new SqlBuilder($this->pdo, $sql);
+        return new PdoBuilder($this->pdo, $sql);
     }
     
     /**
