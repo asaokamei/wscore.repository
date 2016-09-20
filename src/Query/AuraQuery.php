@@ -5,17 +5,17 @@ use PDO;
 use PDOStatement;
 use WScore\Repository\Entity\EntityInterface;
 
-class PdoQuery implements QueryInterface 
+class AuraQuery implements QueryInterface
 {
     /**
      * @var PDO
      */
     private $pdo;
-    
+
     /**
-     * @var string
+     * @var AuraBuilder
      */
-    private $table;
+    private $builder;
 
     /**
      * @var array
@@ -23,44 +23,16 @@ class PdoQuery implements QueryInterface
     private $fetchMode = [PDO::FETCH_ASSOC, null, null];
 
     /**
-     * @var array
-     */
-    private $conditions = [];
-
-    /**
-     * @var array
-     */
-    private $orderBy = [];
-
-    /**
-     * @var
-     */
-    private $join = [];
-
-    /**
-     * PdoQuery constructor.
+     * AuraQuery constructor.
      *
      * @param PDO $pdo
      */
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
+        $this->builder = new AuraBuilder($pdo);
     }
 
-    /**
-     * @return SqlBuilder
-     */
-    private function sql()
-    {
-        $info = [
-            'table'      => $this->table,
-            'conditions' => $this->conditions,
-            'orderBy'    => $this->orderBy,
-            'join'       => $this->join,
-        ];
-        return new SqlBuilder($this->pdo, $info);
-    }
-    
     /**
      * sets database table name to query.
      * should return a new object so that the object can be reused safely.
@@ -70,9 +42,9 @@ class PdoQuery implements QueryInterface
      */
     public function withTable($table)
     {
-        $self = clone($this);
-        $self->table = $table;
-        return $self;
+        $this->builder = $this->builder->clean();
+        $this->builder->set('table', $table);
+        return $this;
     }
 
     /**
@@ -82,7 +54,7 @@ class PdoQuery implements QueryInterface
      */
     public function getTable()
     {
-        return $this->table;
+        return $this->builder->get('table');
     }
 
     /**
@@ -97,8 +69,8 @@ class PdoQuery implements QueryInterface
     {
         $this->fetchMode = [
             $mode,
-            $fetch_args, 
-            $ctor_args,
+            $fetch_args,
+            $ctor_args
         ];
         return $this;
     }
@@ -112,11 +84,23 @@ class PdoQuery implements QueryInterface
      */
     public function condition(array $condition)
     {
-        if (!empty($condition)) {
-            $this->conditions = array_merge($this->conditions, $condition);
-        }
+        $this->builder->merge('conditions', $condition);
         return $this;
     }
+
+    /**
+     * sets the order by clause when select.
+     *
+     * @param string $order
+     * @param string $direction
+     * @return QueryInterface
+     */
+    public function orderBy($order, $direction = 'ASC')
+    {
+        $this->builder->merge('orderBy', [[$order, $direction==='ASC' ?: 'DESC']]);
+        return $this;
+    }
+
     /**
      * selects and returns as indicated by fetch mode.
      * most likely returns some EntityInterface objects.
@@ -129,20 +113,6 @@ class PdoQuery implements QueryInterface
         return $this->select($keys)->fetchAll();
     }
 
-
-    /**
-     * sets the order by clause when select.
-     *
-     * @param string $order
-     * @param string $direction
-     * @return QueryInterface
-     */
-    public function orderBy($order, $direction = 'ASC')
-    {
-        $this->orderBy[] = [$order, $direction];
-        return $this;
-    }
-
     /**
      * execute select statement with $keys as condition.
      * returns PDOStatement reflecting the self::setFetchMode().
@@ -152,8 +122,9 @@ class PdoQuery implements QueryInterface
      */
     public function select($keys = [])
     {
-        $this->condition($keys);
-        $stmt = $this->sql()->execSelect();
+        $this->builder->merge('conditions', $keys);
+        $stmt = $this->builder->execSelect();
+
         /** @noinspection PhpMethodParametersCountMismatchInspection */
         $stmt->setFetchMode(
             $this->fetchMode[0],
@@ -162,7 +133,7 @@ class PdoQuery implements QueryInterface
         );
         return $stmt;
     }
-    
+
     /**
      * returns the number of rows found.
      * the $keys are same as that of self::select method.
@@ -172,23 +143,24 @@ class PdoQuery implements QueryInterface
      */
     public function count($keys = [])
     {
-        return $this->sql()->execCount();
+        $this->condition($keys);
+        return $this->builder->execCount();
     }
 
     /**
      * insert a data into a database table.
-     * returns the new ID of auto-increment column if exists,
-     * or true if no such column.
      *
      * @param array $data
-     * @return string|bool
+     * @return bool
      */
     public function insert(array $data)
     {
-        return $this->sql()->execInsert($data);
+        return $this->builder->execInsert($data);
     }
 
     /**
+     * returns the last inserted ID.
+     *
      * @param string $idName
      * @return string
      */
@@ -196,10 +168,10 @@ class PdoQuery implements QueryInterface
     {
         if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
             if (!$idName) {
-                $idName = implode( '_', [$this->table, $idName, 'seq' ] );
+                $idName = implode( '_', [$this->builder->get('table'), $idName, 'seq' ] );
             }
         }
-        
+
         return $this->pdo->lastInsertId($idName);
     }
 
@@ -213,7 +185,7 @@ class PdoQuery implements QueryInterface
     public function update(array $keys, array $data)
     {
         $this->condition($keys);
-        return $this->sql()->execUpdate($data);
+        return $this->builder->execUpdate($data);
     }
 
     /**
@@ -225,7 +197,7 @@ class PdoQuery implements QueryInterface
     public function delete($keys)
     {
         $this->condition($keys);
-        return $this->sql()->execDelete();
+        return $this->builder->execDelete();
     }
 
     /**
@@ -239,7 +211,7 @@ class PdoQuery implements QueryInterface
      */
     public function join($join, $join_on)
     {
-        $this->join[] = [$join, $join_on];
+        $this->builder->merge('join', [[$join, $join_on]]);
         return $this;
     }
 }

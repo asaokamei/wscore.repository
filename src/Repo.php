@@ -5,7 +5,7 @@ use Interop\Container\ContainerInterface;
 use PDO;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Helpers\CurrentDateTime;
-use WScore\Repository\Query\PdoQuery;
+use WScore\Repository\Query\AuraQuery;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Relations\JoinRepository;
 use WScore\Repository\Relations\JoinRepositoryInterface;
@@ -44,7 +44,7 @@ class Repo
         // use default classes if not set.
         $this->query = $this->_has(QueryInterface::class)
             ? $this->_get(QueryInterface::class)
-            : new PdoQuery($pdo ?: $this->_get(PDO::class));
+            : new AuraQuery($pdo ?: $this->_get(PDO::class));
     }
 
     /**
