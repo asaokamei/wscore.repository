@@ -1,14 +1,14 @@
 <?php
-namespace tests\Utils;
+namespace tests\Utils\Repo;
 
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\AbstractRepository;
 
-class Posts extends AbstractRepository
+class Users extends AbstractRepository
 {
-    protected $table = 'posts';
+    protected $table = 'users';
 
-    protected $primaryKeys = ['post_id'];
+    protected $primaryKeys = ['users_id'];
 
     protected $useAutoInsertId = true;
 

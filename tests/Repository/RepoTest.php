@@ -6,7 +6,7 @@ use PDO;
 use tests\Fixture;
 use tests\Utils\Container;
 use tests\Utils\Query;
-use tests\Utils\Users;
+use tests\Utils\Repo\Users;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Query\PdoQuery;
