@@ -3,7 +3,7 @@ namespace tests\Repository\Relations;
 
 use Interop\Container\ContainerInterface;
 use PDO;
-use tests\Fixture;
+use tests\Utils\Repo\Fixture;
 use tests\Utils\Container;
 use tests\Utils\Repo\Posts;
 use tests\Utils\Repo\Users;

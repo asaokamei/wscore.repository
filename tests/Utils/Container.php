@@ -4,7 +4,7 @@ namespace tests\Utils;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Interop\Container\Exception\NotFoundException;
-use tests\Fixture;
+use tests\Utils\Repo\Fixture;
 use WScore\Repository\Repo;
 
 class Container implements ContainerInterface 

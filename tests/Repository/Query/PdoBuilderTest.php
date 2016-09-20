@@ -2,7 +2,7 @@
 namespace tests\Repository\Query;
 
 use PDO;
-use tests\Fixture;
+use tests\Utils\Repo\Fixture;
 use WScore\Repository\Query\PdoBuilder;
 
 class PdoBuilderTest extends \PHPUnit_Framework_TestCase 

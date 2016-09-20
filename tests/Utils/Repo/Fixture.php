@@ -1,5 +1,5 @@
 <?php
-namespace tests;
+namespace tests\Utils\Repo;
 
 use PDO;
 
