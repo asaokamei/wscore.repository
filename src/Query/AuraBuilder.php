@@ -196,7 +196,7 @@ class AuraBuilder
             foreach ($item[1] as $col1 => $col2) {
                 $using[] = "{$col1}={$col2}";
             }
-            $using = implode(', ', $using);
+            $using = implode(' AND ', $using);
             $select->join('INNER', $table, $using);
         }
     }

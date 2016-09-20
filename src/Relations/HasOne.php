@@ -89,10 +89,10 @@ class HasOne implements RelationInterface
      */
     private function getPrimaryKeys()
     {
-        $targetKeys  = $this->targetRepo->getKeyColumns();
         $sourceData  = $this->sourceEntity->toArray();
-        $primaryKeys = HelperMethods::filterDataByKeys($sourceData, $targetKeys);
-        $primaryKeys = HelperMethods::convertDataKeys($primaryKeys, $this->convert);
+        $targetKeys  = $this->targetRepo->getKeyColumns();
+        $primaryKeys = HelperMethods::filterDataByKeys($sourceData, $this->convert);
+        $primaryKeys = HelperMethods::filterDataByKeys($primaryKeys, $targetKeys);
 
         return $primaryKeys;
     }

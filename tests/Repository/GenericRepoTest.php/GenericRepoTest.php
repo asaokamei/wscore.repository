@@ -6,7 +6,7 @@ use PHPUnit_Framework_TestCase;
 use tests\Utils\Composite\FixtureCompositeKey;
 use WScore\Repository\Repo;
 
-class CompositeKeyTest extends PHPUnit_Framework_TestCase 
+class GenericRepoTest extends PHPUnit_Framework_TestCase 
 {
     /**
      * @var PDO
@@ -26,13 +26,9 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $fixture->insertData();
         $this->repo = new Repo(null, $this->pdo);
     }
-    
+
     function test0()
     {
-        $members = $this->repo->getRepository('members', ['type', 'code']);
-        $main    = $members->findByKey(['type' => 1, 'code' => 1]);
-        $this->assertEquals('Main Member', $main->get('name'));
-        
         $fees = $this->repo->getRepository('fees', ['year', 'type', 'code']);
         $fee2016 = $fees->find(['year' => 2016]);
         $this->assertEquals(4, count($fee2016));
@@ -40,4 +36,15 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
             $this->assertEquals(2016, $f->get('year'));
         }
     }
+
+    /**
+     * @test
+     */
+    function findByKey_works_for_composite_keys()
+    {
+        $members = $this->repo->getRepository('members', ['type', 'code']);
+        $main    = $members->findByKey(['type' => 1, 'code' => 1]);
+        $this->assertEquals('Main Member', $main->get('name'));
+    }
+
 }
