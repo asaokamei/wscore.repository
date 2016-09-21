@@ -146,4 +146,80 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($subMembers));
         $this->assertEquals('Sub Member', $subMembers[0]->get('name'));
     }
+
+    /**
+     * @test
+     */
+    function hasJoin_remove_deletes_a_relation()
+    {
+        /** @var Member $members */
+        $members = $this->repo->getRepository('member');
+        $main    = $members->findByKey(['type' => 1, 'code' => 100]);
+
+        // retrieve associated fees.
+        $joinedFees = $members->fees($main);
+        $fees       = $joinedFees->find();
+        $this->assertEquals(3, count($fees));
+
+        // this is the fee to remove.
+        $feeRemove = $fees[1];
+        $joinedFees->delete($feeRemove);
+        $fees2 = $joinedFees->find();
+        $this->assertEquals(2, count($fees2));
+        // make sure the remaining 2 fees are not $feeRemove
+        foreach($fees2 as $f) {
+            $this->assertNotEquals($feeRemove->getKeys(), $f->getKeys());
+        }
+    }
+
+    /**
+     * @test
+     */
+    function hasJoin_relate_adds_a_new_entity()
+    {
+        /** @var Member $members */
+        $members = $this->repo->getRepository('member');
+        $subMem  = $members->findByKey(['type' => 2, 'code' => 100]);
+
+        // retrieve associated fees.
+        $joinedFees = $members->fees($subMem);
+        $fees1       = $joinedFees->find();
+        $this->assertEquals(2, count($fees1));
+
+        // fees to add...
+        $feeToAdd = $this->repo->getRepository('fee')->findByKey(['year' => 2016, 'type' => 2, 'code' => 'SYSTEM']);
+        $this->assertNotNull($feeToAdd);
+        $joinedFees->relate($feeToAdd);
+
+        // check if $feeToAdd is related
+        $fees2       = $joinedFees->find();
+        $this->assertEquals(3, count($fees2));
+        $containsFeeToAdd = function() use($feeToAdd, $fees2) {
+            foreach($fees2 as $f) {
+                if ($feeToAdd->getKeys() == $f->getKeys()) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        $this->assertTrue($containsFeeToAdd());
+    }
+
+    /**
+     * @test
+     */
+    function hasJoin_clean_removes_all_relations()
+    {
+        /** @var Member $members */
+        $members = $this->repo->getRepository('member');
+        $subMem  = $members->findByKey(['type' => 2, 'code' => 100]);
+
+        // retrieve associated fees.
+        $joinedFees = $members->fees($subMem);
+        $fees1       = $joinedFees->find();
+        $this->assertEquals(2, count($fees1));
+
+        $joinedFees->clear();
+        $this->assertEmpty($joinedFees->find());
+    }
 }
