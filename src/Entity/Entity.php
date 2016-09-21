@@ -8,13 +8,11 @@ class Entity extends AbstractEntity
      *
      * @param string $table
      * @param array $primaryKeys
-     * @param array $columnList
      */
-    public function __construct($table, array $primaryKeys, array $columnList = [])
+    public function __construct($table, array $primaryKeys)
     {
         $this->table       = $table;
         $this->primaryKeys = $primaryKeys;
-        $this->columnList  = $columnList;
         $this->isFetchDone = true;
     }
 

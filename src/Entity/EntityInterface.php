@@ -15,11 +15,6 @@ interface EntityInterface
     public function getKeyColumns();
 
     /**
-     * @return string[]
-     */
-    public function getColumnList();
-
-    /**
      * @return array
      */
     public function getKeys();

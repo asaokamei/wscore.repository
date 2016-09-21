@@ -27,11 +27,6 @@ abstract class AbstractEntity implements EntityInterface
     protected $primaryKeys = [];
 
     /**
-     * @var string[]
-     */
-    protected $columnList = [];
-    
-    /**
      * sets value object class name for each column.
      * The value object is constructed as new ValueObject($value),
      * or a callable that will convert a value to an object.
@@ -72,14 +67,6 @@ abstract class AbstractEntity implements EntityInterface
     public function getKeyColumns()
     {
         return $this->primaryKeys;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getColumnList()
-    {
-        return $this->columnList;
     }
 
     /**
@@ -130,8 +117,8 @@ abstract class AbstractEntity implements EntityInterface
     public function fill(array $data)
     {
         $this->data = array_merge(
-            $this->data, 
-            HelperMethods::filterDataByKeys($data, $this->getColumnList())
+            $this->data,
+            $data
         );
 
         return $this;

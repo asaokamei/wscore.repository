@@ -66,7 +66,6 @@ class RepositoryTestX extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['p1' => 'v1', 'p2' => 'v2', 'col1' => 'val', 'col2' => 'test'], $entity->toArray());
         $this->assertEquals(['p1' => 'v1', 'p2' => 'v2'], $entity->getKeys());
         $this->assertEquals(['p1', 'p2'], $entity->getKeyColumns());
-        $this->assertEquals(['p1', 'p2', 'col1', 'col2'], $entity->getColumnList());
     }
 
     function test2()
