@@ -45,7 +45,7 @@ END_OF_SQL;
 CREATE TABLE fees (
     year    INTEGER NOT NULL,
     type    INTEGER NOT NULL,
-    code    INTEGER NOT NULL,
+    code    VARCHAR(16) NOT NULL,
     amount  INT NOT NULL,
     name    VARCHAR(64) NOT NULL,
     PRIMARY KEY (year, type, code)
@@ -78,33 +78,33 @@ END_OF_SQL;
 
         $inMember = "INSERT INTO members (type, code, name, created_at, updated_at) VALUES (?, ?, ?, ?, ?);";
         $members = [
-            [1, 1, 'Main Member', $now, $now,],
-            [2, 1, 'Sub Member',  $now, $now,],
-            [1, 2, 'Test Member', $now, $now,],
+            [1, 100, 'Main Member', $now, $now,],
+            [2, 100, 'Sub Member',  $now, $now,],
+            [1, 200, 'Test Member', $now, $now,],
         ];
         $this->insert($inMember, $members);
 
         $inFees   = "INSERT INTO fees (year, type, code, amount, name) VALUES(?, ?, ?, ?, ?);";
         $fees = [
-            [2015, 1, 1, 1000, 'member fee',  ],
-            [2015, 1, 2, 100,  'system fee', ],
-            [2016, 1, 1, 1100, 'member fee',  ],
-            [2016, 1, 2, 200,  'system fee', ],
-            [2015, 2, 1, 700, 'sub-member fee',  ],
-            [2015, 2, 2, 100,  'system fee', ],
-            [2016, 2, 1, 800, 'sub-member fee',  ],
-            [2016, 2, 2, 200,  'system fee', ],
+            [2015, 1, 'MEMBER', 1000, 'member fee',  ],
+            [2015, 1, 'SYSTEM', 100,  'system fee', ],
+            [2016, 1, 'MEMBER', 1100, 'member fee',  ],
+            [2016, 1, 'SYSTEM', 200,  'system fee', ],
+            [2015, 2, 'MEMBER', 700,  'sub-member fee',  ],
+            [2015, 2, 'SYSTEM', 100,  'system fee', ],
+            [2016, 2, 'MEMBER', 800,  'sub-member fee',  ],
+            [2016, 2, 'SYSTEM', 200,  'system fee', ],
         ];
         $this->insert($inFees, $fees);
 
         $inOrders = "INSERT INTO orders(member_type, member_code, fee_year, fee_code, created_at) VALUES(?, ?, ?, ?, ?);";
         $orders = [
-            [1, 1, 2015, 1, $now, ],
-            [1, 1, 2016, 1, $now, ],
-            [1, 1, 2016, 2, $now, ],
-            [2, 1, 2015, 1, $now, ],
-            [2, 1, 2016, 1, $now, ],
-            [1, 3, 2016, 1, $now, ],
+            [1, 100, 2015, 'MEMBER', $now, ],
+            [1, 100, 2016, 'MEMBER', $now, ],
+            [1, 100, 2016, 'SYSTEM', $now, ],
+            [2, 100, 2015, 'MEMBER', $now, ],
+            [2, 100, 2016, 'MEMBER', $now, ],
+            [1, 300, 2016, 'MEMBER', $now, ],
         ];
         $this->insert($inOrders, $orders);
 

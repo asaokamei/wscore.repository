@@ -81,7 +81,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     {
         /** @var Member $members */
         $members = $this->repo->getRepository('member');
-        $main    = $members->findByKey(['type' => 1, 'code' => 1]);
+        $main    = $members->findByKey(['type' => 1, 'code' => 100]);
         $this->assertEquals('Main Member', $main->get('name'));
 
         $orders = $members->orders($main);
@@ -92,9 +92,9 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $order2015 = $orders->find(['fee_year' => 2015])[0];
         $this->assertEquals([
             'member_type' => '1',
-            'member_code' => '1',
+            'member_code' => '100',
             'fee_year'    => '2015',
-            'fee_code'    => '1'
+            'fee_code'    => 'MEMBER'
         ], $order2015->getKeys());
     }
 
@@ -107,13 +107,13 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $order         = $this->repo->getRepository('order');
         $order_11_2015 = $order->findByKey([
             'member_type' => '1',
-            'member_code' => '1',
+            'member_code' => '100',
             'fee_year'    => '2015',
-            'fee_code'    => '1'
+            'fee_code'    => 'MEMBER'
         ]);
         $member11      = $order->member($order_11_2015)->find()[0];
         $this->assertEquals(1, $member11->get('type'));
-        $this->assertEquals(1, $member11->get('code'));
+        $this->assertEquals(100, $member11->get('code'));
     }
 
     /**
@@ -123,7 +123,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     {
         /** @var Member $members */
         $members = $this->repo->getRepository('member');
-        $main    = $members->findByKey(['type' => 1, 'code' => 1]);
+        $main    = $members->findByKey(['type' => 1, 'code' => 100]);
         $this->assertEquals('Main Member', $main->get('name'));
 
         $feeJoined = $members->fees($main);
@@ -138,7 +138,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     {
         /** @var Fee $fees */
         $fees   = $this->repo->getRepository('fee');
-        $feeSub = $fees->findByKey(['year' => 2016, 'type' => 2, 'code' => 1]);
+        $feeSub = $fees->findByKey(['year' => 2016, 'type' => 2, 'code' => 'MEMBER']);
         $this->assertEquals('sub-member fee', $feeSub->get('name'));
 
         $subJoined  = $fees->members($feeSub);

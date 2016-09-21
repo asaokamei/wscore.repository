@@ -43,7 +43,7 @@ class GenericRepoTest extends PHPUnit_Framework_TestCase
     function findByKey_works_for_composite_keys()
     {
         $members = $this->repo->getRepository('members', ['type', 'code']);
-        $main    = $members->findByKey(['type' => 1, 'code' => 1]);
+        $main    = $members->findByKey(['type' => 1, 'code' => 100]);
         $this->assertEquals('Main Member', $main->get('name'));
     }
 
