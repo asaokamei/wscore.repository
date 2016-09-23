@@ -30,13 +30,13 @@ interface RepositoryInterface
      * @param array $data
      * @return EntityInterface
      */
-    public function create($data);
+    public function create(array $data);
 
     /**
-     * @param string|array $keys
+     * @param array $keys
      * @return EntityInterface[]
      */
-    public function find($keys);
+    public function find(array $keys);
 
     /**
      * @param array|string $keys

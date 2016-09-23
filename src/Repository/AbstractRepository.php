@@ -91,7 +91,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param array $data
      * @return EntityInterface
      */
-    public function create($data)
+    public function create(array $data)
     {
         /** @var EntityInterface $entity */
         $entity = new $this->entityClass($this->table, $this->primaryKeys, $this->columnList);
@@ -131,7 +131,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param array $keys
      * @return EntityInterface[]
      */
-    public function find($keys)
+    public function find(array $keys)
     {
         $statement = $this->query()->select($keys);
         if (!$statement) {

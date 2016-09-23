@@ -114,14 +114,20 @@ class Repo
 
     /**
      * @param string $key
-     * @param null|RepositoryInterface   $sourceRepo
-     * @param null|RepositoryInterface   $targetRepo
+     * @param null|string|RepositoryInterface   $sourceRepo
+     * @param null|string|RepositoryInterface   $targetRepo
      * @return JoinRepositoryInterface
      */
     public function getJoinRepository($key, $sourceRepo = null, $targetRepo = null)
     {
         if ($this->_has($key)) {
             return $this->_get($key);
+        }
+        if (is_string($sourceRepo)) {
+            $sourceRepo = $this->getRepository($sourceRepo);
+        }
+        if (is_string($targetRepo)) {
+            $targetRepo = $this->getRepository($targetRepo);
         }
         return $this->repositories[$key] = new JoinRepository($this, $key, $sourceRepo, $targetRepo);
     }
