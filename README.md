@@ -46,6 +46,8 @@ Requires a container that implements `ContainerInterface`.
 Sample Code
 ===========
 
+Sample database. 
+
 ```sql
 CREATE TABLE users (
     users_id    INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,18 +60,6 @@ CREATE TABLE posts (
     users_id    INTEGER,
     contents    VARCHAR(256)
 );
-
-CREATE TABLE tags (
-    tag_id      VARCHAR(32),
-    tag         VARCHAR(64)
-);
-
-CREATE TABLE posts_tags (
-    posts_tags_id      INTEGER PRIMARY KEY AUTOINCREMENT,
-    posts_post_id INTEGER,
-    tags_tag_id VARCHAR(32)
-);
-
 ```
 
 Create a Repository
@@ -180,11 +170,72 @@ $user1Posts = $users->posts($user1)->find(); // list of posts
 // use generic repository for posts table...
 $posts = $repo->getRepository('posts', ['post_id'], true);
 $post  = $posts->create(['contents' => 'test relation'])
-$users->posts($user1)->relate($post); // list of posts
+$users->posts($user1)->relate($post); // $post related to $user1.
+$posts->save($post);                  // save the post. 
 ```
+
+Basic Usage
+====
+
+Repository
+----
+
+Entity
+----
+
+Generic Repository
+----
+
+
+
+Relations
+====
+
+```sql
+CREATE TABLE users (...);
+
+CREATE TABLE posts (...);
+
+CREATE TABLE tags (
+    tag_id      VARCHAR(32),
+    tag         VARCHAR(64)
+);
+
+CREATE TABLE posts_tags (
+    posts_tags_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    posts_post_id INTEGER,
+    tags_tag_id VARCHAR(32)
+);
+```
+
+HasOne
+----
+
+* uses primary keys.
+* in case column name is different, use `$convert` array. 
+
+
+HasMany
+----
+
+* uses primary keys.
+* in case column name is different, use `$convert` array. 
+
 
 Join Relation
 ----
+
+Cross/Join, or Many-to-many relationship. 
+
+Uses JoinRepositoryInterface and JoinRelationInterface.
+
+default setup: 
+
+* joining two tables: (table1 and table2)
+* join table name: table1_table2, sorted by table name. 
+* uses primary keys of table1 and table2. 
+* keys in the join table should be {tableX}_{primaryKey}. 
+
 
 Join, or many-to-many relation needs special attention 
 because it requires another table (called `join_table`) 
