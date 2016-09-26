@@ -30,7 +30,7 @@ class Member extends AbstractRepository
      */
     public function orders($member)
     {
-        return $this->repo->hasMany($this, 'order', $member, ['type' => 'member_type', 'code' => 'member_code']);
+        return $this->repo->hasMany($this, 'order', ['type' => 'member_type', 'code' => 'member_code'])->withEntity($member);
     }
 
     /**
@@ -39,6 +39,6 @@ class Member extends AbstractRepository
      */
     public function fees($member)
     {
-        return $this->repo->hasJoin($this, 'fees', $member, 'member2fee');
+        return $this->repo->hasJoin($this, 'fees', 'member2fee')->withEntity($member);
     }
 }

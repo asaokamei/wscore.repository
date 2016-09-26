@@ -30,9 +30,9 @@ class Order extends AbstractRepository
      */
     public function member($order_11_2015)
     {
-        return $this->repo->hasOne($this, 'member', $order_11_2015, [
+        return $this->repo->hasOne($this, 'member', [
             'member_type' => 'type',
             'member_code' => 'code',
-        ]);
+        ])->withEntity($order_11_2015);
     }
 }

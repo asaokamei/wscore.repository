@@ -135,14 +135,12 @@ class Repo
     /**
      * @param RepositoryInterface|string $sourceRepo
      * @param RepositoryInterface|string $repo
-     * @param EntityInterface     $entity
      * @param array               $convert
      * @return HasOne
      */
     public function hasOne(
         $sourceRepo,
         $repo,
-        EntityInterface $entity,
         $convert = []
     ) {
         if (is_string($sourceRepo)) {
@@ -151,20 +149,18 @@ class Repo
         if (is_string($repo)) {
             $repo = $this->getRepository($repo);
         }
-        return new HasOne($sourceRepo, $repo, $entity, $convert);
+        return new HasOne($sourceRepo, $repo, $convert);
     }
 
     /**
      * @param RepositoryInterface|string $sourceRepo
      * @param RepositoryInterface|string $repo
-     * @param EntityInterface     $entity
      * @param array               $convert
      * @return HasMany
      */
     public function hasMany(
         $sourceRepo,
         $repo,
-        EntityInterface $entity,
         $convert = []
     ) {
         if (is_string($sourceRepo)) {
@@ -173,20 +169,18 @@ class Repo
         if (is_string($repo)) {
             $repo = $this->getRepository($repo);
         }
-        return new HasMany($sourceRepo, $repo, $entity, $convert);
+        return new HasMany($sourceRepo, $repo, $convert);
     }
 
     /**
      * @param RepositoryInterface|string $sourceRepo
      * @param RepositoryInterface|string $targetRepo
-     * @param EntityInterface     $entity
      * @param string|null         $joinTable
      * @return HasJoin
      */
     public function hasJoin(
         $sourceRepo,
         $targetRepo,
-        EntityInterface $entity,
         $joinTable = ''
     ) {
         if (is_string($sourceRepo)) {
@@ -197,7 +191,7 @@ class Repo
         }
         $joinTable = $joinTable ?: $this->makeJoinTableName($targetRepo, $sourceRepo);
         $join      = $this->getJoinRepository($joinTable, $sourceRepo, $targetRepo);
-        return new HasJoin($join, $entity);
+        return new HasJoin($join);
     }
 
 

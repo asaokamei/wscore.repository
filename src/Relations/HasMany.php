@@ -31,19 +31,28 @@ class HasMany implements RelationInterface
     /**
      * @param RepositoryInterface $sourceRepo
      * @param RepositoryInterface $targetRepo
-     * @param EntityInterface     $sourceEntity
      * @param array               $convert
      */
     public function __construct(
         RepositoryInterface $sourceRepo,
         RepositoryInterface $targetRepo,
-        EntityInterface $sourceEntity,
         $convert = []
     ) {
         $this->sourceRepo   = $sourceRepo;
         $this->targetRepo   = $targetRepo;
-        $this->sourceEntity = $sourceEntity;
         $this->convert      = $convert;
+    }
+
+    /**
+     * @param EntityInterface $entity
+     * @return static
+     */
+    public function withEntity(EntityInterface $entity)
+    {
+        $self = clone $this;
+        $self->sourceEntity = $entity;
+
+        return $self;
     }
 
     /**

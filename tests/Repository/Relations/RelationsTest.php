@@ -79,14 +79,14 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $post4->get('users_id'));
 
         // retrieve a user from a post entity.
-        $hasOne = $repo->hasOne($posts, $users, $post1);
+        $hasOne = $repo->hasOne($posts, $users)->withEntity($post1);
         $this->assertEquals(1, $hasOne->count());
         $post1users = $hasOne->find();
         $this->assertEquals(1, count($post1users));
         $this->assertEquals($user1->get('name'), $post1users[0]->get('name'));
 
         // retrieve posts from a user entity.
-        $hasMany = $repo->hasMany($users, $posts, $user2);
+        $hasMany = $repo->hasMany($users, $posts)->withEntity($user2);
         $this->assertEquals(2, $hasMany->count());
         $user2posts = $hasMany->find();
         $this->assertEquals(2, count($user2posts));
@@ -131,14 +131,14 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
          * put $post2 as $user1's post.
          */
         // relate them.
-        $hasMany = $repo->hasMany('users', 'posts', $user1);
+        $hasMany = $repo->hasMany('users', 'posts')->withEntity($user1);
         $this->assertEquals(1, $hasMany->count());
 
         $hasMany->relate($post2);
         $this->assertEquals(1, $post2->get('users_id'));
         $posts->save($post2);
 
-        $hasMany = $repo->hasMany($users, $posts, $user1);
+        $hasMany = $repo->hasMany($users, $posts)->withEntity($user1);
         $this->assertEquals(2, $hasMany->count());
 
         /**
@@ -146,12 +146,12 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
          */
         // put $post1 to user2
         $post1 = $posts->findByKey(1); // should belong to user1
-        $hasOne = $repo->hasOne('posts', 'users', $post1);
+        $hasOne = $repo->hasOne('posts', 'users')->withEntity($post1);
         $hasOne->relate($user2);
         $this->assertEquals(2, $post1->get('users_id'));
         $posts->save($post1);
 
-        $hasMany = $repo->hasMany($users, $posts, $user1);
+        $hasMany = $repo->hasMany($users, $posts)->withEntity($user1);
         $this->assertEquals(1, $hasMany->count());
     }
 }

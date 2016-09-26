@@ -7,6 +7,12 @@ use WScore\Repository\Query\QueryInterface;
 interface RelationInterface
 {
     /**
+     * @param EntityInterface $entity
+     * @return static
+     */
+    public function withEntity(EntityInterface $entity);
+    
+    /**
      * @return QueryInterface
      */
     public function query();

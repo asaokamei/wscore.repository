@@ -30,6 +30,6 @@ class Fee extends AbstractRepository
      */
     public function members($feeSub)
     {
-        return $this->repo->hasJoin($this, 'member', $feeSub, 'member2fee');
+        return $this->repo->hasJoin($this, 'member', 'member2fee')->withEntity($feeSub);
     }
 }

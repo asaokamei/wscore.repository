@@ -18,14 +18,23 @@ class HasJoin implements JoinRelationInterface
 
     /**
      * @param JoinRepositoryInterface $joinRepo
-     * @param EntityInterface         $sourceEntity
      */
     public function __construct(
-        JoinRepositoryInterface $joinRepo,
-        EntityInterface $sourceEntity
+        JoinRepositoryInterface $joinRepo
     ) {
         $this->joinRepo     = $joinRepo;
-        $this->sourceEntity = $sourceEntity;
+    }
+
+    /**
+     * @param EntityInterface $entity
+     * @return static
+     */
+    public function withEntity(EntityInterface $entity)
+    {
+        $self = clone $this;
+        $self->sourceEntity = $entity;
+
+        return $self;
     }
 
     /**

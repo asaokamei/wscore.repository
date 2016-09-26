@@ -108,7 +108,7 @@ class Users extends AbstractRepository
      */
     public function posts(EntityInterface $user) 
     {
-        return $this->repo->hasMany($this, 'posts', $user);
+        return $this->repo->hasMany($this, 'posts')->withEntity($user);
     }
 }
 ```
@@ -298,10 +298,11 @@ HasOne
 * in case column name is different, use `$convert` array. 
 
 ```php
-$hasOne = $repo->hasMany(
+use WScore\Repository\Relations\HasOne;
+
+new HasOne(
     $sourceRepo,   // repository object or repository name string
     $targetRepo,   // repository object or repository name string
-    $sourceEntity, // entity to relate from
     $convertArray  // if primary key names differs...
 );
 ```
@@ -317,12 +318,13 @@ HasMany
 * in case column name is different, use `$convert` array. 
 
 ```php
-$hasOne = $repo->hasMany(
+use WScore\Repository\Relations\HasMany;
+
+new HasMany(
     $sourceRepo,   // repository object or repository name string
     $targetRepo,   // repository object or repository name string
-    $sourceEntity, // entity to relate from
     $convertArray  // if primary key names differs...
-;
+);
 ```
 
 where `$sourceRepo` for `users` and `$targetRepo` for `posts` 
@@ -349,20 +351,31 @@ because it requires another table (called `join_table`)
 to represents a relation. 
 
 ```php
-$postTag = $repo->getJoinRepository('posts_tags', 'posts', 'tags');
+use WScore\Repository\Relations\HasMany;
+
+new HasJoin(
+    $joinRepo   // repository object or repository name string
+);
+```
+
+where `$joinRepo` is a repository for join table, which must 
+implement `JoinRepositoryInterface`. To create a `$joinRepo` 
+using a provided class, 
+
+```php
+new JoinRepository(
+    $repo,
+    'posts_tags', 
+    'posts', 
+    'tags'
+);
 ```
 
 where 'posts_tags' is a join table name, and 2 repositories 
 that are joined. 
-                 
-```php
-$join  = $repo->hasJoin('posts', 'tags', $postEntity, 'posts_tags');
-```
 
-If the table is consisted of the 2 sorted 
-tables name as in this example, you can omit the join 
-table name. 
-
+The current implementation of the `JoinRepository` assumes 
+that two different tables are joined. 
 
 Complex Relations
 ====
