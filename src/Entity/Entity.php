@@ -15,6 +15,4 @@ class Entity extends AbstractEntity
         $this->primaryKeys = $primaryKeys;
         $this->isFetchDone = true;
     }
-
-
 }
