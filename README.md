@@ -1,15 +1,17 @@
 WScore/Repository
 =================
 
-Yet-Another ORM, or database repository, for PHP. 
-It is (probably) a Repository Pattern that is similar 
-to Active Record but with separated layers. 
-Being able to read, create, update, delete, and relate entities, 
-it can 
+Yet-Another ORM, or database layer library, for PHP. 
+It is (probably) a Repository Pattern with implementation 
+similar to Active Record with separated layers. That means 
+most of the operation directly access and modifies database. 
+
+Other than being able to read, create, update, delete, 
+and relate entities, it is 
 
 * easy to use, simple to understand, 
-* ready for complex primary keys,
-
+* ready for composite primary keys,
+* possible to code like an Active Record. 
 
 Under development. Not ready for production. 
 
@@ -31,17 +33,18 @@ There are three layers.
 independent from the bottom layers. One of the aim of 
 this repository is to reduce the background code behind 
 entity objects.  
-* The `RepositoryInterface` layer persists the entities 
-using `QueryInterface` object. 
+* The `RepositoryInterface` layer is a gateway to database tables 
+that persist the entities using `QueryInterface` object. 
 The `relationInterface` relates entities using repositories. 
 * The `QueryInterface` layer is at the bottom of the layers 
 responsible of querying database. 
-* There is `JoinRepositoryInterface` and `JoinRelationInterface`
-for many-to-many (join) relation.
 
 There is a `Repo` class which serves as a container as well as 
 a factory for repositories and relations. 
 Requires a container that implements `ContainerInterface`. 
+
+There is `JoinRepositoryInterface` and `JoinRelationInterface`
+for many-to-many (join) relation.
 
 Sample Code
 ===========
@@ -71,6 +74,7 @@ Create a repository for a database table, such as.
 <?php
 use WScore\Repository\Repo;
 use WScore\Repository\Entity\EntityInterface;
+use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Repository\AbstractRepository;
 
@@ -89,11 +93,12 @@ class Users extends AbstractRepository
 
     /**
      * @param Repo $repo
+     * @param QueryInterface $query 
      */
-    public function __construct(Repo $repo) 
+    public function __construct(Repo $repo, QueryInterface $query = null) 
     {
         $this->repo  = $repo;
-        $this->query = $repo->getQuery();
+        $this->query = $query ?: $repo->getQuery();
         $this->now   = $repo->getCurrentDateTime();
     }
     
@@ -128,7 +133,7 @@ $c->set(Repo::class, function(ContainerInterface $c) {
     return new Repo($c);
 });
 $c->set('users', function(ContainerInterface $c) {
-    new new Users($c->get(Repo::class));
+    new new Users($c->get(Repo::class), $c->get(QueryInterface::class));
 });
 ```
 
@@ -162,7 +167,7 @@ $users->save($user1);
 
 The `Repo` has 3 methods for relation: `hasOne`, `hasMany`, and `hasJoin`. 
 The example `Users` repository uses the `hasMany` relation to 
-another table, `posts`;
+another table, `posts` as;
  
 ```php
 public function posts(EntityInterface $user) {
@@ -170,28 +175,29 @@ public function posts(EntityInterface $user) {
 }
 ```
 
-To use the relation, for example, 
+To use the relation, for example:
 
 ```php
 // use generic repository for posts table...
 $posts = $repo->getRepository('posts', ['post_id'], true);
+```
 
+create a posts repository (using a generic repository in this example), then:
+
+```php
 // prepare $user1 and relation to posts
 $users = $repo->getRepository('users');
 $user1 = $users->findByKey(1);
-$user1ToPosts = $users->posts($user1); // hasMany relation.
 
 // get a list of posts
-$user1ToPosts->find();
+$relPosts  = $users->posts($user1); // hasMany relation.
+$listPosts = $user1ToPosts->find();
 
 // relate a new post to $user1.
 $post  = $posts->create(['contents' => 'test relation'])
-$user1ToPosts->relate($post); // $post related to $user1.
+$relPosts->relate($post); // $post related to $user1.
 $posts->save($post);          // save the post. 
 ```
-
-In the example above, `posts` is a generic repository constructed by `Repo`.
-
 
 
 Basic Usage
@@ -206,18 +212,49 @@ It must implement `RepositoryInterface`.
 
 ### RepositoryInterface
 
-
+`WScore\Repository\Repository\RepositoryInterface` is an interface 
+that define a repository for an entity. 
 
 ### Abstract Repository
 
+`WScore\Repository\Repository\AbstractRepository` is a sample repository 
+implementation used also as a generic repository. 
+
 ### Generic Repository
+
+`WScore\Repository\Repository\Repository` is the generic implementation 
+of a repository using `AbstractRepository`. 
+
+```php
+$posts = $repo->getRepository(
+    string $tableName,    // database table name 
+    array  $primaryKeys,  // primary keys in array, ex: ['id']
+    bool   $autoIncrement // set true to use auto incremented id. 
+);
+```
+
+
 
 Entity
 ----
 
 ### EntityInterface
 
-### AbstractEntity
+The entity objects must implement `WScore\Repository\Entity\EntityInterface` 
+so that repositories can retrieve data and primary keys from entities. 
+
+`getPrimaryKeys()` returns an array of primary keys even if there is 
+only one key. For convenient purpose, there are `getIdValue()` and 
+`getIdName()` methods that return the primary key value and name 
+if there is only one primary key. 
+
+### AbstractEntity and Entity
+
+`WScore\Repository\Entity\AbstractEntity` is a sample entity 
+implementation used also as a generic entity. 
+`WScore\Repository\Entity\Entity` is a generic implementation 
+of an entity object using `AbstractEntity`. It serves as a 
+default entity object class if not specified. 
 
 ### Active Record
 
@@ -228,10 +265,19 @@ just like an Active Pattern.
 Relations
 ====
 
-```sql
-CREATE TABLE users (...);
+Sample database. 
 
-CREATE TABLE posts (...);
+```sql
+CREATE TABLE users (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    name  VARCHAR(64) NOT NULL UNIQUE
+);
+
+CREATE TABLE posts (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    users_id    INTEGER,
+    contents    VARCHAR(256)
+);
 
 CREATE TABLE tags (
     tag_id      VARCHAR(32),
@@ -252,7 +298,12 @@ HasOne
 * in case column name is different, use `$convert` array. 
 
 ```php
-$hasOne = $repo->hasMany($sourceRepo, $targetRepo, $sourceEntity, $convertArray);
+$hasOne = $repo->hasMany(
+    $sourceRepo,   // repository object or repository name string
+    $targetRepo,   // repository object or repository name string
+    $sourceEntity, // entity to relate from
+    $convertArray  // if primary key names differs...
+);
 ```
 
 where `$sourceRepo` for `posts` and `$targetRepo` for `users` 
@@ -266,7 +317,12 @@ HasMany
 * in case column name is different, use `$convert` array. 
 
 ```php
-$hasOne = $repo->hasMany($sourceRepo, $targetRepo, $sourceEntity, $convertArray);
+$hasOne = $repo->hasMany(
+    $sourceRepo,   // repository object or repository name string
+    $targetRepo,   // repository object or repository name string
+    $sourceEntity, // entity to relate from
+    $convertArray  // if primary key names differs...
+;
 ```
 
 where `$sourceRepo` for `users` and `$targetRepo` for `posts` 
