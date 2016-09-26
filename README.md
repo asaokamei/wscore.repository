@@ -1,21 +1,21 @@
 WScore/Repository
 =================
 
-Yet-Another database repository for PHP. 
+Yet-Another ORM, or database repository, for PHP. 
 It is (probably) a Repository Pattern that is similar 
 to Active Record but with separated layers. 
-
-Features are; 
+Being able to read, create, update, delete, and relate entities, 
+it can 
 
 * easy to use, simple to understand, 
-* ready for complex primary keys, and   
-* capable to read, create, update, delete, and relate entities. 
+* ready for complex primary keys,
+
 
 Under development. Not ready for production. 
 
 Installation: `git clone https://github.com/asaokamei/wscore.repository`
 
-### Separation
+### Separation of Layers
 
 There are three layers. 
 
@@ -160,19 +160,39 @@ $users->save($user1);
 
 #### relation (hasMany)
 
-Relate to another table, `posts`, as `hasMany` relation.
+The `Repo` has 3 methods for relation: `hasOne`, `hasMany`, and `hasJoin`. 
+The example `Users` repository uses the `hasMany` relation to 
+another table, `posts`;
+ 
+```php
+public function posts(EntityInterface $user) {
+    return $this->repo->hasMany($this, 'posts', $user);
+}
+```
+
+To use the relation, for example, 
 
 ```php
-$users = $repo->getRepository('users');
-$user1 = $users->findByKey(1);
-$user1Posts = $users->posts($user1)->find(); // list of posts
-
 // use generic repository for posts table...
 $posts = $repo->getRepository('posts', ['post_id'], true);
+
+// prepare $user1 and relation to posts
+$users = $repo->getRepository('users');
+$user1 = $users->findByKey(1);
+$user1ToPosts = $users->posts($user1); // hasMany relation.
+
+// get a list of posts
+$user1ToPosts->find();
+
+// relate a new post to $user1.
 $post  = $posts->create(['contents' => 'test relation'])
-$users->posts($user1)->relate($post); // $post related to $user1.
-$posts->save($post);                  // save the post. 
+$user1ToPosts->relate($post); // $post related to $user1.
+$posts->save($post);          // save the post. 
 ```
+
+In the example above, `posts` is a generic repository constructed by `Repo`.
+
+
 
 Basic Usage
 ====
@@ -180,12 +200,29 @@ Basic Usage
 Repository
 ----
 
+A repository is a gateway object to access a table in a database. 
+
+It must implement `RepositoryInterface`. 
+
+### RepositoryInterface
+
+
+
+### Abstract Repository
+
+### Generic Repository
+
 Entity
 ----
 
-Generic Repository
-----
+### EntityInterface
 
+### AbstractEntity
+
+### Active Record
+
+it is possible to make the Entity active, 
+just like an Active Pattern. 
 
 
 Relations
@@ -214,12 +251,26 @@ HasOne
 * uses primary keys.
 * in case column name is different, use `$convert` array. 
 
+```php
+$hasOne = $repo->hasMany($sourceRepo, $targetRepo, $sourceEntity, $convertArray);
+```
+
+where `$sourceRepo` for `posts` and `$targetRepo` for `users` 
+repositories, and $sourceEntity is `$post` entity. 
+
 
 HasMany
 ----
 
 * uses primary keys.
 * in case column name is different, use `$convert` array. 
+
+```php
+$hasOne = $repo->hasMany($sourceRepo, $targetRepo, $sourceEntity, $convertArray);
+```
+
+where `$sourceRepo` for `users` and `$targetRepo` for `posts` 
+repositories, and $sourceEntity is `$user` entity. 
 
 
 Join Relation
@@ -287,13 +338,6 @@ HasOne
 
 General code:
 
-```php
-$hasOne = $repo->hasMany($sourceRepo, $targetRepo, $sourceEntity, $convertArray);
-```
-
-where `$sourceRepo` for `posts` and `$targetRepo` for `users` 
-repositories, and $sourceEntity is `$post` entity. 
-
 For the relation sample, 
 
 ```php
@@ -309,13 +353,6 @@ HasMany
 ----
 
 General code:
-
-```php
-$hasOne = $repo->hasMany($sourceRepo, $targetRepo, $sourceEntity, $convertArray);
-```
-
-where `$sourceRepo` for `users` and `$targetRepo` for `posts` 
-repositories, and $sourceEntity is `$user` entity. 
 
 In case, the `id` has different as in the sample below, 
 set `$convert` array. 
@@ -351,10 +388,4 @@ $users = $repo->getRepository('users', ['user_id'], true);
 $user1 = $users->create(['name' => 'my name']);
 $users->save($user1);
 ```
-
-Active Record
-----
-
-it is possible to make the Entity active, 
-just like an Active Pattern. 
 
