@@ -68,17 +68,17 @@ class Repo
     }
 
     /**
-     * @param string $key
+     * @param string $tableName
      * @param array  $primaryKeys
      * @param bool   $autoIncrement
      * @return RepositoryInterface
      */
-    public function getRepository($key, $primaryKeys = [], $autoIncrement = false)
+    public function getRepository($tableName, $primaryKeys = [], $autoIncrement = false)
     {
-        if ($this->_has($key)) {
-            return $this->_get($key);
+        if ($this->_has($tableName)) {
+            return $this->_get($tableName);
         }
-        return $this->repositories[$key] = new Repository($this, $key, $primaryKeys, $autoIncrement);
+        return $this->repositories[$tableName] = new Repository($this, $tableName, $primaryKeys, $autoIncrement);
     }
 
     /**
@@ -112,15 +112,15 @@ class Repo
     }
 
     /**
-     * @param string $key
-     * @param null|string|RepositoryInterface   $sourceRepo
-     * @param null|string|RepositoryInterface   $targetRepo
+     * @param string                          $tableName
+     * @param null|string|RepositoryInterface $sourceRepo
+     * @param null|string|RepositoryInterface $targetRepo
      * @return JoinRepositoryInterface
      */
-    public function getJoinRepository($key, $sourceRepo = null, $targetRepo = null)
+    public function getJoinRepository($tableName, $sourceRepo = null, $targetRepo = null)
     {
-        if ($this->_has($key)) {
-            return $this->_get($key);
+        if ($this->_has($tableName)) {
+            return $this->_get($tableName);
         }
         if (is_string($sourceRepo)) {
             $sourceRepo = $this->getRepository($sourceRepo);
@@ -128,7 +128,8 @@ class Repo
         if (is_string($targetRepo)) {
             $targetRepo = $this->getRepository($targetRepo);
         }
-        return $this->repositories[$key] = new JoinRepository($this, $key, $sourceRepo, $targetRepo);
+        return $this->repositories[$tableName] 
+            = new JoinRepository($this, $tableName, $sourceRepo, $targetRepo);
     }
     
     /**

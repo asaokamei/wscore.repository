@@ -72,6 +72,23 @@ abstract class AbstractJoinRepository implements JoinRepositoryInterface
     protected $to_repo;
 
     /**
+     * creates a conversion table for joining tables. 
+     * 
+     * @Override
+     * @param RepositoryInterface $repo
+     * @return array
+     */
+    protected function makeConversion(RepositoryInterface $repo)
+    {
+        $table = $repo->getTable();
+        $convert = [];
+        foreach ($repo->getKeyColumns() as $key) {
+            $convert[$key] = $table . '_' . $key;
+        }
+        return $convert;
+    }
+
+    /**
      * @return string
      */
     public function getTable()

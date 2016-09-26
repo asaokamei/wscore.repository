@@ -1,6 +1,8 @@
 <?php
 namespace WScore\Repository\Relations;
 
+use WScore\Repository\Helpers\CurrentDateTime;
+use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\RepositoryInterface;
 
@@ -13,27 +15,23 @@ class JoinRepository extends AbstractJoinRepository
      * @param string              $table
      * @param RepositoryInterface $fromRepo
      * @param RepositoryInterface $toRepo
+     * @param QueryInterface      $query
+     * @param CurrentDateTime     $now
+     * @internal param Repo $repo
      */
-    public function __construct($repo, $table, $fromRepo, $toRepo)
+    public function __construct($repo, $table, $fromRepo, $toRepo, $query = null, $now = null)
     {
         $this->table       = $table;
         $this->primaryKeys = [$this->table . '_id'];
-        $this->query       = $repo->getQuery();
-        $this->now         = $repo->getCurrentDateTime();
+        $this->query       = $query ?: $repo->getQuery();
+        $this->now         = $now ?: $repo->getCurrentDateTime();
 
-        $tabs = [$fromRepo->getTable(), $toRepo->getTable()];
-        $repo = [$fromRepo->getTable() => $fromRepo, $toRepo->getTable() => $toRepo];
-        sort($tabs);
-        ksort($repo);
-        $this->from_table = $tabs[0];
-        $this->from_repo  = $repo[$this->from_table];
-        foreach ($this->from_repo->getKeyColumns() as $key) {
-            $this->from_convert[$key] = $this->from_table . '_' . $key;
-        }
-        $this->to_table = $tabs[1];
-        $this->to_repo  = $repo[$this->to_table];
-        foreach ($this->to_repo->getKeyColumns() as $key) {
-            $this->to_convert[$key] = $this->to_table . '_' . $key;
-        }
+        $this->from_table   = $fromRepo->getTable();
+        $this->from_repo    = $fromRepo;
+        $this->from_convert = $this->makeConversion($fromRepo);
+
+        $this->to_table = $toRepo->getTable();
+        $this->to_repo  = $toRepo;
+        $this->to_convert = $this->makeConversion($toRepo);
     }
 }
