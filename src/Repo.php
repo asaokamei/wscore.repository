@@ -3,7 +3,6 @@ namespace WScore\Repository;
 
 use Interop\Container\ContainerInterface;
 use PDO;
-use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Query\AuraQuery;
 use WScore\Repository\Query\QueryInterface;
@@ -12,7 +11,7 @@ use WScore\Repository\Relations\JoinRepositoryInterface;
 use WScore\Repository\Repository\Repository;
 use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Relations\HasOne;
-use WScore\Repository\Relations\HasJoin;
+use WScore\Repository\Relations\JoinBy;
 use WScore\Repository\Repository\RepositoryInterface;
 
 class Repo
@@ -176,9 +175,9 @@ class Repo
      * @param RepositoryInterface|string $sourceRepo
      * @param RepositoryInterface|string $targetRepo
      * @param string|null         $joinTable
-     * @return HasJoin
+     * @return JoinBy
      */
-    public function hasJoin(
+    public function joinBy(
         $sourceRepo,
         $targetRepo,
         $joinTable = ''
@@ -191,7 +190,7 @@ class Repo
         }
         $joinTable = $joinTable ?: $this->makeJoinTableName($targetRepo, $sourceRepo);
         $join      = $this->getJoinRepository($joinTable, $sourceRepo, $targetRepo);
-        return new HasJoin($join);
+        return new JoinBy($join);
     }
 
 

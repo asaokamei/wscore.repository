@@ -4,7 +4,7 @@ namespace WScore\Repository\Relations;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
 
-class HasJoin implements JoinRelationInterface
+class JoinBy implements JoinRelationInterface
 {
     /**
      * @var JoinRepositoryInterface

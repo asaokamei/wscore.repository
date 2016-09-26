@@ -35,10 +35,10 @@ class Member extends AbstractRepository
 
     /**
      * @param EntityInterface $member
-     * @return \WScore\Repository\Relations\HasJoin
+     * @return \WScore\Repository\Relations\JoinBy
      */
     public function fees($member)
     {
-        return $this->repo->hasJoin($this, 'fees', 'member2fee')->withEntity($member);
+        return $this->repo->joinBy($this, 'fees', 'member2fee')->withEntity($member);
     }
 }

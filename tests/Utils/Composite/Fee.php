@@ -2,7 +2,7 @@
 namespace tests\Utils\Composite;
 
 use WScore\Repository\Entity\EntityInterface;
-use WScore\Repository\Relations\HasJoin;
+use WScore\Repository\Relations\JoinBy;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\AbstractRepository;
 
@@ -26,10 +26,10 @@ class Fee extends AbstractRepository
 
     /**
      * @param EntityInterface $feeSub
-     * @return HasJoin
+     * @return JoinBy
      */
     public function members($feeSub)
     {
-        return $this->repo->hasJoin($this, 'member', 'member2fee')->withEntity($feeSub);
+        return $this->repo->joinBy($this, 'member', 'member2fee')->withEntity($feeSub);
     }
 }

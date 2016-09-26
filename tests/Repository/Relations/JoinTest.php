@@ -10,7 +10,7 @@ use tests\Utils\Repo\Users;
 use WScore\Repository\Entity\AbstractEntity;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Relations\JoinRepository;
-use WScore\Repository\Relations\HasJoin;
+use WScore\Repository\Relations\JoinBy;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\Repository;
 
@@ -28,7 +28,7 @@ class JoinTest extends \PHPUnit_Framework_TestCase
         class_exists(Repository::class);
         class_exists(JoinRepository::class);
         class_exists(PdoQuery::class);
-        class_exists(HasJoin::class);
+        class_exists(JoinBy::class);
         class_exists(AbstractEntity::class);
 
         $c   = $this->getFullContainer();
@@ -103,7 +103,7 @@ class JoinTest extends \PHPUnit_Framework_TestCase
         
         // this is the post entity to join from. 
         $post1 = $posts->findByKey(1);
-        $join  = $repo->hasJoin('posts', 'tags')->withEntity($post1);
+        $join  = $repo->joinBy('posts', 'tags')->withEntity($post1);
 
         // how many joined tags?
         $this->assertEquals(2, $join->count());
@@ -123,7 +123,7 @@ class JoinTest extends \PHPUnit_Framework_TestCase
         
         // this is the post entity to join from. 
         $post1 = $repo->getJoinRepository('posts')->findByKey(1);
-        $join  = $repo->hasJoin('posts', 'tags')->withEntity($post1);
+        $join  = $repo->joinBy('posts', 'tags')->withEntity($post1);
 
         // get a 'blog' tag from tags.
         $blogTag = $repo->getJoinRepository('tags')->findByKey('blog');
@@ -146,7 +146,7 @@ class JoinTest extends \PHPUnit_Framework_TestCase
 
         // this is the post entity to join from.
         $post1 = $repo->getJoinRepository('posts')->findByKey(1);
-        $join  = $repo->hasJoin('posts', 'tags')->withEntity($post1);
+        $join  = $repo->joinBy('posts', 'tags')->withEntity($post1);
         $this->assertEquals(2, $join->count());
 
         // delete one tag.
@@ -168,7 +168,7 @@ class JoinTest extends \PHPUnit_Framework_TestCase
 
         // this is the post entity to join from.
         $post1 = $repo->getJoinRepository('posts')->findByKey(1);
-        $join  = $repo->hasJoin('posts', 'tags')->withEntity($post1);
+        $join  = $repo->joinBy('posts', 'tags')->withEntity($post1);
         $this->assertEquals(2, $join->count());
 
         $join->clear();
@@ -184,7 +184,7 @@ class JoinTest extends \PHPUnit_Framework_TestCase
 
         // this is the post entity to join from.
         $post1 = $repo->getJoinRepository('posts')->findByKey(1);
-        $join  = $repo->hasJoin('posts', 'tags')->withEntity($post1);
+        $join  = $repo->joinBy('posts', 'tags')->withEntity($post1);
 
         $joinTags = $join->query()
             ->find(['tag' => 'tagged']);
@@ -203,7 +203,7 @@ class JoinTest extends \PHPUnit_Framework_TestCase
 
         // this is the post entity to join from.
         $post1 = $repo->getJoinRepository('posts')->findByKey(1);
-        $join  = $repo->hasJoin('posts', 'tags')->withEntity($post1);
+        $join  = $repo->joinBy('posts', 'tags')->withEntity($post1);
 
         $joinTags = $join->queryJoin()->find(['tags_tag_id' => 'test']);
         $this->assertEquals(1, count($joinTags));
