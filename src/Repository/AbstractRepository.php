@@ -116,6 +116,18 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * @param array $data
+     * @return array
+     */
+    protected function filterDataByColumns(array $data)
+    {
+        if (!$columns = $this->getColumnList()) {
+            return $data;
+        }
+        return HelperMethods::filterDataByKeys($data, $columns);
+    }
+    
+    /**
      * @return string
      */
     protected function getIdName()
@@ -182,6 +194,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function insert(EntityInterface $entity)
     {
         $data = $entity->toArray();
+        $data = $this->filterDataByColumns($data);
         $data = $this->_addTimeStamps($data, 'created_at');
         $data = $this->_addTimeStamps($data, 'updated_at');
         if (!$id = $this->query()->insert($data)) {
@@ -202,6 +215,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function update(EntityInterface $entity)
     {
         $data = $entity->toArray();
+        $data = $this->filterDataByColumns($data);
         $data = HelperMethods::removeDataByKeys($data, $this->getKeyColumns());
         $data = $this->_addTimeStamps($data, 'updated_at');
         return $this->query()->update($entity->getKeys(), $data);
