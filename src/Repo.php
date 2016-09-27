@@ -14,6 +14,7 @@ use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Relations\HasOne;
 use WScore\Repository\Relations\JoinBy;
 use WScore\Repository\Repository\RepositoryInterface;
+use WScore\Repository\Repository\RepositoryOptions;
 
 class Repo
 {
@@ -72,14 +73,24 @@ class Repo
      * @param string $tableName
      * @param array  $primaryKeys
      * @param bool   $autoIncrement
+     * @param null|RepositoryOptions   $options
      * @return RepositoryInterface
      */
-    public function getRepository($tableName, $primaryKeys = [], $autoIncrement = false)
+    public function getRepository($tableName, $primaryKeys = [], $autoIncrement = false, $options = null)
     {
         if ($this->_has($tableName)) {
             return $this->_get($tableName);
         }
-        return $this->repositories[$tableName] = new Repository($this, $tableName, $primaryKeys, $autoIncrement);
+        if (!$options) {
+            $options = new RepositoryOptions();
+        }
+        $options->table           = $tableName;
+        $options->primaryKeys     = $primaryKeys ?: ["{$tableName}_id"];
+        $options->useAutoInsertId = $autoIncrement;
+        $this->repositories[$tableName]
+            = new Repository($this, $this->getQuery(), $this->getCurrentDateTime(), $options);
+
+        return $this->repositories[$tableName];
     }
 
     /**
