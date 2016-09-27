@@ -4,7 +4,6 @@ namespace WScore\Repository\Relations;
 use InvalidArgumentException;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Entity\EntityInterface;
-use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
@@ -22,7 +21,7 @@ abstract class AbstractJoinRepository implements JoinRepositoryInterface
     protected $query;
 
     /**
-     * @var CurrentDateTime
+     * @var \DateTimeImmutable
      */
     protected $now;
 

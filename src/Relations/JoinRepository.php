@@ -1,7 +1,7 @@
 <?php
 namespace WScore\Repository\Relations;
 
-use WScore\Repository\Helpers\CurrentDateTime;
+use DateTimeImmutable;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\RepositoryInterface;
@@ -16,7 +16,7 @@ class JoinRepository extends AbstractJoinRepository
      * @param RepositoryInterface $fromRepo
      * @param RepositoryInterface $toRepo
      * @param QueryInterface      $query
-     * @param CurrentDateTime     $now
+     * @param DateTimeImmutable   $now
      * @internal param Repo $repo
      */
     public function __construct($repo, $table, $fromRepo, $toRepo, $query = null, $now = null)

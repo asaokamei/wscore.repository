@@ -8,7 +8,6 @@ use tests\Utils\Container;
 use tests\Utils\Query;
 use tests\Utils\Repo\Users;
 use WScore\Repository\Entity\Entity;
-use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Repository\Repository;
 use WScore\Repository\Query\QueryInterface;
@@ -91,7 +90,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         $c    = new Container();
         $c->set('testing', 'tested');
         $c->set(QueryInterface::class, new PdoQuery(null));
-        $c->set(CurrentDateTime::class, 'test-now');
+        $c->set(\DateTimeImmutable::class, 'test-now');
         $repo = new Repo($c);
 
         // retrieve repository, 'tested'.

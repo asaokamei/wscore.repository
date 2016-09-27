@@ -1,6 +1,7 @@
 <?php
 namespace WScore\Repository;
 
+use DateTimeImmutable;
 use Interop\Container\ContainerInterface;
 use PDO;
 use WScore\Repository\Helpers\CurrentDateTime;
@@ -56,15 +57,15 @@ class Repo
     }
 
     /**
-     * @return CurrentDateTime
+     * @return DateTimeImmutable
      */
     public function getCurrentDateTime()
     {
-        $key = CurrentDateTime::class;
+        $key = DateTimeImmutable::class;
         if ($this->_has($key)) {
             return $this->_get($key);
         }
-        return $this->repositories[$key] = new CurrentDateTime();
+        return $this->repositories[$key] = CurrentDateTime::forge();
     }
 
     /**

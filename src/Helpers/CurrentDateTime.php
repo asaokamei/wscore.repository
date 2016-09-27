@@ -3,26 +3,31 @@ namespace WScore\Repository\Helpers;
 
 use DateTimeImmutable;
 
-class CurrentDateTime
+/**
+ * Class CurrentDateTime
+ * 
+ * a simple factory for DateTimeImmutable object. 
+ * able to set current time externally as static variable. 
+ *
+ * @package WScore\Repository\Helpers
+ */
+class CurrentDateTime extends DateTimeImmutable
 {
-    private $now;
+    private static $now;
 
     /**
-     * CurrentDateTime constructor.
-     *
-     * @param null $now
+     * @param DateTimeImmutable $now
      */
-    public function __construct($now = null)
+    public static function setCurrentTime($now)
     {
-        $this->now = $now ?: new DateTimeImmutable();
+        self::$now = $now;
     }
-
+    
     /**
-     * @param string $format
-     * @return string
+     * @return DateTimeImmutable
      */
-    public function format($format)
+    public static function forge()
     {
-        return $this->now->format($format);
+        return self::$now ?: new DateTimeImmutable();
     }
 }
