@@ -12,7 +12,8 @@ class Repository extends AbstractRepository
         $entityClass,
         $timeStamps,
         $timeStampFormat,
-        $query = null
+        $query = null,
+        $now = ''
     ) {
         $this->table           = $table;
         $this->primaryKeys     = $primaryKeys;
@@ -21,5 +22,6 @@ class Repository extends AbstractRepository
         $this->timeStamps      = $timeStamps;
         $this->timeStampFormat = $timeStampFormat;
         $this->query           = $query ?: new Query();
+        $this->now             = $now;
     }
 }

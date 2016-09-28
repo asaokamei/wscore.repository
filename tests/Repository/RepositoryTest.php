@@ -6,7 +6,7 @@ use tests\Utils\Repository;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Query\QueryInterface;
 
-class RepositoryTestX extends \PHPUnit_Framework_TestCase
+class RepositoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Repository
@@ -58,14 +58,17 @@ class RepositoryTestX extends \PHPUnit_Framework_TestCase
             ['p1', 'p2'],
             ['p1', 'p2', 'col1', 'col2'],
             Entity::class,
-            ['updated_at' => ''],
+            ['updated_at' => 'mod-date'],
             'Y/m/d H:i',
-            $this->q
+            $this->q,
+            new \DateTimeImmutable('2016/09/27 16:00')
         );
         $entity = $repo->create(['p1' => 'v1', 'p2' => 'v2', 'col1' => 'val', 'col2' => 'test', 'bad' => 'error']);
-        $this->assertEquals(['p1' => 'v1', 'p2' => 'v2', 'col1' => 'val', 'col2' => 'test'], $entity->toArray());
+        $this->assertEquals(['p1' => 'v1', 'p2' => 'v2', 'col1' => 'val', 'col2' => 'test', 'bad' => 'error'], $entity->toArray());
         $this->assertEquals(['p1' => 'v1', 'p2' => 'v2'], $entity->getKeys());
         $this->assertEquals(['p1', 'p2'], $entity->getKeyColumns());
+        $repo->insert($entity);
+        $this->assertEquals(['p1' => 'v1', 'p2' => 'v2', 'col1' => 'val', 'col2' => 'test', 'mod-date' => '2016/09/27 16:00'], $this->q->data);
     }
 
     function test2()
