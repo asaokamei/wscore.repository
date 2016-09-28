@@ -57,6 +57,11 @@ interface EntityInterface
     public function toArray();
 
     /**
+     * @return array
+     */
+    public function getUpdatedData();
+
+    /**
      * @param EntityInterface $entity
      * @param array           $convert
      */

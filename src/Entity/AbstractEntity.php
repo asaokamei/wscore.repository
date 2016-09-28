@@ -88,9 +88,13 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function setPrimaryKeyOnCreatedEntity($id)
     {
+        /**
+         * not sure if the following assertion is useful.
+         * commented out for now.
+         *//*
         if ($this->isFetched) {
             throw new BadMethodCallException('cannot set primary key on a fetched entity.');
-        }
+        } */
         if ($id !== true && $id) {
             $this->data[$this->getIdName()] = $id;
         }
@@ -129,10 +133,18 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function toArray()
     {
+        return $this->data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUpdatedData()
+    {
         $array = [];
         // find only the key/value that are modified.
         foreach($this->data as $key => $value) {
-            if (array_key_exists($key, $this->_original_data) && $value === $this->_original_data) {
+            if (array_key_exists($key, $this->_original_data) && $value === $this->_original_data[$key]) {
                 continue; // value has not changed. so ignore it.
             }
             $array[$key] = $value;

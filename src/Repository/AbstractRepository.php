@@ -214,7 +214,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function update(EntityInterface $entity)
     {
-        $data = $entity->toArray();
+        $data = $entity->getUpdatedData();
         $data = $this->filterDataByColumns($data);
         $data = HelperMethods::removeDataByKeys($data, $this->getKeyColumns());
         $data = $this->_addTimeStamps($data, 'updated_at');
