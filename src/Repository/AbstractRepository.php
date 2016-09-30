@@ -28,46 +28,46 @@ abstract class AbstractRepository implements RepositoryInterface
 
     /**
      * @Override
-     * @var string
+     * @var string          table name
      */
     protected $table;
 
     /**
      * @Override
-     * @var string[]
+     * @var string[]        primary keys in array
      */
     protected $primaryKeys = [];
 
     /**
      * @Override
-     * @var string[]
+     * @var string[]        list of columns for filtering input data by keys
      */
     protected $columnList = [];
 
     /**
      * @Override
-     * @var string|EntityInterface
+     * @var string|EntityInterface      entity class name
      */
     protected $entityClass = Entity::class;
 
     /**
      * @Override
-     * @var string[]
+     * @var string[]        timestamps column at create/update if any
      */
     protected $timeStamps = [
-        'created_at' => null,
-        'updated_at' => null,
+        'created_at' => null,  // sets datetime at creation
+        'updated_at' => null,  // sets datetime at modification
     ];
 
     /**
      * @Override
-     * @var string
+     * @var string          format of datetime column
      */
     protected $timeStampFormat = 'Y-m-d H:i:s';
 
     /**
      * @Override
-     * @var bool
+     * @var bool             set to true for auto-increment id
      */
     protected $useAutoInsertId = false;
 

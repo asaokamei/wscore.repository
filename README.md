@@ -53,7 +53,7 @@ Sample database.
 
 ```sql
 CREATE TABLE users (
-    users_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     INTEGER PRIMARY KEY AUTOINCREMENT,
     name        VARCHAR(64) NOT NULL UNIQUE
     created_at  DATETIME
 );
@@ -83,12 +83,12 @@ class Users extends AbstractRepository
     protected $table = 'users';           // table name
     protected $primaryKeys = ['user_id']; // primary keys in array
     protected $useAutoInsertId = true;    // use auto-incremented ID.
-    protected $columnList = [             // for mass-assignments
+    protected $columnList = [             // for filtering data by keys
         'name',     
     ];
     protected $timeStamps = [             // if any...
             'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
+            'updated_at' => null,
         ];
 
     /**
@@ -117,7 +117,7 @@ The `AbstractRepository` serves as a convenient way to create
 a repository but any class can be served as repository which 
 implements `WScore\Repository\Repository\RepositoryInterface`. 
 
-Using ContainerInterface
+`Repo` Class and `ContainerInterface`
 ----
 
 Use another container that is `ContainerInterface` compatible. 
@@ -137,17 +137,29 @@ $c->set('users', function(ContainerInterface $c) {
 });
 ```
 
-`Repo` is a repository manager, container, and a factory. 
+Although it is not necessary to inject `Repo` object into a repository, 
+it is a handy class for managing repository as well as a factory 
+for relation objects. The `Repo` can be constructed as;
+
+```php
+$repo = new Repo($container); // inject ContainerInterface container. 
+```
+
 
 Repository and Entities
 ----
+
+### Entity
+
+The repository requires entities to be of `EntityInterface`. 
+As a default, all repository (of `AbstractRepository`) uses `Entity` class.  
 
 #### create and save
 
 To create an entity and save it: 
 
 ```php
-$users = $repo->getRepository('users');
+$users = $container->get('users');
 $user1 = $users->create(['name' => 'my name']);
 $id    = $users->save($user1); // should return inserted id.
 ```
@@ -157,46 +169,61 @@ $id    = $users->save($user1); // should return inserted id.
 To retrieve an entity, modify it, and save it.
 
 ```php
-$users = $repo->getRepository('users');
+$users = $container->get('users');
 $user1 = $users->findByKey(1);
 $user1->fill(['name' => 'your name']);
 $users->save($user1);
 ```
 
-#### relation (hasMany)
+### Relation
+
+There are 3 relations: `HasOne`, `HasMany`, and `JoinBy`. 
+
+`HasOne` and `HasMany` relations are created using two repositories 
+and conversion of keys if the primary key column names differs in 
+these tables. 
+
+```php
+$hasOne = new HasOne($repo1, $repo2, ['id' => 'other_id']);
+```
+
+`JoinBy` requires another repository, and will be discussed in detail 
+in the following section. 
+
+#### factory for relations
 
 The `Repo` has 3 methods for relation: `hasOne`, `hasMany`, and `hasJoin`. 
 The example `Users` repository uses the `hasMany` relation to 
 another table, `posts` as;
  
 ```php
-public function posts(EntityInterface $user) {
-    return $this->repo->hasMany($this, 'posts', $user);
-}
+$hasMany = $this->repo->hasMany($users, 'posts');
 ```
 
-To use the relation, for example:
+#### relation (hasMany)
+
+Now try to related users and posts. 
+First, create repositories for `users` and `posts`:
 
 ```php
 // use generic repository for posts table...
+$users = $container->get('users');
 $posts = $repo->getRepository('posts', ['post_id'], true);
 ```
 
-create a posts repository (using a generic repository in this example), then:
+then:
 
 ```php
 // prepare $user1 and relation to posts
-$users = $repo->getRepository('users');
 $user1 = $users->findByKey(1);
 
 // get a list of posts
-$relPosts  = $users->posts($user1); // hasMany relation.
-$listPosts = $user1ToPosts->find();
+$user1Posts = $users->posts($user1)->find();
 
 // relate a new post to $user1.
-$post  = $posts->create(['contents' => 'test relation'])
-$relPosts->relate($post); // $post related to $user1.
-$posts->save($post);          // save the post. 
+$newPost  = $posts->create(['contents' => 'test relation'])
+$users->posts($user1)->relate($newPost);
+$posts->save($post);                       // save the post. 
 ```
 
 
@@ -219,6 +246,27 @@ that define a repository for an entity.
 
 `WScore\Repository\Repository\AbstractRepository` is a sample repository 
 implementation used also as a generic repository. 
+
+Extend the `AbstractRepostory` while overriding important properties 
+of the database table. 
+
+```php
+abstract class AbstractRepository implements RepositoryInterface
+{
+    protected $table;              // table name
+    protected $primaryKeys = [];   // primary keys in array. 
+    protected $columnList = [];    // list of columns. can be empty.
+    protected $entityClass = Entity::class; // entity class name.
+    protected $timeStamps = [      // if any
+        'created_at' => null,      // sets datetime at creation
+        'updated_at' => null,      // sets datetime at modification
+    ];
+    protected $timeStampFormat = 'Y-m-d H:i:s'; // format of datetime
+    protected $useAutoInsertId = false;  // set to true for auto-increment id. 
+    
+    ...
+}
+```
 
 ### Generic Repository
 
@@ -251,10 +299,37 @@ if there is only one primary key.
 ### AbstractEntity and Entity
 
 `WScore\Repository\Entity\AbstractEntity` is a sample entity 
-implementation used also as a generic entity. 
-`WScore\Repository\Entity\Entity` is a generic implementation 
-of an entity object using `AbstractEntity`. It serves as a 
+implementation used also as a generic entity class,  
+`WScore\Repository\Entity\Entity`. It serves as a 
 default entity object class if not specified. 
+
+To use your own entity class based on the `AbstractEntity`, 
+extend the class while setting properties. 
+
+```php
+class MyEntity extends AbstractEntity
+{
+    protected $table = 'my_table';
+    protected $primaryKeys = ['my_id', 'your_id'];
+    protected $valueObjectClasses = [
+        'created_at' => \DateTimeImmutable::class,
+        'status' => function($value) {
+            return ValueOfStatus::forge($value);
+        },
+    ];
+
+    ...
+}
+```
+
+#### value object
+
+set value object class name, or a closure as a factory at 
+`AbstractEntity::valueObjectClasses` property. 
+
+The class name must be instantiable by `new` operator 
+with the `$value` as first argument: `new ObjectClass($value)`
+
 
 ### Active Record
 

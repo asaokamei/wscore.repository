@@ -7,6 +7,7 @@ use WScore\Repository\Helpers\HelperMethods;
 abstract class AbstractEntity implements EntityInterface
 {
     /**
+     * @Override
      * @var string
      */
     protected $table;
@@ -22,6 +23,7 @@ abstract class AbstractEntity implements EntityInterface
     protected $_original_data = [];
 
     /**
+     * @Override
      * @var string[]
      */
     protected $primaryKeys = [];
@@ -33,6 +35,7 @@ abstract class AbstractEntity implements EntityInterface
      *
      * [ column-name  =>  value-object class name]
      *
+     * @Override
      * @var string[]|callable{}
      */
     protected $valueObjectClasses = [];
