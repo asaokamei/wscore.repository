@@ -15,12 +15,12 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * @var array
      */
-    protected $data = [];
+    private $data = [];
 
     /**
      * @var array
      */
-    protected $_original_data = [];
+    private $_original_data = [];
 
     /**
      * @Override
@@ -41,21 +41,48 @@ abstract class AbstractEntity implements EntityInterface
     protected $valueObjectClasses = [];
 
     /**
-     * this flag turns true before constructor is called,
-     * i.e. it is false during PDO's fetchObject method.
+     * a flag to check if the operation is PDO's fetchObject method.
+     * set to true by using setFetchDone method inside constructor. 
      *
      * @var bool
      */
-    protected $isFetchDone = false;
+    private $isFetchDone = false;
 
     /**
      * a flag indicating that this entity is fetched
-     * from a database if it is true.
+     * from a database. fetched if it is true, and created if false.
      *
      * @var bool
      */
-    protected $isFetched = false;
+    private $isFetched = false;
 
+    /**
+     * call this method in constructor. 
+     * it will protect from using __set method to 
+     * overwrite entity data. 
+     */
+    protected function setFetchDone()
+    {
+        $this->isFetchDone = true;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isFetchProcessDone()
+    {
+        return $this->isFetchDone;
+    }
+
+    /**
+     * call this method to indicate that the entity is fetched from a database. 
+     * sets isFetched flag to true.
+     */
+    protected function setFetchedFromDb()
+    {
+        $this->isFetched = true;
+    }
+    
     /**
      * @return string
      */
@@ -78,10 +105,10 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function __set($key, $value)
     {
-        if ($this->isFetchDone) {
+        if ($this->isFetchProcessDone()) {
             throw new BadMethodCallException('cannot set properties.');
         }
-        $this->isFetched  = true;
+        $this->setFetchedFromDb();
         $this->data[$key] = $value;
         $this->_original_data[$key] = $value;
     }
@@ -101,7 +128,7 @@ abstract class AbstractEntity implements EntityInterface
         if ($id !== true && $id) {
             $this->data[$this->getIdName()] = $id;
         }
-        $this->isFetched                = true;
+        $this->setFetchedFromDb();
     }
 
     /**

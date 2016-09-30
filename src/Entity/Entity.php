@@ -13,6 +13,6 @@ class Entity extends AbstractEntity
     {
         $this->table       = $table;
         $this->primaryKeys = $primaryKeys;
-        $this->isFetchDone = true;
+        $this->setFetchDone();
     }
 }
