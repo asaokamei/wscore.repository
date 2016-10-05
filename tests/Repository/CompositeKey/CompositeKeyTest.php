@@ -132,7 +132,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     * @ test
      */
     function hasJoin_returns_related_entities_other_way()
     {

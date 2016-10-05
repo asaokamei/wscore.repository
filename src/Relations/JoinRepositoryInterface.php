@@ -35,17 +35,19 @@ interface JoinRepositoryInterface
     /**
      * returns QueryInterface on join table.
      *
-     * @param EntityInterface|null $entity1
-     * @param EntityInterface|null $entity2
+     * @param EntityInterface|null $fromEntity
+     * @param EntityInterface|null $toEntity
      * @return QueryInterface
      */
-    public function queryJoin($entity1 = null, $entity2 = null);
+    public function queryJoin($fromEntity = null, $toEntity = null);
     
     /**
-     * @param EntityInterface $entity
+     * returns QueryInterface on targeted table, opposite of $entity's table.
+     *
+     * @param EntityInterface $fromEntity
      * @return QueryInterface
      */
-    public function queryTarget($entity);
+    public function queryTarget($fromEntity);
 
     /**
      * @param string $key
@@ -54,22 +56,22 @@ interface JoinRepositoryInterface
     public function findByKey($key);
 
     /**
-     * @param EntityInterface $entity
+     * @param EntityInterface $fromEntity
      * @return EntityInterface[]
      */
-    public function select($entity);
+    public function select($fromEntity);
 
     /**
-     * @param EntityInterface $entity1
-     * @param EntityInterface $entity2
+     * @param EntityInterface $fromEntity
+     * @param EntityInterface $toEntity
      * @return bool|EntityInterface
      */
-    public function insert($entity1, $entity2);
+    public function insert($fromEntity, $toEntity);
 
     /**
-     * @param EntityInterface      $entity1
-     * @param EntityInterface|null $entity2
+     * @param EntityInterface      $fromEntity
+     * @param EntityInterface|null $toEntity
      * @return bool
      */
-    public function delete($entity1, $entity2 = null);
+    public function delete($fromEntity, $toEntity = null);
 }

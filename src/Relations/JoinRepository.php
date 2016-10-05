@@ -26,11 +26,9 @@ class JoinRepository extends AbstractJoinRepository
         $this->query       = $query ?: $repo->getQuery();
         $this->now         = $now ?: $repo->getCurrentDateTime();
 
-        $this->from_table   = $fromRepo->getTable();
         $this->from_repo    = $fromRepo;
         $this->from_convert = $this->makeConversion($fromRepo);
 
-        $this->to_table = $toRepo->getTable();
         $this->to_repo  = $toRepo;
         $this->to_convert = $this->makeConversion($toRepo);
     }

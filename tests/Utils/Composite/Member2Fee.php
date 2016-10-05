@@ -18,13 +18,11 @@ class Member2Fee extends AbstractJoinRepository
     public function __construct(Repo $repo)
     {
         $this->query = $repo->getQuery();
-        $this->from_table = 'members';
         $this->from_repo = $repo->getRepository('member');
         $this->from_convert = [
             'type' => 'member_type',
             'code' => 'member_code',
         ];
-        $this->to_table = 'fees';
         $this->to_repo   = $repo->getRepository('fee');
         $this->to_convert = [
             'year' => 'fee_year',

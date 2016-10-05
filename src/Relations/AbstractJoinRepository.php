@@ -1,7 +1,7 @@
 <?php
 namespace WScore\Repository\Relations;
 
-use InvalidArgumentException;
+use DateTimeImmutable;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Helpers\HelperMethods;
@@ -16,63 +16,53 @@ abstract class AbstractJoinRepository implements JoinRepositoryInterface
     protected $table;
 
     /**
+     * @var array
+     */
+    protected $primaryKeys;
+
+    /**
      * @var QueryInterface
      */
     protected $query;
 
     /**
-     * @var \DateTimeImmutable
+     * @var DateTimeImmutable
      */
     protected $now;
 
     /**
-     * @var array
-     */
-    protected $primaryKeys = [];
-
-    /**
-     * @Override
-     * @var string[]
-     */
-    protected $columnList = [];
-
-    /**
-     * @Override
-     * @var string|EntityInterface
-     */
-    protected $entityClass = Entity::class;
-
-    /**
-     * @Override
-     * @var string
-     */
-    protected $from_table;
-
-    protected $from_convert = [];
-
-    /**
-     * @Override
      * @var RepositoryInterface
      */
     protected $from_repo;
 
     /**
-     * @Override
-     * @var string
+     * @var array
      */
-    protected $to_table;
-
-    protected $to_convert = [];
+    protected $from_convert;
 
     /**
-     * @Override
      * @var RepositoryInterface
      */
     protected $to_repo;
 
     /**
-     * creates a conversion table for joining tables. 
-     * 
+     * @var array
+     */
+    protected $to_convert;
+
+    /**
+     * @var string|EntityInterface
+     */
+    protected $entityClass = Entity::class;
+
+    /**
+     * @var string[]
+     */
+    protected $columnList;
+
+    /**
+     * creates a conversion table for joining tables.
+     *
      * @Override
      * @param RepositoryInterface $repo
      * @return array
@@ -132,61 +122,22 @@ abstract class AbstractJoinRepository implements JoinRepositoryInterface
     }
 
     /**
-     * @param EntityInterface $entity
-     * @param bool            $getOpposite
-     * @return string
-     */
-    private function getFromOrTo($entity, $getOpposite = false)
-    {
-        if ($entity->getTable() === $this->from_table) {
-            $target = ['from', 'to',];
-        } elseif ($entity->getTable() === $this->to_table) {
-            $target = ['to', 'from',];
-        } else {
-            throw new InvalidArgumentException('entity not from nor to table.');
-        }
-        if ($getOpposite) {
-            return $target[1];
-        }
-        return $target[0];
-    }
-
-    /**
-     * @param EntityInterface $entity
-     * @return array
-     */
-    private function getConvert($entity)
-    {
-        $fromTo = $this->getFromOrTo($entity);
-        return $fromTo === 'from' ? $this->from_convert : $this->to_convert;
-    }
-
-    /**
-     * @param EntityInterface $entity
-     * @return array
-     */
-    private function getConvertedKeys($entity)
-    {
-        return HelperMethods::convertDataKeys($entity->getKeys(), $this->getConvert($entity));
-    }
-
-    /**
      * returns QueryInterface on join table.
      *
-     * @param EntityInterface|null $entity1
-     * @param EntityInterface|null $entity2
+     * @param EntityInterface|null $fromEntity
+     * @param EntityInterface|null $toEntity
      * @return QueryInterface
      */
-    public function queryJoin($entity1 = null, $entity2 = null)
+    public function queryJoin($fromEntity = null, $toEntity = null)
     {
         $keys = [];
-        if ($entity1) {
-            $keys = $this->getConvertedKeys($entity1);
+        if ($fromEntity) {
+            $keys = $this->convertFromKeys($fromEntity);
         }
-        if ($entity2) {
+        if ($toEntity) {
             $keys = array_merge(
                 $keys,
-                $this->getConvertedKeys($entity2)
+                $this->convertToKeys($toEntity)
             );
         }
         return $this->query
@@ -196,49 +147,38 @@ abstract class AbstractJoinRepository implements JoinRepositoryInterface
     }
 
     /**
+     * @param EntityInterface $fromEntity
+     * @return array
+     */
+    private function convertFromKeys(EntityInterface $fromEntity)
+    {
+        return HelperMethods::convertDataKeys($fromEntity->getKeys(), $this->from_convert);
+    }
+
+    /**
+     * @param EntityInterface $toEntity
+     * @return array
+     */
+    private function convertToKeys(EntityInterface $toEntity)
+    {
+        return HelperMethods::convertDataKeys($toEntity->getKeys(), $this->to_convert);
+    }
+
+    /**
      * returns QueryInterface on targeted table, opposite of $entity's table.
      *
-     * @param EntityInterface $entity
+     * @param EntityInterface $fromEntity
      * @return QueryInterface
      */
-    public function queryTarget($entity)
+    public function queryTarget($fromEntity)
     {
-        $fromTo = $this->getFromOrTo($entity, true);
-        $method = "query" . $fromTo;
-        return $this->$method($entity);
-    }
-
-    /**
-     * @param EntityInterface|null $entity
-     * @return QueryInterface
-     */
-    protected function queryFrom($entity = null)
-    {
-        $keys = $entity
-            ? $this->getConvertedKeys($entity)
-            : [];
-
-        return $this->from_repo
-            ->query()
-            ->condition($keys)
-            ->join($this->table, $this->from_convert);
-    }
-
-    /**
-     * @param EntityInterface|null $entity
-     * @return QueryInterface
-     */
-    protected function queryTo($entity = null)
-    {
-        $keys = $entity
-            ? $this->getConvertedKeys($entity)
-            : [];
-
+        $keys   = $this->convertFromKeys($fromEntity);
         return $this->to_repo
             ->query()
             ->condition($keys)
             ->join($this->table, $this->to_convert);
     }
+
 
     /**
      * @param string $key
@@ -253,26 +193,26 @@ abstract class AbstractJoinRepository implements JoinRepositoryInterface
     }
 
     /**
-     * @param EntityInterface $entity
+     * @param EntityInterface $fromEntity
      * @return EntityInterface[]
      */
-    public function select($entity)
+    public function select($fromEntity)
     {
-        return $this->queryTarget($entity)
+        return $this->queryTarget($fromEntity)
             ->select()
             ->fetchAll();
     }
 
     /**
-     * @param EntityInterface $entity1
-     * @param EntityInterface $entity2
+     * @param EntityInterface $fromEntity
+     * @param EntityInterface $toEntity
      * @return bool|string
      */
-    public function insert($entity1, $entity2)
+    public function insert($fromEntity, $toEntity)
     {
         $data = array_merge(
-            $this->getConvertedKeys($entity1),
-            $this->getConvertedKeys($entity2)
+            $this->convertFromKeys($fromEntity),
+            $this->convertToKeys($toEntity)
         );
         if (!$id = $this->queryJoin()->insert($data)) {
             return false; // failed to insert...
@@ -281,14 +221,14 @@ abstract class AbstractJoinRepository implements JoinRepositoryInterface
     }
 
     /**
-     * @param EntityInterface      $entity1
-     * @param EntityInterface|null $entity2
+     * @param EntityInterface      $fromEntity
+     * @param EntityInterface|null $toEntity
      * @return bool
      */
-    public function delete($entity1, $entity2 = null)
+    public function delete($fromEntity, $toEntity = null)
     {
         return $this
-            ->queryJoin($entity1, $entity2)
+            ->queryJoin($fromEntity, $toEntity)
             ->delete([]);
     }
 }
