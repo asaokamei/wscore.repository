@@ -1,6 +1,7 @@
 <?php
 namespace WScore\Repository\Query;
 
+use Aura\SqlQuery\Common\SelectInterface;
 use PDO;
 use PDOStatement;
 use WScore\Repository\Entity\EntityInterface;
@@ -76,6 +77,49 @@ class AuraQuery implements QueryInterface
     }
 
     /**
+     * @param string $class
+     * @param array  $ctor_args
+     * @return QueryInterface
+     */
+    public function setFetchModeToClass($class, $ctor_args = [])
+    {
+        return $this->setFetchMode(
+            \PDO::FETCH_CLASS, $class, $ctor_args
+        );
+    }
+
+    /**
+     * @return QueryInterface
+     */
+    public function setFetchModeToArray()
+    {
+        return $this->setFetchMode(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * @return SelectInterface
+     */
+    public function newSelect()
+    {
+        return $this->builder->newSelect();
+    }
+
+    /**
+     * @param string $sql
+     * @param array  $data
+     * @return PDOStatement
+     */
+    public function execute($sql, $data = [])
+    {
+        $stmt = $this->pdo->prepare($sql);
+        if ($stmt instanceof PDOStatement) {
+            $stmt->execute($data);
+            $this->applyFetchModeToStmt($stmt);
+        }
+        return $stmt;
+    }
+
+    /**
      * sets where statement from [$column_name => $value, ] to
      * WHERE $column_name = $value AND ...
      *
@@ -124,13 +168,8 @@ class AuraQuery implements QueryInterface
     {
         $this->builder->merge('conditions', $keys);
         $stmt = $this->builder->execSelect();
+        $this->applyFetchModeToStmt($stmt);
 
-        /** @noinspection PhpMethodParametersCountMismatchInspection */
-        $stmt->setFetchMode(
-            $this->fetchMode[0],
-            $this->fetchMode[1],
-            $this->fetchMode[2]
-        );
         return $stmt;
     }
 
@@ -213,5 +252,18 @@ class AuraQuery implements QueryInterface
     {
         $this->builder->merge('join', [[$join, $join_on]]);
         return $this;
+    }
+
+    /**
+     * @param PDOStatement $stmt
+     */
+    private function applyFetchModeToStmt($stmt)
+    {
+        /** @noinspection PhpMethodParametersCountMismatchInspection */
+        $stmt->setFetchMode(
+            $this->fetchMode[0],
+            $this->fetchMode[1],
+            $this->fetchMode[2]
+        );
     }
 }

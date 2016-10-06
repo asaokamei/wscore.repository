@@ -76,6 +76,14 @@ class AuraBuilder
     }
 
     /**
+     * @return SelectInterface
+     */
+    public function newSelect()
+    {
+        return $this->factory->newSelect();
+    }
+
+    /**
      * @return PDOStatement
      */
     public function execSelect()
