@@ -12,6 +12,13 @@ class Query implements QueryInterface
     public $orderBy = [];
     public $data;
     public $keys;
+    private $sql;
+
+    public function execute($sql, $data = [])
+    {
+        $this->sql  = $sql;
+        $this->data = $data;
+    }
 
     /**
      * sets database table name to query.
