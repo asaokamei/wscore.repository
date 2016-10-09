@@ -7,6 +7,13 @@ use WScore\Repository\Entity\EntityInterface;
 interface QueryInterface
 {
     /**
+     * @param string $sql
+     * @param array  $data
+     * @return PDOStatement
+     */
+    public function execute($sql, $data = []);
+    
+    /**
      * sets database table name to query.
      * should return a new object so that the object can be reused safely.
      *

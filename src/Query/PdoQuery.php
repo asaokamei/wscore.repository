@@ -60,7 +60,35 @@ class PdoQuery implements QueryInterface
         ];
         return new PdoBuilder($this->pdo, $info);
     }
-    
+
+    /**
+     * @param string $sql
+     * @param array  $data
+     * @return PDOStatement
+     */
+    public function execute($sql, $data = [])
+    {
+        $stmt = $this->pdo->prepare($sql);
+        if ($stmt instanceof PDOStatement) {
+            $stmt->execute($data);
+            $this->applyFetchModeToStmt($stmt);
+        }
+        return $stmt;
+    }
+
+    /**
+     * @param PDOStatement $stmt
+     */
+    private function applyFetchModeToStmt($stmt)
+    {
+        /** @noinspection PhpMethodParametersCountMismatchInspection */
+        $stmt->setFetchMode(
+            $this->fetchMode[0],
+            $this->fetchMode[1],
+            $this->fetchMode[2]
+        );
+    }
+
     /**
      * sets database table name to query.
      * should return a new object so that the object can be reused safely.
@@ -154,12 +182,8 @@ class PdoQuery implements QueryInterface
     {
         $this->condition($keys);
         $stmt = $this->sql()->execSelect();
-        /** @noinspection PhpMethodParametersCountMismatchInspection */
-        $stmt->setFetchMode(
-            $this->fetchMode[0],
-            $this->fetchMode[1],
-            $this->fetchMode[2]
-        );
+        $this->applyFetchModeToStmt($stmt);
+
         return $stmt;
     }
     
