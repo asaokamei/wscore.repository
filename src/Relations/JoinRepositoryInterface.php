@@ -27,6 +27,18 @@ interface JoinRepositoryInterface
     public function getColumnList();
 
     /**
+     * @param EntityInterface $fromEntity
+     * @return array
+     */
+    public function convertFromKeys(EntityInterface $fromEntity);
+
+    /**
+     * @param EntityInterface $toEntity
+     * @return array
+     */
+    public function convertToKeys(EntityInterface $toEntity);
+    
+    /**
      * @param array $data
      * @return EntityInterface
      */

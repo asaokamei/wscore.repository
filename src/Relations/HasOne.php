@@ -45,6 +45,20 @@ class HasOne implements RelationInterface
 
     /**
      * @param EntityInterface $entity
+     * @return array
+     */
+    public function getTargetKeys(EntityInterface $entity)
+    {
+        $sourceData  = $entity->toArray();
+        $targetKeys  = $this->targetRepo->getKeyColumns();
+        $primaryKeys = HelperMethods::filterDataByKeys($sourceData, $this->convert);
+        $primaryKeys = HelperMethods::filterDataByKeys($primaryKeys, $targetKeys);
+
+        return $primaryKeys;
+    }
+
+    /**
+     * @param EntityInterface $entity
      * @return static
      */
     public function withEntity(EntityInterface $entity)
@@ -60,7 +74,7 @@ class HasOne implements RelationInterface
      */
     public function query()
     {
-        $primaryKeys = $this->getPrimaryKeys();
+        $primaryKeys = $this->getTargetKeys($this->sourceEntity);
         return $this->targetRepo->query()
                                 ->condition($primaryKeys);
     }
@@ -91,18 +105,5 @@ class HasOne implements RelationInterface
         $this->sourceEntity->relate($entity, $this->convert);
 
         return $entity;
-    }
-
-    /**
-     * @return array
-     */
-    private function getPrimaryKeys()
-    {
-        $sourceData  = $this->sourceEntity->toArray();
-        $targetKeys  = $this->targetRepo->getKeyColumns();
-        $primaryKeys = HelperMethods::filterDataByKeys($sourceData, $this->convert);
-        $primaryKeys = HelperMethods::filterDataByKeys($primaryKeys, $targetKeys);
-
-        return $primaryKeys;
     }
 }

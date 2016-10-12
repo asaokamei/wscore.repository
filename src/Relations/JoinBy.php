@@ -27,6 +27,15 @@ class JoinBy implements JoinRelationInterface
 
     /**
      * @param EntityInterface $entity
+     * @return array
+     */
+    public function getTargetKeys(EntityInterface $entity)
+    {
+        return $this->joinRepo->convertFromKeys($entity);
+    }
+
+    /**
+     * @param EntityInterface $entity
      * @return static
      */
     public function withEntity(EntityInterface $entity)

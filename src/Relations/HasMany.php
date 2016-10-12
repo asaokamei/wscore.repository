@@ -45,6 +45,16 @@ class HasMany implements RelationInterface
 
     /**
      * @param EntityInterface $entity
+     * @return array
+     */
+    public function getTargetKeys(EntityInterface $entity)
+    {
+        $primaryKeys = $entity->getKeys();
+        return HelperMethods::convertDataKeys($primaryKeys, $this->convert);
+    }
+    
+    /**
+     * @param EntityInterface $entity
      * @return static
      */
     public function withEntity(EntityInterface $entity)
@@ -60,8 +70,7 @@ class HasMany implements RelationInterface
      */
     public function query()
     {
-        $primaryKeys = $this->sourceEntity->getKeys();
-        $primaryKeys = HelperMethods::convertDataKeys($primaryKeys, $this->convert);
+        $primaryKeys = $this->getTargetKeys($this->sourceEntity);
         return $this->targetRepo->query()
             ->condition($primaryKeys);
     }

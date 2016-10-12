@@ -150,7 +150,7 @@ abstract class AbstractJoinRepository implements JoinRepositoryInterface
      * @param EntityInterface $fromEntity
      * @return array
      */
-    private function convertFromKeys(EntityInterface $fromEntity)
+    public function convertFromKeys(EntityInterface $fromEntity)
     {
         return HelperMethods::convertDataKeys($fromEntity->getKeys(), $this->from_convert);
     }
@@ -159,7 +159,7 @@ abstract class AbstractJoinRepository implements JoinRepositoryInterface
      * @param EntityInterface $toEntity
      * @return array
      */
-    private function convertToKeys(EntityInterface $toEntity)
+    public function convertToKeys(EntityInterface $toEntity)
     {
         return HelperMethods::convertDataKeys($toEntity->getKeys(), $this->to_convert);
     }

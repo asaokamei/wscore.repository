@@ -8,6 +8,12 @@ interface RelationInterface
 {
     /**
      * @param EntityInterface $entity
+     * @return array
+     */
+    public function getTargetKeys(EntityInterface $entity);
+    
+    /**
+     * @param EntityInterface $entity
      * @return static
      */
     public function withEntity(EntityInterface $entity);
