@@ -1,17 +1,20 @@
 WScore/Repository
 =================
 
-Yet-Another ORM, or database layer library, for PHP. 
-It is (probably) a Repository Pattern with implementation 
-similar to Active Record with separated layers. That means 
-most of the operation directly access and modifies database. 
+Yet-Another ORM for PHP based on (probably) a Repository Pattern; entities and Repositories are represented by different classes. 
+It is focused on providing a sufficient functionalities for command (Create, Update, Delete) operations. 
 
 Other than being able to read, create, update, delete, 
-and relate entities, it is 
+and relate entities, it 
 
-* easy to use, simple to understand, 
-* ready for composite primary keys,
-* possible to code like an Active Record. 
+* works well with composite primary keys, 
+* ready to customize entity as well as data-access layer, 
+* yet, might work without much configuration.
+
+On the other hand, it 
+
+* does not provide eager loading (instead, use `Assembly` object), 
+* accesses database on operations (like Active Record pattern). 
 
 Under development. Not ready for production. 
 
@@ -22,7 +25,7 @@ Installation: `git clone https://github.com/asaokamei/wscore.repository`
 There are three layers. 
 
 ```
-                EntityInterface
+               EntityInterface
                  ↑         ↑
   RepositoryInterface ← RelationInterface
            ↓
@@ -30,14 +33,14 @@ There are three layers.
 ```
 
 * The top layer is the `EntityInterface`, which is 
-independent from the bottom layers. One of the aim of 
-this repository is to reduce the background code behind 
-entity objects.  
+  independent from the bottom layers but provides methods 
+  necessary for bottom layers to work with. 
 * The `RepositoryInterface` layer is a gateway to database tables 
-that persist the entities using `QueryInterface` object. 
-The `relationInterface` relates entities using repositories. 
+  that persist the entities. At the similar level, there is 
+  `relationInterface` relates entities using repositories. 
 * The `QueryInterface` layer is at the bottom of the layers 
-responsible of querying database. 
+  responsible of querying database. (This layer is only used 
+  by generic repositories.)
 
 There is a `Repo` class which serves as a container as well as 
 a factory for repositories and relations. 
@@ -49,7 +52,9 @@ for many-to-many (join) relation.
 Sample Code
 ===========
 
-Sample database. 
+### Sample database
+
+Here's a sample database table, `users`. 
 
 ```sql
 CREATE TABLE users (
@@ -57,21 +62,14 @@ CREATE TABLE users (
     name        VARCHAR(64) NOT NULL UNIQUE
     created_at  DATETIME
 );
-
-CREATE TABLE posts (
-    post_id     INTEGER PRIMARY KEY AUTOINCREMENT,
-    users_id    INTEGER,
-    contents    VARCHAR(256)
-);
 ```
 
-Create a Repository
+creating a repository
 ----
 
-Create a repository for a database table, such as. 
+Create a repository for a database table, such as;
 
 ```php
-<?php
 use WScore\Repository\Repo;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
@@ -83,7 +81,7 @@ class Users extends AbstractRepository
     protected $table = 'users';           // table name
     protected $primaryKeys = ['user_id']; // primary keys in array
     protected $useAutoInsertId = true;    // use auto-incremented ID.
-    protected $columnList = [             // for filtering data by keys
+    protected $columnList = [             // for filtering data by column names
         'name',     
     ];
     protected $timeStamps = [             // if any...
@@ -101,15 +99,6 @@ class Users extends AbstractRepository
         $this->query = $query ?: $repo->getQuery();
         $this->now   = $repo->getCurrentDateTime();
     }
-    
-    /**
-     * @param EntityInterface $user
-     * @return HasMany
-     */
-    public function posts(EntityInterface $user) 
-    {
-        return $this->repo->hasMany($this, 'posts')->withEntity($user);
-    }
 }
 ```
 
@@ -117,10 +106,11 @@ The `AbstractRepository` serves as a convenient way to create
 a repository but any class can be served as repository which 
 implements `WScore\Repository\Repository\RepositoryInterface`. 
 
-`Repo` Class and `ContainerInterface`
+preparing a container
 ----
 
-Use another container that is `ContainerInterface` compatible. 
+`WScore/Repository` uses a container that implements `ContainerInterface`. Set up a container 
+(assuming that the container has `set` method). 
 
 ```php
 $c = new Container();
@@ -142,19 +132,16 @@ it is a handy class for managing repository as well as a factory
 for relation objects. The `Repo` can be constructed as;
 
 ```php
-$repo = new Repo($container); // inject ContainerInterface container. 
+$repo = new Repo($container); // inject the container. 
 ```
 
 
-Repository and Entities
+working with entity
 ----
 
-### Entity
+Entity objects implementing `EntityInterface` are constructed from the fetched result. `WScore\Repository\Entity\Entity` class is used as a default class for all repository of `AbstractRepository`).  
 
-The repository requires entities to be of `EntityInterface`. 
-As a default, all repository (of `AbstractRepository`) uses `Entity` class.  
-
-#### create and save
+### create and save
 
 To create an entity and save it: 
 
@@ -164,7 +151,7 @@ $user1 = $users->create(['name' => 'my name']);
 $id    = $users->save($user1); // should return inserted id.
 ```
 
-#### retrieve, modify, and save. 
+### retrieve, modify, and save. 
 
 To retrieve an entity, modify it, and save it.
 
@@ -175,40 +162,64 @@ $user1->fill(['name' => 'your name']);
 $users->save($user1);
 ```
 
-### Relation
+dealing with relation
+--------
 
 There are 3 relations: `HasOne`, `HasMany`, and `JoinBy`. 
 
-`HasOne` and `HasMany` relations are created using two repositories 
-and conversion of keys if the primary key column names differs in 
-these tables. 
+### sample database
 
-```php
-$hasOne = new HasOne($repo1, $repo2, ['id' => 'other_id']);
+Add another database table, `posts`, that is related to the `users`.
+
+```sql
+CREATE TABLE posts (
+    post_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    users_id    INTEGER,
+    contents    VARCHAR(256)
+);
 ```
 
-`JoinBy` requires another repository, and will be discussed in detail 
-in the following section. 
-
-#### factory for relations
+### example for hasMany relation
 
 The `Repo` has 3 methods for relation: `hasOne`, `hasMany`, and `hasJoin`. 
-The example `Users` repository uses the `hasMany` relation to 
-another table, `posts` as;
- 
+Let's add a method in `Users` class to access the relation object. 
+
 ```php
-$hasMany = $this->repo->hasMany($users, 'posts');
+class Users extends AbstractRepository
+{
+    // ... from previous code ...
+    /**
+     * @param EntityInterface $user
+     * @return HasMany
+     */
+    public function posts(EntityInterface $user) 
+    {
+        return $this->repo->hasMany($this, 'posts')->withEntity($user);
+    }
+}
 ```
 
-#### relation (hasMany)
-
-Now try to related users and posts. 
-First, create repositories for `users` and `posts`:
+`HasOne` and `HasMany` relates two repositories using 
+the primary keys. Provide conversion array if the column name 
+of the primary keys differs in these tables. 
 
 ```php
-// use generic repository for posts table...
-$users = $container->get('users');
-$posts = $repo->getRepository('posts', ['post_id'], true);
+$hasMany = $this->repo->hasMany($users, 'posts', ['id' => 'user_id']);
+```
+
+`JoinBy` requires another repository, and will be discussed in detail in the following section. 
+
+
+#### relating entities
+
+Now try to related users and posts. 
+First, create repositories for `users` and `posts`. 
+This example uses generic repository for `posts` table. 
+
+```php
+$repo  = $container->get(Repo::class);
+$users = $repo->getRepository('users'); // get it from container. 
+$posts = $repo->getRepository('posts', ['post_id'], true); // use generic repository.
 ```
 
 then:
@@ -223,12 +234,85 @@ $user1Posts = $users->posts($user1)->find();
 // relate a new post to $user1.
 $newPost  = $posts->create(['contents' => 'test relation'])
 $users->posts($user1)->relate($newPost);
-$posts->save($post);                       // save the post. 
+$posts->save($post); // save the post. 
 ```
 
 
-Basic Usage
+Customizing Repository and Entity
 ====
+
+EntityInterface
+----
+
+The entity objects must implement `WScore\Repository\Entity\EntityInterface` 
+so that repositories can retrieve data and primary keys from entities. 
+
+`getPrimaryKeys()` returns an array of primary keys even if there is 
+only one key. For convenient purpose, there are `getIdValue()` and 
+`getIdName()` methods that return the primary key value and name 
+if there is only one primary key. 
+
+### AbstractEntity and Entity
+
+`WScore\Repository\Entity\AbstractEntity` is a sample entity 
+implementation used also as a generic entity class,  
+`WScore\Repository\Entity\Entity`. It serves as a 
+default entity object class if not specified. 
+
+To use your own entity class based on the `AbstractEntity`, 
+extend the class while setting properties. 
+
+```php
+class MyEntity extends AbstractEntity
+{
+    protected $valueObjectClasses = [
+        'created_at' => \DateTimeImmutable::class,
+        'status' => function($value) {
+            return ValueOfStatus::forge($value);
+        },
+    ];
+	/**
+     * Entity constructor.
+     *
+     * @param string $table
+     * @param array $primaryKeys
+     */
+    public function __construct($table, array $primaryKeys)
+    {
+        parent::__construct($table, $primaryKeys);
+    }
+}
+```
+
+#### constructor
+
+The current repository passes `$table`, `$primaryKey`, and `$repository`, to the entity's constructor. 
+
+Make sure you call parent constructor in the constructor with `$table` and `$primaryKeys`; it sets some flags to manage its status used during the fetch operation in PDOStatement. 
+
+#### value object
+
+`$valueObjectClasses` is used to construct a value object when accessed via `get` method. Provide 
+
+* a class name, if it can be constructed by `new Class($value)`, or 
+* a callable factory. 
+
+
+### Active Record
+
+it is possible to make the Entity active, 
+just like an Active Pattern. 
+
+### isFetched?
+
+`AbstractEntity` uses several internal flags to manage the status or origins of the entity. 
+
+* `$isFetchDone`: a flag that is set to true **in the constructor**. 
+  Used to set properties during PDO's fetchObject. 
+* `$isFetched`: a flag that is set to true if fetched from PDO. 
+* `isFetched()`: a method returns if the entity is fetched from database. Uses the `$isFetched` flag. 
+* `setPrimaryKeyOnCreatedEntity()`: a method to set primary keys at inserting a new entity into database. This method is used if repository's `$autoInsertedId` flag is true (i.e. using auto-incremented id). This method also sets `$isFetched` flag to true. 
+
 
 Repository
 ----
@@ -281,60 +365,6 @@ $posts = $repo->getRepository(
 );
 ```
 
-
-
-Entity
-----
-
-### EntityInterface
-
-The entity objects must implement `WScore\Repository\Entity\EntityInterface` 
-so that repositories can retrieve data and primary keys from entities. 
-
-`getPrimaryKeys()` returns an array of primary keys even if there is 
-only one key. For convenient purpose, there are `getIdValue()` and 
-`getIdName()` methods that return the primary key value and name 
-if there is only one primary key. 
-
-### AbstractEntity and Entity
-
-`WScore\Repository\Entity\AbstractEntity` is a sample entity 
-implementation used also as a generic entity class,  
-`WScore\Repository\Entity\Entity`. It serves as a 
-default entity object class if not specified. 
-
-To use your own entity class based on the `AbstractEntity`, 
-extend the class while setting properties. 
-
-```php
-class MyEntity extends AbstractEntity
-{
-    protected $table = 'my_table';
-    protected $primaryKeys = ['my_id', 'your_id'];
-    protected $valueObjectClasses = [
-        'created_at' => \DateTimeImmutable::class,
-        'status' => function($value) {
-            return ValueOfStatus::forge($value);
-        },
-    ];
-
-    ...
-}
-```
-
-#### value object
-
-set value object class name, or a closure as a factory at 
-`AbstractEntity::valueObjectClasses` property. 
-
-The class name must be instantiable by `new` operator 
-with the `$value` as first argument: `new ObjectClass($value)`
-
-
-### Active Record
-
-it is possible to make the Entity active, 
-just like an Active Pattern. 
 
 
 Relations
