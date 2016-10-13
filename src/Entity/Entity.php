@@ -11,8 +11,6 @@ class Entity extends AbstractEntity
      */
     public function __construct($table, array $primaryKeys)
     {
-        $this->table       = $table;
-        $this->primaryKeys = $primaryKeys;
-        $this->setFetchDone();
+        parent::__construct($table, $primaryKeys);
     }
 }

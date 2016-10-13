@@ -10,7 +10,7 @@ abstract class AbstractEntity implements EntityInterface
      * @Override
      * @var string
      */
-    protected $table;
+    private $table;
 
     /**
      * @var array|string[]
@@ -26,7 +26,7 @@ abstract class AbstractEntity implements EntityInterface
      * @Override
      * @var string[]
      */
-    protected $primaryKeys = [];
+    private $primaryKeys = [];
 
     /**
      * sets value object class name for each column.
@@ -55,6 +55,19 @@ abstract class AbstractEntity implements EntityInterface
      * @var bool
      */
     private $isFetched = false;
+
+    /**
+     * AbstractEntity constructor.
+     *
+     * @param string $table
+     * @param array  $primaryKeys
+     */
+    public function __construct($table, array $primaryKeys)
+    {
+        $this->table       = $table;
+        $this->primaryKeys = $primaryKeys;
+        $this->setFetchDone();
+    }
 
     /**
      * call this method in constructor. 
