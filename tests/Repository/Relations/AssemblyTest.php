@@ -7,7 +7,7 @@ use tests\Utils\Container;
 use tests\Utils\Repo\Fixture;
 use tests\Utils\Repo\Posts;
 use tests\Utils\Repo\Users;
-use WScore\Repository\Relations\Assembly;
+use WScore\Repository\Assembly;
 use WScore\Repository\Repo;
 
 class AssemblyTest extends \PHPUnit_Framework_TestCase

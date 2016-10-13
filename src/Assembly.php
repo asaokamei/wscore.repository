@@ -1,7 +1,8 @@
 <?php
-namespace WScore\Repository\Relations;
+namespace WScore\Repository;
 
 use WScore\Repository\Entity\EntityInterface;
+use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
 /**
