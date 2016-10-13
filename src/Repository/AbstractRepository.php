@@ -88,13 +88,24 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * get argument for entity's constructor argument
+     * 
+     * @override
+     * @return array
+     */
+    protected function getEntityCtorArgs()
+    {
+        return [$this->table, $this->primaryKeys, $this];
+    }
+
+    /**
      * @param array $data
      * @return EntityInterface
      */
     public function create(array $data)
     {
         /** @var EntityInterface $entity */
-        $entity = new $this->entityClass($this->table, $this->primaryKeys, $this);
+        $entity = new $this->entityClass(...$this->getEntityCtorArgs());
         $entity->fill($data);
         return $entity;
     }
@@ -222,6 +233,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * @override
      * @param EntityInterface $entity
      * @return mixed
      */
@@ -237,7 +249,7 @@ abstract class AbstractRepository implements RepositoryInterface
     {
         return $this->query
             ->withTable($this->table)
-            ->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass, [$this->table, $this->primaryKeys, $this]);
+            ->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass, $this->getEntityCtorArgs());
     }
 
     /**
