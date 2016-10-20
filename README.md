@@ -2,19 +2,22 @@ WScore/Repository
 =================
 
 Yet-Another ORM for PHP based on (probably) a Repository Pattern; entities and Repositories are represented by different classes. 
-It is focused on providing a sufficient functionalities for command (Create, Update, Delete) operations. 
+It functionality is focused for command (Create, Update, Delete) operations. 
 
 Other than being able to read, create, update, delete, 
-and relate entities, it 
+and relate entities, `WScore/Repository` has following features. 
 
-* works well with composite primary keys, 
-* ready to customize entity as well as data-access layer, 
-* yet, might work without much configuration.
+* Use **different classes for DAO and Entity layer**. 
+  You can use your own DAO object to implement some special requirements if necessary. 
+* Work with **composite primary keys**. 
+* Yet, it is easy to use.
 
-On the other hand, it 
+On the other hand, it does not have followings. 
 
-* does not provide eager loading (instead, use `Assembly` object), 
-* accesses database on operations (like Active Record pattern). 
+* Does not have eager loading nor solution for N+1 problem. 
+  Instead, use `Assembly` object or other libraries. 
+* No caching like `Unit of Work` that flushes out entities all at once. Most of the operations results in accessesing database. 
+* No complex SQL construction. 
 
 Under development. Not ready for production. 
 
