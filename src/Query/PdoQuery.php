@@ -13,29 +13,14 @@ class PdoQuery implements QueryInterface
     private $pdo;
     
     /**
-     * @var string
-     */
-    private $table;
-
-    /**
      * @var array
      */
     private $fetchMode = [PDO::FETCH_ASSOC, null, null];
 
     /**
-     * @var array
+     * @var SqlBuilder
      */
-    private $conditions = [];
-
-    /**
-     * @var array
-     */
-    private $orderBy = [];
-
-    /**
-     * @var
-     */
-    private $join = [];
+    private $builder = null;
 
     /**
      * PdoQuery constructor.
@@ -45,20 +30,6 @@ class PdoQuery implements QueryInterface
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
-    }
-
-    /**
-     * @return PdoBuilder
-     */
-    private function sql()
-    {
-        $info = [
-            'table'      => $this->table,
-            'conditions' => $this->conditions,
-            'orderBy'    => $this->orderBy,
-            'join'       => $this->join,
-        ];
-        return new PdoBuilder($this->pdo, $info);
     }
 
     /**
@@ -98,9 +69,8 @@ class PdoQuery implements QueryInterface
      */
     public function withTable($table)
     {
-        $self = clone($this);
-        $self->table = $table;
-        return $self;
+        $this->builder = SqlBuilder::forge($table);
+        return $this;
     }
 
     /**
@@ -110,7 +80,7 @@ class PdoQuery implements QueryInterface
      */
     public function getTable()
     {
-        return $this->table;
+        return $this->builder->getTable();
     }
 
     /**
@@ -140,9 +110,8 @@ class PdoQuery implements QueryInterface
      */
     public function condition(array $condition)
     {
-        if (!empty($condition)) {
-            $this->conditions = array_merge($this->conditions, $condition);
-        }
+        $this->builder->setWhere($condition);
+
         return $this;
     }
     /**
@@ -167,8 +136,25 @@ class PdoQuery implements QueryInterface
      */
     public function orderBy($order, $direction = 'ASC')
     {
-        $this->orderBy[] = [$order, $direction];
+        $this->builder->orderBy($order, $direction);
+
         return $this;
+    }
+
+    /**
+     * @param string $sql
+     * @param array  $data
+     * @return PDOStatement
+     */
+    private function exec($sql, $data)
+    {
+        $stmt = $this->pdo->prepare($sql);
+        if ($stmt instanceof PDOStatement) {
+            if ($stmt->execute($data)) {
+                $this->setFetchMode($stmt);
+            }
+        }
+        return $stmt;
     }
 
     /**
@@ -181,10 +167,8 @@ class PdoQuery implements QueryInterface
     public function select($keys = [])
     {
         $this->condition($keys);
-        $stmt = $this->sql()->execSelect();
-        $this->applyFetchModeToStmt($stmt);
-
-        return $stmt;
+        $sql = $this->builder->makeSelect();
+        return $this->exec($sql, $this->builder->getBindData());
     }
     
     /**
