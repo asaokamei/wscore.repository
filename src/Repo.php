@@ -5,7 +5,7 @@ use DateTimeImmutable;
 use Interop\Container\ContainerInterface;
 use PDO;
 use WScore\Repository\Helpers\CurrentDateTime;
-use WScore\Repository\Query\AuraQuery;
+use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Relations\JoinRepository;
 use WScore\Repository\Relations\JoinRepositoryInterface;
@@ -54,7 +54,7 @@ class Repo
             return $this->_get(QueryInterface::class);
         }
         return $this->repositories[QueryInterface::class] 
-            = new AuraQuery($this->pdo ?: $this->_get(PDO::class));
+            = new PdoQuery($this->pdo ?: $this->_get(PDO::class));
     }
 
     /**

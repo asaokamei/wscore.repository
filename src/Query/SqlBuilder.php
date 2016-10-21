@@ -29,6 +29,16 @@ class SqlBuilder
     private $orderBy = [];
 
     /**
+     * @var array
+     */
+    private $join = [];
+
+    /**
+     * @var string
+     */
+    private $sql = '';
+
+    /**
      * SqlBuilder constructor.
      */
     public function __construct()
@@ -56,6 +66,14 @@ class SqlBuilder
     }
 
     /**
+     * @return string
+     */
+    public function getSql()
+    {
+        return $this->sql;
+    }
+
+    /**
      * returns the table name.
      *
      * @return string
@@ -72,7 +90,7 @@ class SqlBuilder
      * @param array $where
      * @return self
      */
-    public function setWhere(array $where)
+    public function where(array $where)
     {
         if (!empty($where)) {
             $this->where = array_merge($this->where, $where);
@@ -94,6 +112,17 @@ class SqlBuilder
     }
 
     /**
+     * @param string $join
+     * @param array  $join_on
+     * @return self
+     */
+    public function join($join, $join_on)
+    {
+        $this->join[] = [$join, $join_on];
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function makeSelect()
@@ -101,9 +130,10 @@ class SqlBuilder
         $table = $this->makeTable();
         $where = $this->makeWhere();
         $order = $this->makeOrder();
-        $sql   = "SELECT * FROM {$table}{$where}{$order}";
+        $joins = $this->makeJoin();
+        $this->sql = "SELECT * FROM {$table}{$joins}{$where}{$order}";
 
-        return $sql;
+        return $this->sql;
     }
 
     /**
@@ -114,9 +144,10 @@ class SqlBuilder
         $table = $this->makeTable();
         $where = $this->makeWhere();
         $order = $this->makeOrder();
-        $sql   = "SELECT COUNT(*) AS count FROM {$table}{$where}{$order}";
+        $joins = $this->makeJoin();
+        $this->sql = "SELECT COUNT(*) AS count FROM {$table}{$joins}{$where}{$order}";
 
-        return $sql;
+        return $this->sql;
     }
 
     /**
@@ -134,9 +165,9 @@ class SqlBuilder
         }
         $into   = implode(', ', $into);
         $values = implode(', ', $values);
-        $sql    = "INSERT INTO {$table} ({$into}) VALUES ({$values});";
+        $this->sql = "INSERT INTO {$table} ({$into}) VALUES ({$values});";
         
-        return $sql;
+        return $this->sql;
     }
 
     /**
@@ -152,9 +183,9 @@ class SqlBuilder
         }
         $sets  = implode(', ', $sets);
         $where = $this->makeWhere();
-        $sql   = "UPDATE {$table} SET {$sets}{$where};";
+        $this->sql = "UPDATE {$table} SET {$sets}{$where};";
         
-        return $sql;
+        return $this->sql;
     }
 
     /**
@@ -164,9 +195,9 @@ class SqlBuilder
     {
         $table = $this->makeTable();
         $where = $this->makeWhere();
-        $sql   = "DELETE FROM {$table}{$where};";
+        $this->sql = "DELETE FROM {$table}{$where};";
         
-        return $sql;
+        return $this->sql;
     }
 
     /**
@@ -276,5 +307,28 @@ class SqlBuilder
             return '';
         }
         return ' ORDER BY ' . implode(', ', $order);
+    }
+
+    /**
+     * @return string
+     */
+    private function makeJoin()
+    {
+        $sql = [];
+        foreach($this->join as $join) {
+            $table = $join[0];
+            $using = [];
+            foreach($join[1] as $col1 => $col2) {
+                $using[] = "{$col1}={$col2}";
+            }
+            $using = implode(' AND ', $using);
+            $sql[] = "JOIN {$table} ON( {$using} )";
+        }
+        $sql = implode(' ', $sql);
+        if ($sql) {
+            $sql = ' ' . $sql . ' ';
+        }
+
+        return $sql;
     }
 }

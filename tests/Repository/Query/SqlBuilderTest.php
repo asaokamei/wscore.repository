@@ -13,7 +13,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
         $b = SqlBuilder::forge('table');
         $this->assertEquals('SELECT * FROM table', $b->makeSelect());
         
-        $b = SqlBuilder::forge('table')->setWhere(['key' => 'val']);
+        $b = SqlBuilder::forge('table')->where(['key' => 'val']);
         $this->assertEquals('SELECT * FROM table WHERE key = :holder_1', $b->makeSelect());
         $this->assertEquals('val', $b->getBindData()['holder_1']);
 
@@ -26,7 +26,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
      */
     function make_select_with_where_in()
     {
-        $b = SqlBuilder::forge('table')->setWhere(['key' => ['v1', 'v2']]);
+        $b = SqlBuilder::forge('table')->where(['key' => ['v1', 'v2']]);
         $this->assertEquals('SELECT * FROM table WHERE key IN ( :holder_1, :holder_2 )', $b->makeSelect());
         $this->assertEquals('v1', $b->getBindData()['holder_1']);
         $this->assertEquals('v2', $b->getBindData()['holder_2']);
@@ -37,7 +37,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
      */
     function make_select_with_where_or()
     {
-        $b = SqlBuilder::forge('table')->setWhere([['k1' => 'v1', 'k2' => 'v2']]);
+        $b = SqlBuilder::forge('table')->where([['k1' => 'v1', 'k2' => 'v2']]);
         $this->assertEquals('SELECT * FROM table WHERE ( k1 = :holder_1 OR k2 = :holder_2 )', $b->makeSelect());
         $this->assertEquals('v1', $b->getBindData()['holder_1']);
         $this->assertEquals('v2', $b->getBindData()['holder_2']);
@@ -49,7 +49,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
     function make_select_complex_where()
     {
         $b = SqlBuilder::forge('table')
-            ->setWhere([
+            ->where([
                 'status' => 'test',
                 ['k1' => 'v1', 'k2' => 'v2'],
                 'type' => ['t1', 't2'],
@@ -94,7 +94,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
      */
     function make_delete_sql()
     {
-        $b = SqlBuilder::forge('table')->setWhere(['k' => 'v']);
+        $b = SqlBuilder::forge('table')->where(['k' => 'v']);
         $this->assertEquals(
             'DELETE FROM table WHERE k = :holder_1;',
             $b->makeDelete());
@@ -106,7 +106,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
      */
     function make_count_sql()
     {
-        $b = SqlBuilder::forge('table')->setWhere(['k' => 'v']);
+        $b = SqlBuilder::forge('table')->where(['k' => 'v']);
         $this->assertEquals(
             'SELECT COUNT(*) AS count FROM table WHERE k = :holder_1',
             $b->makeCount());

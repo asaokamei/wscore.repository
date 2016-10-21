@@ -110,7 +110,7 @@ class PdoQuery implements QueryInterface
      */
     public function condition(array $condition)
     {
-        $this->builder->setWhere($condition);
+        $this->builder->where($condition);
 
         return $this;
     }
@@ -142,16 +142,16 @@ class PdoQuery implements QueryInterface
     }
 
     /**
-     * @param string $sql
-     * @param array  $data
      * @return PDOStatement
      */
-    private function exec($sql, $data)
+    private function execBuilder()
     {
+        $sql  = $this->builder->getSql();
+        $data = $this->builder->getBindData();
         $stmt = $this->pdo->prepare($sql);
         if ($stmt instanceof PDOStatement) {
             if ($stmt->execute($data)) {
-                $this->setFetchMode($stmt);
+                $this->applyFetchModeToStmt($stmt);
             }
         }
         return $stmt;
@@ -167,8 +167,8 @@ class PdoQuery implements QueryInterface
     public function select($keys = [])
     {
         $this->condition($keys);
-        $sql = $this->builder->makeSelect();
-        return $this->exec($sql, $this->builder->getBindData());
+        $this->builder->makeSelect();
+        return $this->execBuilder();
     }
     
     /**
@@ -180,7 +180,10 @@ class PdoQuery implements QueryInterface
      */
     public function count($keys = [])
     {
-        return $this->sql()->execCount();
+        $this->condition($keys);
+        $this->builder->makeCount();
+        $stmt = $this->execBuilder();
+        return (int) $stmt->fetchColumn(0);
     }
 
     /**
@@ -193,7 +196,8 @@ class PdoQuery implements QueryInterface
      */
     public function insert(array $data)
     {
-        return $this->sql()->execInsert($data);
+        $this->builder->makeInsert($data);
+        return $this->execBuilder();
     }
 
     /**
@@ -216,24 +220,26 @@ class PdoQuery implements QueryInterface
      *
      * @param array $keys
      * @param array $data
-     * @return bool
+     * @return bool|PDOStatement
      */
     public function update(array $keys, array $data)
     {
-        $this->condition($keys);
-        return $this->sql()->execUpdate($data);
+        $this->builder->where($keys);
+        $this->builder->makeUpdate($data);
+        return $this->execBuilder();
     }
 
     /**
      * deletes the rows selected by $keys.
      *
      * @param array $keys
-     * @return bool
+     * @return bool|PDOStatement
      */
     public function delete($keys)
     {
-        $this->condition($keys);
-        return $this->sql()->execDelete();
+        $this->builder->where($keys);
+        $this->builder->makeDelete();
+        return $this->execBuilder();
     }
 
     /**
@@ -243,11 +249,11 @@ class PdoQuery implements QueryInterface
      *
      * @param string $join
      * @param array  $join_on
-     * @return QueryInterface
+     * @return self
      */
     public function join($join, $join_on)
     {
-        $this->join[] = [$join, $join_on];
+        $this->builder->join($join, $join_on);
         return $this;
     }
 }
