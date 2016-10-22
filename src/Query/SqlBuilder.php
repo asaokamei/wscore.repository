@@ -229,66 +229,61 @@ class SqlBuilder
      */
     private function makeWhere()
     {
-        $where = $this->makeWhereList([], $this->where);
+        $where = $this->makeWhereList($this->where);
         if (empty($where)) {
             return '';
         }
-        return ' WHERE ' . implode(' AND ', $where);
+        if (substr($where, 0, 2) === '( ' && substr($where, -2) == ' )') {
+            $where = substr($where, 2);
+            $where = substr($where, 0, -2);
+        }
+        return ' WHERE ' . $where;
     }
 
     /**
-     * @param array $where
      * @param array $value
-     * @return array
+     * @return string
      */
-    private function makeWhereList($where, $value)
+    private function makeWhereList($value)
     {
         if (empty($value)) {
-            return $where;
+            return '';
         }
+        $andOr = 'OR';
+        $where = [];
         foreach ($value as $column => $v) {
             if (is_array($v)) {
-                $where = is_numeric($column)
-                    ? $this->makeWhereOr($where, $v)
-                    : $this->makeWhereIn($where, $column, $v);
+                $where[] = is_numeric($column)
+                    ? $this->makeWhereList($v)
+                    : $this->makeWhereIn($column, $v);
                 continue;
             }
+            $andOr = 'AND';
             $where[] = "{$column} = " . $this->getHolderName($v);
         }
 
-        return $where;
+        $line = implode(" {$andOr} ", $where);
+        if (count($where) > 1 ) {
+            return "( {$line} )";
+        }
+        return $line;
     }
 
     /**
-     * @param array  $where
      * @param string $column
      * @param array  $value
-     * @return array
+     * @return string
      */
-    private function makeWhereIn($where, $column, $value)
+    private function makeWhereIn($column, $value)
     {
         if (empty($value)) {
-            return $where;
+            return '';
         }
         $list = [];
         foreach($value as $v) {
             $list[] = $this->getHolderName($v);
         }
-        $where[] = "{$column} IN ( " . implode(', ', $list) . " )";
-        return $where;
-    }
-
-    /**
-     * @param array $where
-     * @param array $value
-     * @return array
-     */
-    private function makeWhereOr($where, $value)
-    {
-        $wOr = $this->makeWhereList([], $value);
-        $where[] = '( ' . implode(' OR ', $wOr) . ' )';
-
-        return $where;
+        return "{$column} IN ( " . implode(', ', $list) . " )";
     }
 
     /**

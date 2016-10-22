@@ -37,8 +37,8 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
      */
     function make_select_with_where_or()
     {
-        $b = SqlBuilder::forge('table')->where([['k1' => 'v1', 'k2' => 'v2']]);
-        $this->assertEquals('SELECT * FROM table WHERE ( k1 = :holder_1 OR k2 = :holder_2 )', $b->makeSelect());
+        $b = SqlBuilder::forge('table')->where([['k1' => 'v1'], ['k2' => 'v2']]);
+        $this->assertEquals('SELECT * FROM table WHERE k1 = :holder_1 OR k2 = :holder_2', $b->makeSelect());
         $this->assertEquals('v1', $b->getBindData()['holder_1']);
         $this->assertEquals('v2', $b->getBindData()['holder_2']);
     }
@@ -51,7 +51,7 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
         $b = SqlBuilder::forge('table')
             ->where([
                 'status' => 'test',
-                ['k1' => 'v1', 'k2' => 'v2'],
+                [['k1' => 'v1'], ['k2' => 'v2']],
                 'type' => ['t1', 't2'],
             ]);
         $this->assertEquals(
@@ -62,6 +62,29 @@ class SqlBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('v2', $b->getBindData()['holder_3']);
         $this->assertEquals('t1', $b->getBindData()['holder_4']);
         $this->assertEquals('t2', $b->getBindData()['holder_5']);
+    }
+
+    /**
+     * @test
+     */
+    function make_select_complex_or_list()
+    {
+        $b = SqlBuilder::forge('table')
+            ->where([
+                'status' => 'test', [
+                    ['k1' => 'v1', 'k2' => 'w1'],
+                    ['k1' => 'v2', 'k2' => 'w2'],
+                ],
+                'type' => ['t1', 't2'],
+            ]);
+        $this->assertEquals(
+            'SELECT * FROM table WHERE status = :holder_1 AND ( ( k1 = :holder_2 AND k2 = :holder_3 ) OR ( k1 = :holder_4 AND k2 = :holder_5 ) ) AND type IN ( :holder_6, :holder_7 )',
+            $b->makeSelect());
+        $this->assertEquals('test', $b->getBindData()['holder_1']);
+        $this->assertEquals('v1', $b->getBindData()['holder_2']);
+        $this->assertEquals('w1', $b->getBindData()['holder_3']);
+        $this->assertEquals('v2', $b->getBindData()['holder_4']);
+        $this->assertEquals('w2', $b->getBindData()['holder_5']);
     }
 
     /**
