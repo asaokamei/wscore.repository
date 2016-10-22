@@ -173,8 +173,8 @@ SQL;
               =<<<SQL
 CREATE TABLE posts_tags (
     posts_tags_id      INTEGER PRIMARY KEY AUTOINCREMENT,
-    posts_post_id INTEGER,
-    tags_tag_id VARCHAR(32),
+    post_id     INTEGER,
+    tag_id      VARCHAR(32),
     created_at  DATETIME
 );
 SQL;
@@ -187,7 +187,7 @@ SQL;
     public function insertPostsTags()
     {
         $insert =<<<SQL
-INSERT INTO posts_tags (posts_post_id, tags_tag_id, created_at) VALUES (?, ?, ?);
+INSERT INTO posts_tags (post_id, tag_id, created_at) VALUES (?, ?, ?);
 SQL;
         $now  = (new \DateTime())->format('Y-m-d H:i:s');
         $list = [

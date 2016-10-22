@@ -7,6 +7,7 @@ use PDO;
 use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Query\QueryInterface;
+use WScore\Repository\Relations\Join;
 use WScore\Repository\Relations\JoinRepository;
 use WScore\Repository\Relations\JoinRepositoryInterface;
 use WScore\Repository\Repository\Repository;
@@ -206,6 +207,35 @@ class Repo
         return new JoinBy($join);
     }
 
+    /**
+     * @param RepositoryInterface|string $fromRepo
+     * @param RepositoryInterface|string $toRepo
+     * @param string $joinRepo
+     * @param array  $from_convert
+     * @param array  $to_convert
+     * @return Join
+     */
+    public function join(
+        $fromRepo,
+        $toRepo,
+        $joinRepo = '',
+        $from_convert = [],
+        $to_convert = []
+    ) {
+        if (is_string($fromRepo)) {
+            $fromRepo = $this->getRepository($fromRepo);
+        }
+        if (is_string($toRepo)) {
+            $toRepo = $this->getRepository($toRepo);
+        }
+        if (!$joinRepo) {
+            $joinRepo = $this->makeJoinTableName($toRepo, $fromRepo);
+        }
+        if (is_string($joinRepo)) {
+            $joinRepo = $this->getRepository($joinRepo);
+        }
+        return new Join($fromRepo, $joinRepo, $toRepo, $from_convert, $to_convert);
+    }
 
     /**
      * create a join table name from 2 joined tables.

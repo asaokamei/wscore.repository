@@ -49,7 +49,9 @@ class HelperMethods
         foreach($convert as $key => $col) {
             if (array_key_exists($key, $input)) {
                 $input[$col] = $input[$key];
-                unset($input[$key]);
+                if ($key !== $col ) {
+                    unset($input[$key]);
+                }
             }
         }
         return $input;
