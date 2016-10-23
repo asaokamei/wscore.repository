@@ -241,19 +241,4 @@ class PdoQuery implements QueryInterface
         $this->builder->makeDelete();
         return $this->execBuilder();
     }
-
-    /**
-     * JOIN clause with another $join table, with $join_on condition.
-     * if $join_on is an array (keys are numeric), turns the value to
-     * USING clause, for hashed array, turns to ON clause.
-     *
-     * @param string $join
-     * @param array  $join_on
-     * @return self
-     */
-    public function join($join, $join_on)
-    {
-        $this->builder->join($join, $join_on);
-        return $this;
-    }
 }

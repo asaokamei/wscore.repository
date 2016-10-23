@@ -118,14 +118,4 @@ interface QueryInterface
      */
     public function delete($keys);
 
-    /**
-     * JOIN clause with another $join table, with $join_on condition.
-     * if $join_on is an array (keys are numeric), turns the value to
-     * USING clause, for hashed array, turns to ON clause.
-     *
-     * @param string $join
-     * @param array  $join_on
-     * @return QueryInterface
-     */
-    public function join($join, $join_on);
 }
