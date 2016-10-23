@@ -213,8 +213,8 @@ abstract class AbstractRepository implements RepositoryInterface
         }
         if ($this->useAutoInsertId) {
             $id = $this->query()->lastId($this->getTable(), $this->getIdName());
+            $entity->setPrimaryKeyOnCreatedEntity($id);
         }
-        $entity->setPrimaryKeyOnCreatedEntity($id);
 
         return $entity;
     }

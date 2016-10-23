@@ -94,7 +94,7 @@ class Join implements JoinRelationInterface
     {
         $data = $entity->toArray();
         $keys = HelperMethods::filterDataByKeys($data, $this->to_convert);
-        $keys = HelperMethods::convertDataKeys($keys, $this->to_convert);
+        $keys = HelperMethods::convertDataKeys($keys, array_flip($this->to_convert));
         return $keys;
     }
     
@@ -151,7 +151,7 @@ class Join implements JoinRelationInterface
         if (!$this->sourceEntity) {
             throw new \BadMethodCallException('must have source entity to delete.');
         }
-        $keys = $this->convertFromKeys($entity);
+        $keys = $this->convertToKeys($entity);
         return $this->queryJoin()
             ->delete($keys);
     }

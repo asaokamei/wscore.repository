@@ -7,7 +7,6 @@ use PHPUnit_Framework_TestCase;
 use tests\Utils\Composite\Fee;
 use tests\Utils\Composite\FixtureCompositeKey;
 use tests\Utils\Composite\Member;
-use tests\Utils\Composite\Member2Fee;
 use tests\Utils\Composite\Order;
 use tests\Utils\Container;
 use WScore\Repository\Relations\JoinBy;
@@ -63,9 +62,6 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         });
         $c->set('order', function (ContainerInterface $c) {
             return new Order($c->get(Repo::class));
-        });
-        $c->set('member2fee', function (ContainerInterface $c) {
-            return new Member2Fee($c->get(Repo::class));
         });
         $c->set(Repo::class, function (ContainerInterface $c) {
             return new Repo($c);

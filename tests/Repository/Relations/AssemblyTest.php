@@ -27,10 +27,8 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $this->repo = $c->getRepo();
 
         // prepare for test. need to pre-create tags repository. 
-        $tags  = $this->repo->getRepository('tags', ['tag_id']);
-        $posts = $this->repo->getRepository('posts', ['post_id'], true);
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $postTag = $this->repo->getJoinRepository('posts_tags', $posts, $tags);
+        $this->repo->getRepository('tags', ['tag_id']);
+        $this->repo->getRepository('posts', ['post_id'], true);
     }
     
     /**

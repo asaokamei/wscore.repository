@@ -11,8 +11,6 @@ use tests\Utils\Repo\Users;
 use WScore\Repository\Entity\AbstractEntity;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Relations\Join;
-use WScore\Repository\Relations\JoinRepository;
-use WScore\Repository\Relations\JoinBy;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\Repository;
 
@@ -28,7 +26,6 @@ class JoinTest extends \PHPUnit_Framework_TestCase
         class_exists(Container::class);
         class_exists(Repo::class);
         class_exists(Repository::class);
-        class_exists(JoinRepository::class);
         class_exists(PdoQuery::class);
         class_exists(Join::class);
         class_exists(AbstractEntity::class);
