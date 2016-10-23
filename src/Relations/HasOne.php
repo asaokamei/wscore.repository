@@ -40,7 +40,19 @@ class HasOne implements RelationInterface
     ) {
         $this->sourceRepo   = $sourceRepo;
         $this->targetRepo   = $targetRepo;
-        $this->convert      = $convert;
+        $this->convert      = $convert ?: $this->makeConversion();
+    }
+
+    /**
+     * @return array
+     */
+    private function makeConversion()
+    {
+        $convert = [];
+        foreach($this->targetRepo->getKeyColumns() as $k) {
+            $convert[$k] = $k;
+        }
+        return $convert;
     }
 
     /**
@@ -49,12 +61,11 @@ class HasOne implements RelationInterface
      */
     public function getTargetKeys(EntityInterface $entity)
     {
-        $sourceData  = $entity->toArray();
-        $targetKeys  = $this->targetRepo->getKeyColumns();
-        $primaryKeys = HelperMethods::filterDataByKeys($sourceData, $this->convert);
-        $primaryKeys = HelperMethods::filterDataByKeys($primaryKeys, $targetKeys);
+        $keys = $entity->toArray();
+        $keys = HelperMethods::filterDataByKeys($keys, array_flip($this->convert));
+        $keys = HelperMethods::convertDataKeys($keys, $this->convert);
 
-        return $primaryKeys;
+        return $keys;
     }
 
     /**
@@ -75,6 +86,9 @@ class HasOne implements RelationInterface
     public function query()
     {
         $primaryKeys = $this->getTargetKeys($this->sourceEntity);
+        if ($this->sourceEntity && empty($primaryKeys)) {
+            throw new \InvalidArgumentException('cannot convert primary key.');
+        }
         return $this->targetRepo->query()
                                 ->condition($primaryKeys);
     }

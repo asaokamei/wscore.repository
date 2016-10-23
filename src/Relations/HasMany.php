@@ -40,7 +40,19 @@ class HasMany implements RelationInterface
     ) {
         $this->sourceRepo   = $sourceRepo;
         $this->targetRepo   = $targetRepo;
-        $this->convert      = $convert;
+        $this->convert      = $convert ?: $this->makeConversion();
+    }
+
+    /**
+     * @return array
+     */
+    private function makeConversion()
+    {
+        $convert = [];
+        foreach($this->sourceRepo->getKeyColumns() as $key) {
+            $convert[$key] = $key;
+        }
+        return $convert;
     }
 
     /**
@@ -49,8 +61,9 @@ class HasMany implements RelationInterface
      */
     public function getTargetKeys(EntityInterface $entity)
     {
-        $primaryKeys = $entity->getKeys();
-        return HelperMethods::convertDataKeys($primaryKeys, $this->convert);
+        $keys = $entity->toArray();
+        $keys = HelperMethods::filterDataByKeys($keys, array_flip($this->convert));
+        return HelperMethods::convertDataKeys($keys, $this->convert);
     }
     
     /**
