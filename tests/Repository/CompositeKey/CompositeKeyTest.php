@@ -9,7 +9,6 @@ use tests\Utils\Composite\FixtureCompositeKey;
 use tests\Utils\Composite\Member;
 use tests\Utils\Composite\Order;
 use tests\Utils\Container;
-use WScore\Repository\Relations\JoinBy;
 use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Relations\HasOne;
 use WScore\Repository\Repo;
@@ -30,7 +29,6 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         class_exists(Order::class);
         class_exists(HasMany::class);
         class_exists(HasOne::class);
-        class_exists(JoinBy::class);
 
         $c       = $this->getContainer();
         $fixture = $c->get(FixtureCompositeKey::class);
@@ -125,22 +123,6 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $feeJoined = $members->fees($main);
         $fees      = $feeJoined->find();
         $this->assertEquals(3, count($fees));
-    }
-
-    /**
-     * @ test
-     */
-    function hasJoin_returns_related_entities_other_way()
-    {
-        /** @var Fee $fees */
-        $fees   = $this->repo->getRepository('fee');
-        $feeSub = $fees->findByKey(['year' => 2016, 'type' => 2, 'code' => 'MEMBER']);
-        $this->assertEquals('sub-member fee', $feeSub->get('name'));
-
-        $subJoined  = $fees->members($feeSub);
-        $subMembers = $subJoined->find();
-        $this->assertEquals(1, count($subMembers));
-        $this->assertEquals('Sub Member', $subMembers[0]->get('name'));
     }
 
     /**

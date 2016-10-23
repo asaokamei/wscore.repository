@@ -8,12 +8,9 @@ use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Relations\Join;
-use WScore\Repository\Relations\JoinRepository;
-use WScore\Repository\Relations\JoinRepositoryInterface;
 use WScore\Repository\Repository\Repository;
 use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Relations\HasOne;
-use WScore\Repository\Relations\JoinBy;
 use WScore\Repository\Repository\RepositoryInterface;
 use WScore\Repository\Repository\RepositoryOptions;
 
@@ -125,27 +122,6 @@ class Repo
     }
 
     /**
-     * @param string                          $tableName
-     * @param null|string|RepositoryInterface $sourceRepo
-     * @param null|string|RepositoryInterface $targetRepo
-     * @return JoinRepositoryInterface
-     */
-    public function getJoinRepository($tableName, $sourceRepo = null, $targetRepo = null)
-    {
-        if ($this->_has($tableName)) {
-            return $this->_get($tableName);
-        }
-        if (is_string($sourceRepo)) {
-            $sourceRepo = $this->getRepository($sourceRepo);
-        }
-        if (is_string($targetRepo)) {
-            $targetRepo = $this->getRepository($targetRepo);
-        }
-        return $this->repositories[$tableName] 
-            = new JoinRepository($this, $tableName, $sourceRepo, $targetRepo);
-    }
-    
-    /**
      * @param RepositoryInterface|string $sourceRepo
      * @param RepositoryInterface|string $repo
      * @param array               $convert
@@ -183,28 +159,6 @@ class Repo
             $repo = $this->getRepository($repo);
         }
         return new HasMany($sourceRepo, $repo, $convert);
-    }
-
-    /**
-     * @param RepositoryInterface|string $sourceRepo
-     * @param RepositoryInterface|string $targetRepo
-     * @param string|null         $joinTable
-     * @return JoinBy
-     */
-    public function joinBy(
-        $sourceRepo,
-        $targetRepo,
-        $joinTable = ''
-    ) {
-        if (is_string($sourceRepo)) {
-            $sourceRepo = $this->getRepository($sourceRepo);
-        }
-        if (is_string($targetRepo)) {
-            $targetRepo = $this->getRepository($targetRepo);
-        }
-        $joinTable = $joinTable ?: $this->makeJoinTableName($targetRepo, $sourceRepo);
-        $join      = $this->getJoinRepository($joinTable, $sourceRepo, $targetRepo);
-        return new JoinBy($join);
     }
 
     /**

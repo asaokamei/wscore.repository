@@ -1,8 +1,6 @@
 <?php
 namespace tests\Utils\Composite;
 
-use WScore\Repository\Entity\EntityInterface;
-use WScore\Repository\Relations\JoinBy;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\AbstractRepository;
 
@@ -22,14 +20,5 @@ class Fee extends AbstractRepository
         $this->repo            = $repo;
         $this->query           = $repo->getQuery();
         $this->now             = $repo->getCurrentDateTime();
-    }
-
-    /**
-     * @param EntityInterface $feeSub
-     * @return JoinBy
-     */
-    public function members($feeSub)
-    {
-        return $this->repo->joinBy($this, 'member', 'member2fee')->withEntity($feeSub);
     }
 }
