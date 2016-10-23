@@ -9,7 +9,7 @@ use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\Repository;
 
-class HasOneManyTest extends \PHPUnit_Framework_TestCase
+class SimpleIdTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Container
@@ -93,5 +93,29 @@ class HasOneManyTest extends \PHPUnit_Framework_TestCase
 
         $users = $hasOne->find();
         $this->assertEquals(2, $users[0]->getIdValue());
+    }
+    
+    function test_join()
+    {
+        $users = $this->repo->getRepository('users');
+        $user1 = $users->findByKey(1);
+        $this->assertEquals(1, $user1->getIdValue());
+
+        $join = $this->repo->join($users, 'posts', 'user_post', [
+            'id' => 'user_id'
+        ], [
+            'id' => 'post_id'
+        ])->withEntity($user1);
+        $this->assertEquals(2, $join->count());
+
+        $joins = $join->queryJoin()->find();
+        $this->assertEquals(1, $joins[0]->get('user_id'));
+        $this->assertEquals(1, $joins[1]->get('user_id'));
+        $this->assertEquals(1, $joins[0]->get('post_id'));
+        $this->assertEquals(2, $joins[1]->get('post_id'));
+
+        $posts = $join->find();
+        $this->assertEquals(1, $posts[0]->getIdValue());
+        $this->assertEquals(2, $posts[1]->getIdValue());
     }
 }
