@@ -48,12 +48,6 @@ interface RepositoryInterface
      * @param EntityInterface $entity
      * @return EntityInterface
      */
-    public function save(EntityInterface $entity);
-
-    /**
-     * @param EntityInterface $entity
-     * @return EntityInterface
-     */
     public function insert(EntityInterface $entity);
 
     /**

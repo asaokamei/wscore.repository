@@ -136,7 +136,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
         $hasMany->relate($post2);
         $this->assertEquals(1, $post2->get('users_id'));
-        $posts->save($post2);
+        $post2->save();
 
         $hasMany = $repo->hasMany($users, $posts)->withEntity($user1);
         $this->assertEquals(2, $hasMany->count());
@@ -149,7 +149,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $hasOne = $repo->hasOne('posts', 'users')->withEntity($post1);
         $hasOne->relate($user2);
         $this->assertEquals(2, $post1->get('users_id'));
-        $posts->save($post1);
+        $post1->save();
 
         $hasMany = $repo->hasMany($users, $posts)->withEntity($user1);
         $this->assertEquals(1, $hasMany->count());

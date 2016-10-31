@@ -232,8 +232,8 @@ class RepoTest extends \PHPUnit_Framework_TestCase
             'gender' => 'T',
                                 ]);
 
-        $users->save($user1);
-        $users->save($user2);
+        $user1->save();
+        $user2->save();
 
         $this->assertEquals('test-update', $users->findByKey(1)->get('name'));
         $this->assertEquals('test-insert', $users->findByKey(2)->get('name'));

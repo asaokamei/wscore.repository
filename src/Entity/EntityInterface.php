@@ -1,6 +1,9 @@
 <?php
 namespace WScore\Repository\Entity;
 
+use WScore\Repository\Relations\JoinRelationInterface;
+use WScore\Repository\Relations\RelationInterface;
+
 interface EntityInterface
 {
 
@@ -66,4 +69,15 @@ interface EntityInterface
      * @param array           $convert
      */
     public function relate(EntityInterface $entity, $convert = []);
+
+    /**
+     * @return bool
+     */
+    public function save();
+
+    /**
+     * @param string $name
+     * @return RelationInterface|JoinRelationInterface
+     */
+    public function getRelation($name);
 }
