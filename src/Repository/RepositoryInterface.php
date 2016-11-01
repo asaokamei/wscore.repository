@@ -33,6 +33,12 @@ interface RepositoryInterface
     public function create(array $data);
 
     /**
+     * @param array $data
+     * @return EntityInterface
+     */
+    public function createAsFetched(array $data);
+
+    /**
      * @param array $keys
      * @return EntityInterface[]
      */

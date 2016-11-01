@@ -111,6 +111,24 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * @param array $data
+     * @return EntityInterface
+     */
+    public function createAsFetched(array $data)
+    {
+        /** @var EntityInterface $entity */
+        $reflection = new \ReflectionClass($this->entityClass);
+        $entity     = $reflection->newInstanceWithoutConstructor();
+        foreach ($data as $key => $value) {
+            $entity->$key = $value;
+        }
+        $reflection->getConstructor()
+            ->invoke($entity, ...$this->getEntityCtorArgs());
+
+        return $entity;
+    }
+
+    /**
      * @return string[]
      */
     public function getKeyColumns()
@@ -211,7 +229,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function update(EntityInterface $entity)
     {
-        $data = $entity->getUpdatedData();
+        $data = $entity->toArray();
         $data = $this->filterDataByColumns($data);
         $data = HelperMethods::removeDataByKeys($data, $this->getKeyColumns());
         $data = $this->_addTimeStamps($data, 'updated_at');
