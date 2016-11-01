@@ -3,9 +3,15 @@ namespace WScore\Repository\Relations;
 
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
+use WScore\Repository\Repository\RepositoryInterface;
 
 interface RelationInterface
 {
+    /**
+     * @return RepositoryInterface
+     */
+    public function getTargetRepository();
+
     /**
      * @param EntityInterface $entity
      * @return array

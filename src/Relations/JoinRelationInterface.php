@@ -7,6 +7,14 @@ use WScore\Repository\Query\QueryInterface;
 interface JoinRelationInterface extends RelationInterface
 {
     /**
+     * get keys to find join-entities from $fromEntity.
+     *
+     * @param EntityInterface $fromEntity
+     * @return array
+     */
+    public function convertFromKeys(EntityInterface $fromEntity);
+
+    /**
      * @return bool
      */
     public function clear();

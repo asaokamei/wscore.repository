@@ -58,7 +58,15 @@ class Join implements JoinRelationInterface
         $this->from_convert = $from_convert ?: $this->makeConvertKey($fromRepo->getKeyColumns());
         $this->to_convert   = $to_convert ?: $this->makeConvertKey($toRepo->getKeyColumns());
     }
-    
+
+    /**
+     * @return RepositoryInterface
+     */
+    public function getTargetRepository()
+    {
+        return $this->toRepo;
+    }
+
     private function makeConvertKey($keys)
     {
         $convert = [];

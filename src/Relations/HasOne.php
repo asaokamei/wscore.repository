@@ -44,6 +44,14 @@ class HasOne implements RelationInterface
     }
 
     /**
+     * @return RepositoryInterface
+     */
+    public function getTargetRepository()
+    {
+        return $this->targetRepo;
+    }
+
+    /**
      * @return array
      */
     private function makeConversion()
