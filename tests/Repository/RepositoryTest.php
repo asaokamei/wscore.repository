@@ -42,7 +42,10 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Entity::class, $repo->getEntityClass());
     }
 
-    function test1()
+    /**
+     * @test
+     */
+    function query_returns_QueryInterface_instance()
     {
         $query = $this->repo->query();
         $this->assertEquals(true, $query instanceof QueryInterface);
@@ -71,7 +74,10 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['p1' => 'v1', 'p2' => 'v2', 'col1' => 'val', 'col2' => 'test', 'mod-date' => '2016/09/27 16:00'], $this->q->data);
     }
 
-    function test2()
+    /**
+     * @test
+     */
+    function find_and_findByKey_queries_by_keys()
     {
         $this->repo->find(['key' => 'tested']);
         $this->assertEquals(['key' => 'tested'], $this->q->keys);
@@ -80,7 +86,10 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['key' => 'tested'], $this->q->keys);
     }
 
-    function test3()
+    /**
+     * @test
+     */
+    function findByKey_accepts_simple_value()
     {
         $repo = new Repository(
             'testTable',
@@ -96,7 +105,10 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['p1' => 'p-value'], $this->q->keys);
     }
 
-    function test4()
+    /**
+     * @test
+     */
+    function create_method_creates_a_new_entity()
     {
         $entity = $this->repo->create(['col1' => 'val', 'col2' => 'test', ]);
         $this->repo->insert($entity);
@@ -105,8 +117,11 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('test_create', $this->q->data);
         $this->assertArrayHasKey('test_update', $this->q->data);
     }
-    
-    function test5()
+
+    /**
+     * @test
+     */
+    function update_filters_columns_not_in_getColumns()
     {
         $repo = new Repository(
             'testTable',
@@ -126,8 +141,11 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->q->data['col2']);
         $this->assertArrayHasKey('test_update', $this->q->data);
     }
-    
-    function test6()
+
+    /**
+     * @test
+     */
+    function deletes_passes_primaryKeys_to_Query_instance()
     {
         $repo = new Repository(
             'testTable',
