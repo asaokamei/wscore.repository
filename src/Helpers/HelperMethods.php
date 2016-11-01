@@ -2,6 +2,7 @@
 namespace WScore\Repository\Helpers;
 
 use InvalidArgumentException;
+use WScore\Repository\Entity\EntityInterface;
 
 class HelperMethods
 {
@@ -74,5 +75,32 @@ class HelperMethods
             return new $class($value);
         }
         throw new InvalidArgumentException('cannot convert to object');
+    }
+
+    /**
+     * @param EntityInterface $entity
+     * @param array           $convert
+     * @return string
+     */
+    public static function flatKey(EntityInterface $entity, array $convert = [])
+    {
+        if (empty($convert)) {
+            return self::flattenKey($entity->getKeys());
+        }
+        $keys = HelperMethods::filterDataByKeys($entity->toArray(), $convert);
+        return HelperMethods::flattenKey($keys);
+    }
+
+    /**
+     * @param array $keys
+     * @return string
+     */
+    public static function flattenKey(array $keys)
+    {
+        $flat = [];
+        foreach($keys as $key => $val) {
+            $flat[] = "{$key}:{$val}";
+        }
+        return implode("\t", $flat);
     }
 }
