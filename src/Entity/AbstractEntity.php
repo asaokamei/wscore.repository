@@ -3,8 +3,6 @@ namespace WScore\Repository\Entity;
 
 use BadMethodCallException;
 use WScore\Repository\Helpers\HelperMethods;
-use WScore\Repository\Relations\JoinRelationInterface;
-use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
 abstract class AbstractEntity implements EntityInterface
@@ -63,11 +61,6 @@ abstract class AbstractEntity implements EntityInterface
      * @var RepositoryInterface
      */
     protected $repo;
-
-    /**
-     * @var RelationInterface[]|JoinRelationInterface{}
-     */
-    protected $relations = [];
 
     /**
      * AbstractEntity constructor.
@@ -293,19 +286,4 @@ abstract class AbstractEntity implements EntityInterface
         return true;
     }
 
-    /**
-     * @param string $name
-     * @return RelationInterface|JoinRelationInterface
-     */
-    public function getRelation($name)
-    {
-        if (method_exists($this->repo, $name)) {
-            /** @var RelationInterface $relation */
-            $relation = $this->repo->$name();
-            $relation->withEntity($this);
-            $this->relations[$name] = $relation;
-            return $relation;
-        }
-        return null;
-    }
 }
