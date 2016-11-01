@@ -19,11 +19,6 @@ abstract class AbstractEntity implements EntityInterface
     private $data = [];
 
     /**
-     * @var array|string[]
-     */
-    private $_original_data = [];
-
-    /**
      * @Override
      * @var string[]
      */
@@ -94,27 +89,6 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * @param string $key
-     * @param mixed $value
-     */
-    protected function _setOriginalData($key, $value)
-    {
-        $this->_original_data[$key] = $value;
-    }
-
-    /**
-     * @param string $key
-     * @return array|string
-     */
-    protected function _getOriginalData($key = null)
-    {
-        if (is_null($key)) {
-            return $this->_original_data;
-        }
-        return array_key_exists($key, $this->_original_data) ? $this->_original_data[$key] : null;
-    }
-
-    /**
      * call this method to indicate that the entity is fetched from a database. 
      * sets isFetched flag to true.
      */
@@ -150,7 +124,6 @@ abstract class AbstractEntity implements EntityInterface
         }
         $this->setFetchedFromDb();
         $this->data[$key] = $value;
-        $this->_setOriginalData($key, $value);
     }
 
     /**
@@ -168,7 +141,6 @@ abstract class AbstractEntity implements EntityInterface
         if ($id !== true && $id) {
             $key = $this->getIdName();
             $this->data[$key] = $id;
-            $this->_setOriginalData($key, $id);
         }
         $this->setFetchedFromDb();
     }
@@ -206,22 +178,6 @@ abstract class AbstractEntity implements EntityInterface
     public function toArray()
     {
         return $this->data;
-    }
-
-    /**
-     * @return array
-     */
-    public function getUpdatedData()
-    {
-        $array = [];
-        // find only the key/value that are modified.
-        foreach($this->data as $key => $value) {
-            if ($value === $this->_getOriginalData($key)) {
-                continue; // value has not changed. so ignore it.
-            }
-            $array[$key] = $value;
-        }
-        return $array;
     }
 
     /**

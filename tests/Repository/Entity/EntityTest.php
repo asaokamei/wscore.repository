@@ -122,39 +122,6 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function toArray_returns_only_modified_data()
-    {
-        // create an entity that is fetched from a database.
-
-        // instance without running a constructor.
-        $reflection = new \ReflectionClass(Entity::class);
-        /** @var Entity $entity */
-        $entity = $reflection->newInstanceWithoutConstructor();
-
-        // set properties; which will set isFetched to true.
-        $this->assertFalse($entity->isFetched());
-        /** @noinspection PhpUndefinedFieldInspection */
-        $entity->test_id = 'tested';
-        /** @noinspection PhpUndefinedFieldInspection */
-        $entity->name    = 'name';
-        $this->assertTrue($entity->isFetched());
-
-        // execute the constructor.
-        $refCtor         = $reflection->getConstructor();
-        $refCtor->invoke($entity, 'tested', ['test_id']);
-        $this->assertEquals([], $entity->getUpdatedData());
-        $this->assertEquals(['test_id' => 'tested', 'name' => 'name'], $entity->toArray());
-
-        // update some values
-        $data = ['name' => 'new-name'];
-        $entity->fill($data);
-        $this->assertEquals($data, $entity->getUpdatedData());
-        $this->assertEquals(['test_id' => 'tested', 'name' => 'new-name'], $entity->toArray());
-    }
-
-    /**
-     * @test
-     */
     function valueObject()
     {
         $entity = $this->entity('test', ['tested_id']);
