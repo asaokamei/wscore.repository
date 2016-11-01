@@ -114,6 +114,21 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->repo->insert($entity);
         $this->assertEquals('val', $this->q->data['col1']);
         $this->assertEquals('test', $this->q->data['col2']);
+        $this->assertFalse($entity->isFetched());
+        $this->assertArrayHasKey('test_create', $this->q->data);
+        $this->assertArrayHasKey('test_update', $this->q->data);
+    }
+
+    /**
+     * @test
+     */
+    function createAsFetched_method_creates_an_entity_as_fetched()
+    {
+        $entity = $this->repo->createAsFetched(['col1' => 'val', 'col2' => 'test', ]);
+        $this->repo->insert($entity);
+        $this->assertEquals('val', $this->q->data['col1']);
+        $this->assertEquals('test', $this->q->data['col2']);
+        $this->assertTrue($entity->isFetched());
         $this->assertArrayHasKey('test_create', $this->q->data);
         $this->assertArrayHasKey('test_update', $this->q->data);
     }
