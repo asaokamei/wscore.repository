@@ -33,6 +33,14 @@ class Entities implements IteratorAggregate
     }
 
     /**
+     * @param EntityInterface[] $entities
+     */
+    public function entities($entities)
+    {
+        $this->entities = $entities;
+    }
+
+    /**
      * @param string $name
      * @return Joined|Related
      */

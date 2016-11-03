@@ -1,6 +1,7 @@
 <?php
 namespace tests\Utils\Repo;
 
+use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\AbstractRepository;
 
@@ -28,5 +29,13 @@ class Users extends AbstractRepository
         $this->repo  = $repo;
         $this->query = $repo->getQuery();
         $this->now   = $repo->getCurrentDateTime();
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function posts()
+    {
+        return $this->repo->hasMany($this, 'posts');
     }
 }

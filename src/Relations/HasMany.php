@@ -91,9 +91,12 @@ class HasMany implements RelationInterface
      */
     public function query()
     {
-        $primaryKeys = $this->getTargetKeys($this->sourceEntity);
-        return $this->targetRepo->query()
-            ->condition($primaryKeys);
+        $query = $this->targetRepo->query();
+        if ($this->sourceEntity) {
+            $primaryKeys = $this->getTargetKeys($this->sourceEntity);
+            $query->condition($primaryKeys);
+        }
+        return $query;
     }
 
     /**
