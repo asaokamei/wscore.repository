@@ -1,6 +1,7 @@
 <?php
 namespace tests\Utils\Repo;
 
+use WScore\Repository\Relations\Join;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\AbstractRepository;
 
@@ -28,5 +29,13 @@ class Posts extends AbstractRepository
         $this->repo  = $repo;
         $this->query = $repo->getQuery();
         $this->now   = $repo->getCurrentDateTime();
+    }
+    
+    /**
+     * @return Join
+     */
+    public function tags()
+    {
+        return $this->repo->join($this, 'tags', 'posts_tags');
     }
 }

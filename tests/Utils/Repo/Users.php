@@ -2,6 +2,7 @@
 namespace tests\Utils\Repo;
 
 use WScore\Repository\Relations\HasMany;
+use WScore\Repository\Relations\Join;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\AbstractRepository;
 

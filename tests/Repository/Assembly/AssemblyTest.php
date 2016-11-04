@@ -6,13 +6,14 @@ use PDO;
 use tests\Utils\Container;
 use tests\Utils\Repo\Fixture;
 use tests\Utils\Repo\Posts;
+use tests\Utils\Repo\PostsTags;
 use tests\Utils\Repo\Users;
 use WScore\Repository\Assembly\Entities;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\Repository;
 
-class RelationsTest extends \PHPUnit_Framework_TestCase
+class AssemblyTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var ContainerInterface
@@ -59,6 +60,9 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $c->set('posts', function (ContainerInterface $c) {
             return new Posts($c->get(Repo::class));
         });
+        $c->set('posts_tags', function (ContainerInterface $c) {
+            return new PostsTags($c->get(Repo::class));
+        });
         $c->set(Repo::class, function (ContainerInterface $c) {
             return new Repo($c);
         });
@@ -78,5 +82,35 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         foreach($relate->find($user2) as $post) {
             $this->assertEquals('2', $post->get('users_id'));
         }
+    }
+    
+    function test2()
+    {
+        /** @var Users $userRepo */
+        $userRepo = $this->c->get('users');
+        $user2    = $userRepo->findByKey(2);
+        $user3    = $userRepo->findByKey(3);
+        $userAsm  = new Entities($this->c->get('users'));
+        $userAsm->entities([$user2, $user3]);
+        $relate = $userAsm->relate('posts');
+        $this->assertEquals(2, count($relate->find($user2)));
+        $this->assertEquals(1, count($relate->find($user3)));
+        foreach($relate->find($user2) as $post) {
+            $this->assertEquals('2', $post->get('users_id'));
+        }
+        foreach($relate->find($user3) as $post) {
+            $this->assertEquals('3', $post->get('users_id'));
+        }
+    }
+    
+    function test3()
+    {
+        /** @var Users $userRepo */
+        $userRepo = $this->c->get('users');
+        $user2    = $userRepo->findByKey(2);
+        $userAsm  = new Entities($this->c->get('users'));
+        $userAsm->entities([$user2]);
+        $postAsm  = $userAsm->relate('posts');
+        $tagsAsm  = $postAsm->relate('tags');
     }
 }
