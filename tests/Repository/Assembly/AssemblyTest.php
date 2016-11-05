@@ -155,14 +155,13 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $repo */
         $repo  = $this->c->get('users');
-        $user1 = $repo->findByKey(1);
-        $user2 = $repo->findByKey(2);
         $list  = new EntityList($repo);
-        $list->setEntities([$user1, $user2]);
+        $list->execute('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 2]);
 
         $list->relate('posts');
         $list->relate('posts')->relate('tags');
-        
+
+        list($user1, $user2) = $list;
         $this->assertEquals(1, count($user1->posts));
         $post10 = $user1->posts[0];
         $this->assertEquals(2, count($post10->tags));
@@ -173,5 +172,29 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $post20 = $user2->posts[0];
         $this->assertEquals(1, count($post20->tags));
         $this->assertEquals('blogging', $post20->tags[0]->tag);
+    }
+
+    /**
+     * @test
+     */    
+    function entityList_iterates()
+    {
+        /** @var Users $repo */
+        $repo  = $this->c->get('users');
+        $list  = new EntityList($repo);
+        $list->execute('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 3]);
+
+        $idList = [1, 3];
+        foreach($list as $entity) {
+            $id = array_shift($idList);
+            $this->assertEquals($id, $entity->users_id);
+        }
+        $this->assertEquals(2, count($list));
+        $this->assertTrue(isset($list[0]));
+        $this->assertTrue(isset($list[1]));
+        $this->assertFalse(isset($list[2]));
+        
+        unset($list[0]);
+        $this->assertEquals(1, count($list));
     }
 }

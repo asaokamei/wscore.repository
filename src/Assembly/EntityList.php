@@ -7,7 +7,7 @@ use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class EntityList implements IteratorAggregate, \ArrayAccess 
+class EntityList implements IteratorAggregate, \ArrayAccess, \Countable
 {
     /**
      * @var RepositoryInterface
@@ -38,6 +38,16 @@ class EntityList implements IteratorAggregate, \ArrayAccess
     public function setEntities($entities)
     {
         $this->entities = $entities;
+    }
+
+    /**
+     * @param string $sql
+     * @param array $data
+     */
+    public function execute($sql, $data = [])
+    {
+        $stmt = $this->repository->query()->execute($sql, $data);
+        $this->entities = $stmt->fetchAll();
     }
 
     /**
@@ -124,7 +134,7 @@ class EntityList implements IteratorAggregate, \ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        throw new \InvalidArgumentException('cannot set to entity list');
+        $this->entities[$offset] = $value;
     }
 
     /**
@@ -135,6 +145,18 @@ class EntityList implements IteratorAggregate, \ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        throw new \InvalidArgumentException('cannot unset to entity list');
+        if (array_key_exists($offset, $this->entities)) {
+            unset($this->entities[$offset]);
+        }
+    }
+
+    /**
+     * Count elements of an object
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->entities);
     }
 }
