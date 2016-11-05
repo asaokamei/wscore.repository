@@ -6,7 +6,7 @@ use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class Joined extends Entities
+class Joined extends EntityList
 {
     /**
      * @var JoinRelationInterface
@@ -126,7 +126,7 @@ class Joined extends Entities
             $keys[] = $this->relation->getTargetKeys($entity);
         }
         $found = $this->relation->query()->condition($keys)->find();
-        $this->entities($found);
+        $this->setEntities($found);
         /** @var EntityInterface[] $found */
         foreach ($found as $toEntity) {
             $key                     = HelperMethods::flatKey($toEntity, $this->convertTo);

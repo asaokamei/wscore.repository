@@ -7,7 +7,7 @@ use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class Entities implements IteratorAggregate, \ArrayAccess 
+class EntityList implements IteratorAggregate, \ArrayAccess 
 {
     /**
      * @var RepositoryInterface
@@ -35,7 +35,7 @@ class Entities implements IteratorAggregate, \ArrayAccess
     /**
      * @param EntityInterface[] $entities
      */
-    public function entities($entities)
+    public function setEntities($entities)
     {
         $this->entities = $entities;
     }
@@ -44,7 +44,7 @@ class Entities implements IteratorAggregate, \ArrayAccess
      * @param string $name
      * @return Joined|Related
      */
-    public function relate($name)
+    public function getList($name)
     {
         if (array_key_exists($name, $this->related)) {
             return $this->related[$name];

@@ -8,7 +8,7 @@ use tests\Utils\Repo\Fixture;
 use tests\Utils\Repo\Posts;
 use tests\Utils\Repo\PostsTags;
 use tests\Utils\Repo\Users;
-use WScore\Repository\Assembly\Entities;
+use WScore\Repository\Assembly\EntityList;
 use WScore\Repository\Assembly\Joined;
 use WScore\Repository\Assembly\Related;
 use WScore\Repository\Query\PdoQuery;
@@ -83,11 +83,11 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
         $user2    = $userRepo->findByKey(2);
-        $userAsm  = new Entities($this->c->get('users'));
-        $userAsm->entities([$user2]);
-        $relate = $userAsm->relate('posts');
-        $this->assertEquals(2, count($relate->find($user2)));
-        foreach($relate->find($user2) as $post) {
+        $userList = new EntityList($this->c->get('users'));
+        $userList->setEntities([$user2]);
+        $postList = $userList->getList('posts');
+        $this->assertEquals(2, count($postList->find($user2)));
+        foreach($postList->find($user2) as $post) {
             $this->assertEquals('2', $post->get('users_id'));
         }
     }
@@ -98,15 +98,15 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $userRepo = $this->c->get('users');
         $user2    = $userRepo->findByKey(2);
         $user3    = $userRepo->findByKey(3);
-        $userAsm  = new Entities($this->c->get('users'));
-        $userAsm->entities([$user2, $user3]);
-        $relate = $userAsm->relate('posts');
-        $this->assertEquals(2, count($relate->find($user2)));
-        $this->assertEquals(1, count($relate->find($user3)));
-        foreach($relate->find($user2) as $post) {
+        $userList = new EntityList($this->c->get('users'));
+        $userList->setEntities([$user2, $user3]);
+        $postList = $userList->getList('posts');
+        $this->assertEquals(2, count($postList->find($user2)));
+        $this->assertEquals(1, count($postList->find($user3)));
+        foreach($postList->find($user2) as $post) {
             $this->assertEquals('2', $post->get('users_id'));
         }
-        foreach($relate->find($user3) as $post) {
+        foreach($postList->find($user3) as $post) {
             $this->assertEquals('3', $post->get('users_id'));
         }
     }
@@ -116,12 +116,12 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
         $user1    = $userRepo->findByKey(1);
-        $userList = new Entities($this->c->get('users'));
-        $userList->entities([$user1]);
-        $postList = $userList->relate('posts');
+        $userList = new EntityList($this->c->get('users'));
+        $userList->setEntities([$user1]);
+        $postList = $userList->getList('posts');
         $this->assertEquals(1, count($postList->find($user1)));
         $post = $postList[0];
-        $tagsList = $postList->relate('tags');
+        $tagsList = $postList->getList('tags');
         $this->assertEquals(2, count($tagsList->find($post)));
     }
 }

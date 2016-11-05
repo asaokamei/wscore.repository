@@ -6,7 +6,7 @@ use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class Related extends Entities
+class Related extends EntityList
 {
     /**
      * @var RelationInterface
@@ -73,7 +73,7 @@ class Related extends Entities
             $keys[] = $this->relation->getTargetKeys($entity);
         }
         $found = $this->relation->query()->condition([$keys])->find();
-        $this->entities($found);
+        $this->setEntities($found);
         $this->indexFound($found);
     }
 
