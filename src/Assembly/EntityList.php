@@ -53,6 +53,14 @@ class EntityList implements IteratorAggregate, \ArrayAccess
         $related              = $this->getLoaded($relation, $this->entities);
         $this->related[$name] = $related;
 
+        /**
+         * set related entities to the source entities. 
+         */
+        foreach($this->entities as $entity) {
+            $found = $related->find($entity);
+            $entity->setRelatedEntities($name, $found);
+        }
+
         return $related;
     }
 

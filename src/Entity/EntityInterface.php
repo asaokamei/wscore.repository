@@ -66,4 +66,11 @@ interface EntityInterface
      * @return bool
      */
     public function save();
+
+
+    /**
+     * @param string $name
+     * @param EntityInterface[] $entities
+     */
+    public function setRelatedEntities($name, $entities);
 }

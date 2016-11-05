@@ -3,6 +3,8 @@ namespace WScore\Repository\Entity;
 
 use BadMethodCallException;
 use WScore\Repository\Helpers\HelperMethods;
+use WScore\Repository\Relations\JoinRelationInterface;
+use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
 abstract class AbstractEntity implements EntityInterface
@@ -56,6 +58,16 @@ abstract class AbstractEntity implements EntityInterface
      * @var RepositoryInterface
      */
     protected $repo;
+
+    /**
+     * @var EntityInterface[][]
+     */
+    private $relatedEntities = [];
+
+    /**
+     * @var RelationInterface[]|JoinRelationInterface[]
+     */
+    private $relations = [];
 
     /**
      * AbstractEntity constructor.
@@ -241,5 +253,50 @@ abstract class AbstractEntity implements EntityInterface
         $this->repo->insert($this);
         return true;
     }
+    
+    /**
+     * @param string $name
+     * @param array  $args
+     * @return JoinRelationInterface|RelationInterface|mixed
+     */
+    public function __call($name, $args)
+    {
+        if (!method_exists($this->repo, $name)) {
+            throw new BadMethodCallException('no such methods: '. $name);
+        }
+        if (isset($this->relations[$name])) {
+            return $this->relations[$name];
+        }
+        $returned = $this->repo->$name(...$args);
+        if ($returned instanceof RelationInterface) {
+            $returned = $returned->withEntity($this);
+            $this->relations[$name] = $returned;
+        }
+        return $returned;
+    }
 
+    /**
+     * @param string $name
+     * @return null|EntityInterface[]
+     */
+    public function __get($name)
+    {
+        if (array_key_exists($name, $this->relatedEntities)) {
+            return $this->relatedEntities[$name];
+        }
+        if (array_key_exists($name, $this->data)) {
+            return $this->data[$name];
+        }
+        
+        return null;
+    }
+
+    /**
+     * @param string $name
+     * @param EntityInterface[] $entities
+     */
+    public function setRelatedEntities($name, $entities)
+    {
+        $this->relatedEntities[$name] = $entities;
+    }
 }

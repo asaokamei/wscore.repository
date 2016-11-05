@@ -110,6 +110,29 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('3', $post->get('users_id'));
         }
     }
+
+    /**
+     * @test
+     */
+    function user2_and_user3_hasMany_posts()
+    {
+        /** @var Users $userRepo */
+        $userRepo = $this->c->get('users');
+        $user2    = $userRepo->findByKey(2);
+        $user3    = $userRepo->findByKey(3);
+        $userList = new EntityList($userRepo);
+        $userList->setEntities([$user2, $user3]);
+        $userList->getList('posts');
+
+        $this->assertEquals(2, count($user2->posts));
+        $this->assertEquals(1, count($user3->posts));
+        foreach($user2->posts as $post) {
+            $this->assertEquals('2', $post->users_id);
+        }
+        foreach($user3->posts as $post) {
+            $this->assertEquals('3', $post->users_id);
+        }
+    }
     
     function test3()
     {
@@ -123,5 +146,32 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $post = $postList[0];
         $tagsList = $postList->getList('tags');
         $this->assertEquals(2, count($tagsList->find($post)));
+    }
+
+    /**
+     * @test
+     */
+    function user1_hasOne_post_and_joined_with_tags()
+    {
+        /** @var Users $userRepo */
+        $userRepo = $this->c->get('users');
+        $user1    = $userRepo->findByKey(1);
+        $user2    = $userRepo->findByKey(2);
+        $userList = new EntityList($userRepo);
+        $userList->setEntities([$user1, $user2]);
+
+        $userList->getList('posts');
+        $userList->getList('posts')->getList('tags');
+        
+        $this->assertEquals(1, count($user1->posts));
+        $post10 = $user1->posts[0];
+        $this->assertEquals(2, count($post10->tags));
+        $this->assertEquals('test tag', $post10->tags[0]->tag);
+        $this->assertEquals('tagged', $post10->tags[1]->tag);
+
+        $this->assertEquals(2, count($user2->posts));
+        $post20 = $user2->posts[0];
+        $this->assertEquals(1, count($post20->tags));
+        $this->assertEquals('blogging', $post20->tags[0]->tag);
     }
 }
