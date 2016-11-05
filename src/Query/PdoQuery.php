@@ -110,7 +110,9 @@ class PdoQuery implements QueryInterface
      */
     public function condition(array $condition)
     {
-        $this->builder->where($condition);
+        if (!empty($condition)) {
+            $this->builder->where($condition);
+        }
 
         return $this;
     }

@@ -9,9 +9,12 @@ use tests\Utils\Repo\Posts;
 use tests\Utils\Repo\PostsTags;
 use tests\Utils\Repo\Users;
 use WScore\Repository\Assembly\Entities;
+use WScore\Repository\Assembly\Joined;
+use WScore\Repository\Assembly\Related;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\Repository;
+use WScore\ScoreSql\Sql\Join;
 
 class AssemblyTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,6 +34,9 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         class_exists(Repo::class);
         class_exists(Repository::class);
         class_exists(PdoQuery::class);
+        class_exists(Join::class);
+        class_exists(Related::class);
+        class_exists(Joined::class);
 
         $this->c = $this->getFullContainer();
         $this->fix = $this->c->getFix();
@@ -64,7 +70,9 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
             return new PostsTags($c->get(Repo::class));
         });
         $c->set(Repo::class, function (ContainerInterface $c) {
-            return new Repo($c);
+            $repo = new Repo($c);
+            $repo->getRepository('tags', ['tag_id'], true);
+            return $repo;
         });
 
         return $c;
@@ -107,10 +115,13 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
-        $user2    = $userRepo->findByKey(2);
-        $userAsm  = new Entities($this->c->get('users'));
-        $userAsm->entities([$user2]);
-        $postAsm  = $userAsm->relate('posts');
-        $tagsAsm  = $postAsm->relate('tags');
+        $user1    = $userRepo->findByKey(1);
+        $userList = new Entities($this->c->get('users'));
+        $userList->entities([$user1]);
+        $postList = $userList->relate('posts');
+        $this->assertEquals(1, count($postList->find($user1)));
+        $post = $postList[0];
+        $tagsList = $postList->relate('tags');
+        $this->assertEquals(2, count($tagsList->find($post)));
     }
 }

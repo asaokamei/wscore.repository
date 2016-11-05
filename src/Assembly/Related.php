@@ -72,7 +72,8 @@ class Related extends Entities
         foreach ($entities as $entity) {
             $keys[] = $this->relation->getTargetKeys($entity);
         }
-        $found = $this->relation->query()->condition($keys)->find();
+        $found = $this->relation->query()->condition([$keys])->find();
+        $this->entities($found);
         $this->indexFound($found);
     }
 

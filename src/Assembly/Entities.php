@@ -7,7 +7,7 @@ use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class Entities implements IteratorAggregate
+class Entities implements IteratorAggregate, \ArrayAccess 
 {
     /**
      * @var RepositoryInterface
@@ -15,7 +15,7 @@ class Entities implements IteratorAggregate
     private $repository;
 
     /**
-     * @var EntityInterface
+     * @var EntityInterface[]
      */
     private $entities = [];
 
@@ -82,5 +82,51 @@ class Entities implements IteratorAggregate
         foreach ($this->entities as $entity) {
             yield $entity;
         }
+    }
+
+    /**
+     * Whether a offset exists
+     *
+     * @param mixed 
+     * @return boolean
+     */
+    public function offsetExists($offset)
+    {
+        return array_key_exists($offset, $this->entities);
+    }
+
+    /**
+     * Offset to retrieve
+     *
+     * @param mixed 
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return array_key_exists($offset, $this->entities) ?
+            $this->entities[$offset] : null;
+    }
+
+    /**
+     * Offset to set
+     *
+     * @param mixed
+     * @param mixed
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        throw new \InvalidArgumentException('cannot set to entity list');
+    }
+
+    /**
+     * Offset to unset
+     *
+     * @param mixed
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        throw new \InvalidArgumentException('cannot unset to entity list');
     }
 }

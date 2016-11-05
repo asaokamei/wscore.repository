@@ -100,7 +100,7 @@ class Joined extends Entities
         foreach ($fromEntities as $entity) {
             $keys[] = $this->relation->convertFromKeys($entity);
         }
-        $found = $this->relation->queryJoin()->condition($keys)->find();
+        $found = $this->relation->queryJoin()->condition([$keys])->find();
 
         /** @var EntityInterface[] $found */
         foreach ($found as $join) {
@@ -126,6 +126,7 @@ class Joined extends Entities
             $keys[] = $this->relation->getTargetKeys($entity);
         }
         $found = $this->relation->query()->condition($keys)->find();
+        $this->entities($found);
         /** @var EntityInterface[] $found */
         foreach ($found as $toEntity) {
             $key                     = HelperMethods::flatKey($toEntity, $this->convertTo);
