@@ -85,7 +85,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $user2    = $userRepo->findByKey(2);
         $userList = new EntityList($this->c->get('users'));
         $userList->setEntities([$user2]);
-        $postList = $userList->getList('posts');
+        $postList = $userList->relate('posts');
         $this->assertEquals(2, count($postList->find($user2)));
         foreach($postList->find($user2) as $post) {
             $this->assertEquals('2', $post->get('users_id'));
@@ -100,7 +100,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $user3    = $userRepo->findByKey(3);
         $userList = new EntityList($this->c->get('users'));
         $userList->setEntities([$user2, $user3]);
-        $postList = $userList->getList('posts');
+        $postList = $userList->relate('posts');
         $this->assertEquals(2, count($postList->find($user2)));
         $this->assertEquals(1, count($postList->find($user3)));
         foreach($postList->find($user2) as $post) {
@@ -122,7 +122,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $user3    = $userRepo->findByKey(3);
         $userList = new EntityList($userRepo);
         $userList->setEntities([$user2, $user3]);
-        $userList->getList('posts');
+        $userList->relate('posts');
 
         $this->assertEquals(2, count($user2->posts));
         $this->assertEquals(1, count($user3->posts));
@@ -141,10 +141,10 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $user1    = $userRepo->findByKey(1);
         $userList = new EntityList($this->c->get('users'));
         $userList->setEntities([$user1]);
-        $postList = $userList->getList('posts');
+        $postList = $userList->relate('posts');
         $this->assertEquals(1, count($postList->find($user1)));
         $post = $postList[0];
-        $tagsList = $postList->getList('tags');
+        $tagsList = $postList->relate('tags');
         $this->assertEquals(2, count($tagsList->find($post)));
     }
 
@@ -153,15 +153,15 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
      */
     function user1_hasOne_post_and_joined_with_tags()
     {
-        /** @var Users $userRepo */
-        $userRepo = $this->c->get('users');
-        $user1    = $userRepo->findByKey(1);
-        $user2    = $userRepo->findByKey(2);
-        $userList = new EntityList($userRepo);
-        $userList->setEntities([$user1, $user2]);
+        /** @var Users $repo */
+        $repo  = $this->c->get('users');
+        $user1 = $repo->findByKey(1);
+        $user2 = $repo->findByKey(2);
+        $list  = new EntityList($repo);
+        $list->setEntities([$user1, $user2]);
 
-        $userList->getList('posts');
-        $userList->getList('posts')->getList('tags');
+        $list->relate('posts');
+        $list->relate('posts')->relate('tags');
         
         $this->assertEquals(1, count($user1->posts));
         $post10 = $user1->posts[0];

@@ -44,7 +44,7 @@ class EntityList implements IteratorAggregate, \ArrayAccess
      * @param string $name
      * @return Joined|Related
      */
-    public function getList($name)
+    public function relate($name)
     {
         if (array_key_exists($name, $this->related)) {
             return $this->related[$name];
