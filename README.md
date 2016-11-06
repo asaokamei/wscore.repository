@@ -1,8 +1,8 @@
 WScore/Repository
 =================
 
-Yet-Another ORM for PHP based on (probably) a Repository Pattern; entities and Repositories are represented by different classes. 
-It functionality is focused for command (Create, Update, Delete) operations. 
+Yet-Another ORM for PHP based on (probably) a Repository Pattern; 
+entities and Repositories are represented by different classes. 
 
 Other than being able to read, create, update, delete, 
 and relate entities, `WScore/Repository` has following features. 
@@ -14,9 +14,9 @@ and relate entities, `WScore/Repository` has following features.
 
 On the other hand, it does not have followings. 
 
-* Does not have eager loading nor solution for N+1 problem. 
-  Instead, use `Assembly` object or other libraries. 
-* No caching like `Unit of Work` that flushes out entities all at once. Most of the operations results in accessesing database. 
+* **No eager loading**;
+  instead, use `Assembly` object or other libraries. 
+* **No caching of entities**; most of the operations results in database access. 
 * No complex SQL construction. 
 
 Under development. Not ready for production. 
@@ -28,34 +28,38 @@ Installation: `git clone https://github.com/asaokamei/wscore.repository`
 There are three layers. 
 
 ```
-               EntityInterface
-                 ↑         ↑
-  RepositoryInterface ← RelationInterface
-           ↓
-  QueryInterface
+  EntityInterface　↔ RelationInterface
+            ↑          ↕
+        RepositoryInterface
+                ↓
+          QueryInterface
 ```
 
-* The top layer is the `EntityInterface`, which is 
+* The top layer is the `EntityInterface`, which is mostly 
   independent from the bottom layers but provides methods 
   necessary for bottom layers to work with. 
+  `RelationInterface` relates entities using repositories, 
+  which has some dependencies on bottom layer. 
 * The `RepositoryInterface` layer is a gateway to database tables 
-  that persist the entities. At the similar level, there is 
-  `relationInterface` relates entities using repositories. 
+  that persist the entities. 
 * The `QueryInterface` layer is at the bottom of the layers 
-  responsible of querying database. (This layer is only used 
-  by generic repositories.)
+  responsible of querying database. 
 
 There is a `Repo` class which serves as a container as well as 
 a factory for repositories and relations. 
 Requires a container that implements `ContainerInterface`. 
 
-There is `JoinRepositoryInterface` and `JoinRelationInterface`
-for many-to-many (join) relation.
+There is `JoinRelationInterface` for many-to-many (join) relation.
 
 Sample Code
 ===========
 
-### Sample database
+Preparation
+----
+
+Requires some preparation to use this ORM. 
+
+### sample database
 
 Here's a sample database table, `users`. 
 
@@ -63,20 +67,15 @@ Here's a sample database table, `users`.
 CREATE TABLE users (
     user_id     INTEGER PRIMARY KEY AUTOINCREMENT,
     name        VARCHAR(64) NOT NULL UNIQUE
-    created_at  DATETIME
 );
 ```
 
-creating a repository
-----
+### `Users` repository
 
 Create a repository for a database table, such as;
 
 ```php
 use WScore\Repository\Repo;
-use WScore\Repository\Entity\EntityInterface;
-use WScore\Repository\Query\QueryInterface;
-use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Repository\AbstractRepository;
 
 class Users extends AbstractRepository
@@ -84,24 +83,6 @@ class Users extends AbstractRepository
     protected $table = 'users';           // table name
     protected $primaryKeys = ['user_id']; // primary keys in array
     protected $useAutoInsertId = true;    // use auto-incremented ID.
-    protected $columnList = [             // for filtering data by column names
-        'name',     
-    ];
-    protected $timeStamps = [             // if any...
-            'created_at' => 'created_at',
-            'updated_at' => null,
-        ];
-
-    /**
-     * @param Repo $repo
-     * @param QueryInterface $query 
-     */
-    public function __construct(Repo $repo, QueryInterface $query = null) 
-    {
-        $this->repo  = $repo;
-        $this->query = $query ?: $repo->getQuery();
-        $this->now   = $repo->getCurrentDateTime();
-    }
 }
 ```
 
@@ -109,8 +90,7 @@ The `AbstractRepository` serves as a convenient way to create
 a repository but any class can be served as repository which 
 implements `WScore\Repository\Repository\RepositoryInterface`. 
 
-preparing a container
-----
+### setting up `Repo` and a container
 
 `WScore/Repository` uses a container that implements `ContainerInterface`. Set up a container 
 (assuming that the container has `set` method). 
@@ -139,7 +119,7 @@ $repo = new Repo($container); // inject the container.
 ```
 
 
-working with entity
+Working with Repository and Entity
 ----
 
 Entity objects implementing `EntityInterface` are constructed from the fetched result. `WScore\Repository\Entity\Entity` class is used as a default class for all repository of `AbstractRepository`).  
@@ -165,7 +145,7 @@ $user1->fill(['name' => 'your name']);
 $users->save($user1);
 ```
 
-dealing with relation
+Relation
 --------
 
 There are 3 relations: `HasOne`, `HasMany`, and `JoinBy`. 
@@ -177,52 +157,55 @@ Add another database table, `posts`, that is related to the `users`.
 ```sql
 CREATE TABLE posts (
     post_id     INTEGER PRIMARY KEY AUTOINCREMENT,
-    users_id    INTEGER,
+    user_id    INTEGER,
     contents    VARCHAR(256)
 );
 ```
 
-### example for hasMany relation
+Also create `Posts` class and set it in the container. 
 
-The `Repo` has 3 methods for relation: `hasOne`, `hasMany`, and `hasJoin`. 
-Let's add a method in `Users` class to access the relation object. 
+```php
+class Posts extends AbstractRepository
+{
+    protected $table = 'posts';           // table name
+    protected $primaryKeys = ['post_id']; // primary keys in array
+    protected $useAutoInsertId = true;    // use auto-incremented ID.
+}
+$c->set('posts', function(ContainerInterface $c) {
+    new new Posts($c->get(Repo::class));
+});
+```
+
+
+### user hasMany posts
+
+Let's change the `Users` repository by adding a `hasMany` relation.
 
 ```php
 class Users extends AbstractRepository
 {
     // ... from previous code ...
     /**
-     * @param EntityInterface $user
-     * @return HasMany
+     * @return RelationInterface
      */
-    public function posts(EntityInterface $user) 
+    public function posts() 
     {
-        return $this->repo->hasMany($this, 'posts')->withEntity($user);
+        return $this->repo->hasMany($this, 'posts');
     }
 }
 ```
 
-`HasOne` and `HasMany` relates two repositories using 
-the primary keys. Provide conversion array if the column name 
-of the primary keys differs in these tables. 
+`Repo` has helper methods to create relation objects. 
 
-```php
-$hasMany = $this->repo->hasMany($users, 'posts', ['id' => 'user_id']);
-```
-
-`JoinBy` requires another repository, and will be discussed in detail in the following section. 
-
-
-#### relating entities
+### relating entities
 
 Now try to related users and posts. 
 First, create repositories for `users` and `posts`. 
 This example uses generic repository for `posts` table. 
 
 ```php
-$repo  = $container->get(Repo::class);
-$users = $repo->getRepository('users'); // get it from container. 
-$posts = $repo->getRepository('posts', ['post_id'], true); // use generic repository.
+$users = $container->get('users');
+$posts = $container->get('posts');
 ```
 
 then:
@@ -232,12 +215,12 @@ then:
 $user1 = $users->findByKey(1);
 
 // get a list of posts
-$user1Posts = $users->posts($user1)->find();
+$user1Posts = $user1->posts()->find();
 
 // relate a new post to $user1.
 $newPost  = $posts->create(['contents' => 'test relation'])
-$users->posts($user1)->relate($newPost);
-$posts->save($post); // save the post. 
+$user1->posts()->relate($newPost);
+$newPost->save(); // save the post. 
 ```
 
 

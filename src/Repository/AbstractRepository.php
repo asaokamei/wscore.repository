@@ -72,6 +72,22 @@ abstract class AbstractRepository implements RepositoryInterface
     protected $useAutoInsertId = false;
 
     /**
+     * AbstractRepository constructor.
+     *
+     * @param Repo $repo
+     */
+    public function __construct(Repo $repo)
+    {
+        $this->repo = $repo;
+        if (!$this->query) {
+            $this->query = $repo->getQuery();
+        }
+        if (!$this->now) {
+            $this->now = $repo->getCurrentDateTime();
+        }
+    }
+
+    /**
      * @return string
      */
     public function getTable()

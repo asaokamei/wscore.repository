@@ -17,12 +17,12 @@ class Repository extends AbstractRepository
      */
     public function __construct($repo, $query, $now, $options = null)
     {
-        $this->repo  = $repo;
         $this->query = $query;
         $this->now   = $now;
         if ($options) {
             $this->_setupRepositoryOptions($options);
         }
+        parent::__construct($repo);
     }
 
     /**
