@@ -79,7 +79,7 @@ abstract class AbstractEntity implements EntityInterface
     {
         $this->table       = $table;
         $this->primaryKeys = $primaryKeys;
-        $this->setFetchDone();
+        $this->_setFetchDone();
     }
 
     /**
@@ -87,7 +87,7 @@ abstract class AbstractEntity implements EntityInterface
      * it will protect from using __set method to 
      * overwrite entity data. 
      */
-    protected function setFetchDone()
+    protected function _setFetchDone()
     {
         $this->isFetchDone = true;
     }
@@ -95,7 +95,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * @return bool
      */
-    protected function isFetchProcessDone()
+    protected function _isFetchProcessDone()
     {
         return $this->isFetchDone;
     }
@@ -104,7 +104,7 @@ abstract class AbstractEntity implements EntityInterface
      * call this method to indicate that the entity is fetched from a database. 
      * sets isFetched flag to true.
      */
-    protected function setFetchedFromDb()
+    protected function _setFetchedFromDb()
     {
         $this->isFetched = true;
     }
@@ -131,10 +131,10 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function __set($key, $value)
     {
-        if ($this->isFetchProcessDone()) {
+        if ($this->_isFetchProcessDone()) {
             throw new BadMethodCallException('cannot set properties.');
         }
-        $this->setFetchedFromDb();
+        $this->_setFetchedFromDb();
         $this->data[$key] = $value;
     }
 
@@ -154,7 +154,7 @@ abstract class AbstractEntity implements EntityInterface
             $key = $this->getIdName();
             $this->data[$key] = $id;
         }
-        $this->setFetchedFromDb();
+        $this->_setFetchedFromDb();
     }
 
     /**
@@ -261,20 +261,34 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function __call($name, $args)
     {
-        if (!method_exists($this->repo, $name)) {
-            throw new BadMethodCallException('no such methods: '. $name);
+        if ($relation = $this->_getRelationObject($name)) {
+            $relation = $relation->withEntity($this);
+            return $relation;
         }
+
+        throw new BadMethodCallException('no such methods: '. $name);
+    }
+
+    /**
+     * @param string $name
+     * @return null|JoinRelationInterface|RelationInterface
+     */
+    private function _getRelationObject($name)
+    {
         if (isset($this->relations[$name])) {
             return $this->relations[$name];
         }
-        $returned = $this->repo->$name(...$args);
-        if ($returned instanceof RelationInterface) {
-            $returned = $returned->withEntity($this);
-            $this->relations[$name] = $returned;
+        if (!method_exists($this->repo, $name)) {
+            return null;
         }
-        return $returned;
+        $relation = $this->repo->$name();
+        if ($relation instanceof RelationInterface) {
+            $this->relations[$name] = $relation;
+            return $relation;
+        }
+        return null;
     }
-
+    
     /**
      * @param string $name
      * @return null|EntityInterface[]
@@ -284,11 +298,11 @@ abstract class AbstractEntity implements EntityInterface
         if (array_key_exists($name, $this->relatedEntities)) {
             return $this->relatedEntities[$name];
         }
-        if (array_key_exists($name, $this->data)) {
-            return $this->data[$name];
+        if ($relation = $this->_getRelationObject($name)) {
+            return $relation->withEntity($this)->find();
         }
         
-        return null;
+        return $this->get($name);
     }
 
     /**
