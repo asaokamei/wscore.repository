@@ -104,7 +104,7 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
         $join = $this->repo->join($users, 'posts', 'user_post', [
             'id' => 'user_id'
         ], [
-            'id' => 'post_id'
+            'post_id' => 'id'
         ])->withEntity($user1);
         $this->assertEquals(2, $join->count());
 

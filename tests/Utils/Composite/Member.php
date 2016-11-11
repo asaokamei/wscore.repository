@@ -44,9 +44,9 @@ class Member extends AbstractRepository
             'type' => 'member_type',
             'code' => 'member_code',
         ], [
-            'year' => 'fee_year',
-            'type' => 'member_type',
-            'code' => 'fee_code',
+           'fee_year' => 'year',
+           'member_type' => 'type',
+           'fee_code' => 'code',
         ])->withEntity($member);
     }
 }

@@ -91,7 +91,7 @@ class Join implements JoinRelationInterface
      */
     public function convertToKeys(EntityInterface $toEntity)
     {
-        return HelperMethods::convertDataKeys($toEntity->getKeys(), $this->to_convert);
+        return HelperMethods::convertDataKeys($toEntity->getKeys(), array_flip($this->to_convert));
     }
 
     /**
@@ -101,8 +101,8 @@ class Join implements JoinRelationInterface
     public function getTargetKeys(EntityInterface $entity)
     {
         $data = $entity->toArray();
-        $keys = HelperMethods::filterDataByKeys($data, $this->to_convert);
-        $keys = HelperMethods::convertDataKeys($keys, array_flip($this->to_convert));
+        $keys = HelperMethods::filterDataByKeys($data, array_flip($this->to_convert));
+        $keys = HelperMethods::convertDataKeys($keys, $this->to_convert);
         return $keys;
     }
     
