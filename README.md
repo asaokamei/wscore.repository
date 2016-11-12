@@ -96,16 +96,16 @@ implements `WScore\Repository\Repository\RepositoryInterface`.
 (assuming that the container has `set` method). 
 
 ```php
-$c = new Container();
-$c->set(PDO::class, function () {
+$container = new Container();
+$container->set(PDO::class, function () {
     $pdo = new PDO('sqlite::memory:');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $pdo;
 });
-$c->set(Repo::class, function(ContainerInterface $c) {
+$container->set(Repo::class, function(ContainerInterface $c) {
     return new Repo($c);
 });
-$c->set('users', function(ContainerInterface $c) {
+$container->set('users', function(ContainerInterface $c) {
     new new Users($c->get(Repo::class), $c->get(QueryInterface::class));
 });
 ```
@@ -156,9 +156,9 @@ Add another database table, `posts`, that is related to the `users`.
 
 ```sql
 CREATE TABLE posts (
-    post_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id    INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id    INTEGER,
-    contents    VARCHAR(256)
+    contents   VARCHAR(256)
 );
 ```
 
@@ -177,7 +177,7 @@ $c->set('posts', function(ContainerInterface $c) {
 ```
 
 
-### user hasMany posts
+### user `hasMany` posts
 
 Let's change the `Users` repository by adding a `hasMany` relation.
 
@@ -224,19 +224,16 @@ $newPost->save(); // save the post.
 ```
 
 
-Customizing Repository and Entity
+Entity
 ====
+
+An entity object represents a record of a database table. 
 
 EntityInterface
 ----
 
 The entity objects must implement `WScore\Repository\Entity\EntityInterface` 
 so that repositories can retrieve data and primary keys from entities. 
-
-`getPrimaryKeys()` returns an array of primary keys even if there is 
-only one key. For convenient purpose, there are `getIdValue()` and 
-`getIdName()` methods that return the primary key value and name 
-if there is only one primary key. 
 
 ### AbstractEntity and Entity
 
@@ -262,19 +259,30 @@ class MyEntity extends AbstractEntity
      *
      * @param string $table
      * @param array $primaryKeys
+     + @param RepositoryInterface $repository
      */
-    public function __construct($table, array $primaryKeys)
+    public function __construct($table, array $primaryKeys, $repository)
     {
-        parent::__construct($table, $primaryKeys);
+        parent::__construct($table, $primaryKeys, $repo);
     }
 }
 ```
 
 #### constructor
 
-The current repository passes `$table`, `$primaryKey`, and `$repository`, to the entity's constructor. 
+The current repository passes `$table`, `$primaryKey`, and 
+`$repository`, to the entity's constructor. 
 
-Make sure you call parent constructor in the constructor with `$table` and `$primaryKeys`; it sets some flags to manage its status used during the fetch operation in PDOStatement. 
+Make sure you call parent constructor in the constructor with 
+at least `$table` and `$primaryKeys`; it sets some flags to 
+manage its status used during the fetch operation in PDOStatement. 
+
+#### primary keys
+
+`getPrimaryKeys()` returns an array of primary keys even if there is 
+only one key. For convenient purpose, there are `getIdValue()` and 
+`getIdName()` methods that return the primary key value and name 
+if there is only one primary key. 
 
 #### value object
 
@@ -284,12 +292,7 @@ Make sure you call parent constructor in the constructor with `$table` and `$pri
 * a callable factory. 
 
 
-### Active Record
-
-it is possible to make the Entity active, 
-just like an Active Pattern. 
-
-### isFetched?
+#### isFetched?
 
 `AbstractEntity` uses several internal flags to manage the status or origins of the entity. 
 
@@ -299,9 +302,53 @@ just like an Active Pattern.
 * `isFetched()`: a method returns if the entity is fetched from database. Uses the `$isFetched` flag. 
 * `setPrimaryKeyOnCreatedEntity()`: a method to set primary keys at inserting a new entity into database. This method is used if repository's `$autoInsertedId` flag is true (i.e. using auto-incremented id). This method also sets `$isFetched` flag to true. 
 
+### Active Record
+
+The entity behaves just like an ActiveRecord if its repository is 
+passed as the third argument. 
+
+#### save()
+
+`save()` method inserts or update entity state to the database; 
+based on the fetched state of the entity. `isFetched` method 
+provides if the entity is fetched (i.e. retrieved) from database or not. 
+
+```php
+$entity->save();
+```
+
+or 
+
+```php
+if ($entity->isFetched()) {
+    $repository->update($entity);
+} else {
+    $repository->insert($entity);
+}
+```
+
+#### `__call()` method and getting `RelationInterface` object
+
+Entity objects call repository's methods using the magic method, `__call()`. 
+If the returned value is `RelationInterface` objects, the entity sets 
+itself to the relation object. 
+
+As such, the entity for the `Users` class can do;
+
+```php
+$numberOfPosts = $user->posts()->count();
+```
+
+#### __get()
+
+Accessing relation property will return the related entities, or properties. 
+
+```php
+$relatedPosts = $user->posts;
+```
 
 Repository
-----
+====
 
 A repository is a gateway object to access a table in a database. 
 
@@ -340,15 +387,20 @@ abstract class AbstractRepository implements RepositoryInterface
 
 ### Generic Repository
 
-`WScore\Repository\Repository\Repository` is the generic implementation 
-of a repository using `AbstractRepository`. 
+There is a generic repository by providing 
+
+* table name, 
+* primary keys, 
+* and auto-incremented flag. 
+
+It is possible to create a repository for the users table as;
 
 ```php
-$posts = $repo->getRepository(
-    string $tableName,    // database table name 
-    array  $primaryKeys,  // primary keys in array, ex: ['id']
-    bool   $autoIncrement // set true to use auto incremented id. 
-);
+$repo  = $container->get(Repo::class);
+$users = $repo->getRepository('users', ['user_id'], true);
+$user1 = $users->findByKey(1);
+$user1->fill(['name' => 'my name']);
+$user1->save($user1);
 ```
 
 
@@ -358,194 +410,134 @@ Relations
 
 Sample database. 
 
-```sql
-CREATE TABLE users (
-    id    INTEGER PRIMARY KEY AUTOINCREMENT,
-    name  VARCHAR(64) NOT NULL UNIQUE
-);
-
-CREATE TABLE posts (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    users_id    INTEGER,
-    contents    VARCHAR(256)
-);
-
-CREATE TABLE tags (
-    tag_id      VARCHAR(32),
-    tag         VARCHAR(64)
-);
-
-CREATE TABLE posts_tags (
-    posts_tags_id      INTEGER PRIMARY KEY AUTOINCREMENT,
-    posts_post_id INTEGER,
-    tags_tag_id VARCHAR(32)
-);
 ```
+    |users|    |posts  |    |posts_tags|    |tags|
+    +-----+    +-------+    +----------|    +----|
+    |id   |*--<|id     |*--<|post_id   |>--*|code|
+    |name |    |user_id|    |tag_id    |    |tag |
+               |content|    
+```
+
 
 HasOne
 ----
 
-* uses primary keys.
-* in case column name is different, use `$convert` array. 
+Use `HasOne` object to represent one-to-one relation. 
 
 ```php
 use WScore\Repository\Relations\HasOne;
 
 new HasOne(
-    $sourceRepo,   // repository object or repository name string
-    $targetRepo,   // repository object or repository name string
-    $convertArray  // if primary key names differs...
+    $fromRepo,     // repository to relate from 
+    $toRepo,       // repository to relate to 
+    $convertArray  // conversion of keys
 );
 ```
 
-where `$sourceRepo` for `posts` and `$targetRepo` for `users` 
-repositories, and $sourceEntity is `$post` entity. 
+where 
 
+* `$fromRepo` for `posts` repository, 
+* `$toRepo` for `users` repository, and 
+* `$convertArray` is the key-map of `$fromRepo` to the `$toRepo`. 
+
+For the example above, the `posts` entity is related to 
+one `users` entity by mapping`posts:user_id` to `users:id`. 
+
+```php
+$userToPost = new HasOne($posts, $users, ['user_id' => 'id']);
+```
+
+`$convertArray` maybe omitted if the primary keys of the `$toRepo` 
+is used as foreign keys and the column names in both repositories 
+are the same. 
+
+`Repo` object has a convenient method to construct a `HasOne` object; 
+for instance following code will convert the repository name to 
+repository object.
+
+```php
+$repo->hasOne('posts', 'users', ['user_id' => 'id']);
+```
 
 HasMany
 ----
 
-* uses primary keys.
-* in case column name is different, use `$convert` array. 
+Use `HasMany` object to represent one-to-many relation.
 
 ```php
 use WScore\Repository\Relations\HasMany;
 
 new HasMany(
-    $sourceRepo,   // repository object or repository name string
-    $targetRepo,   // repository object or repository name string
-    $convertArray  // if primary key names differs...
+    $fromRepo,     // repository to relate from 
+    $toRepo,       // repository to relate to 
+    $convertArray  // conversion of keys
 );
 ```
 
-where `$sourceRepo` for `users` and `$targetRepo` for `posts` 
-repositories, and $sourceEntity is `$user` entity. 
+* `$fromRepo` for `posts` repository, 
+* `$toRepo` for `users` repository, and 
+* `$convertArray` is the key-map of `$fromRepo` to the `$toRepo`. 
+
+For the example above, the `users` entity is related to 
+one `posts` entity by mapping`users:id` to `posts:user_id`. 
+
+```php
+$userToPost = new HasMany($users, $posts, ['id' => 'user_id']);
+```
+
+`$convertArray` maybe omitted if the primary keys of the `$fromRepo` 
+is used as foreign keys and the column names in both repositories 
+are the same. 
+
+`Repo` object has a convenient method to construct a `HasOne` object; 
+for instance following code will convert the repository name to 
+repository object.
+
+```php
+$repo->hasMany('users', 'posts', ['id' => 'user_id']);
+```
 
 
 Join Relation
 ----
 
-Cross/Join, or Many-to-many relationship. 
-
-Uses JoinRepositoryInterface and JoinRelationInterface.
-
-default setup: 
-
-* joining two tables: (table1 and table2)
-* join table name: table1_table2, sorted by table name. 
-* uses primary keys of table1 and table2. 
-* keys in the join table should be {tableX}_{primaryKey}. 
-
-
-Join, or many-to-many relation needs special attention 
-because it requires another table (called `join_table`) 
-to represents a relation. 
+Use `Join` object to represent many-to-many relation 
+using a join (or cross) table. 
 
 ```php
-use WScore\Repository\Relations\HasMany;
-
-new HasJoin(
-    $joinRepo   // repository object or repository name string
+new Join(
+        RepositoryInterface $fromRepo,
+        RepositoryInterface $toRepo,
+        RepositoryInterface $joinRepo,
+        array $from_convert = [],
+        array $to_convert = []
 );
 ```
 
-where `$joinRepo` is a repository for join table, which must 
-implement `JoinRepositoryInterface`. To create a `$joinRepo` 
-using a provided class, 
+* `$fromRepo` for `posts` repository, 
+* `$toRepo` for `tags` repository,
+* `$joinRepo` for 'posts_tags' repository,
+* `$from_convert` is the key-map of `$fromRepo` to the `$joinRepo`. 
+* `$to_convert` is the key-map of `$joinRepo` to the `$toRepo`. 
+
+For the example above, the `users` entity is related to 
+one `posts` entity by mapping`users:id` to `posts:user_id`. 
 
 ```php
-new JoinRepository(
-    $repo,
-    'posts_tags', 
-    'posts', 
-    'tags'
-);
+$userToPost = new Join($posts, $tags, $posts_tags, 
+    ['id' => 'post_id'], ['tag_id' => 'code']);
 ```
 
-where 'posts_tags' is a join table name, and 2 repositories 
-that are joined. 
+The `$from_convert` as well as `$to_convert` maybe omitted 
+if the primary keys of the `$fromRepo` and `$toRepo` 
+are used as foreign keys and the column names in all repositories 
+are the same. 
 
-The current implementation of the `JoinRepository` assumes 
-that two different tables are joined. 
-
-Complex Relations
-====
-
-All of the relations must be related by using primary keys.
-
-
-### Sample table. 
-
-```sql
-CREATE TABLE members (
-    type  INTEGER NOT NULL,
-    code  INTEGER NOT NULL,
-    name        VARCHAR(64) NOT NULL UNIQUE,
-    PRIMARY KEY (type, code)
-);
-
-CREATE TABLE orders (
-    member_type INTEGER NOT NULL,
-    member_code INTEGER NOT NULL,
-    fee_year    INTEGER NOT NULL,
-    fee_code    INTEGER NOT NULL,
-    PRIMARY KEY (member_type, member_code, fee_year, fee_code)
-);
-```
-
-HasOne
-----
-
-General code:
-
-For the relation sample, 
+`Repo` object has a convenient method to construct a `Join` object. 
+If all conversion array can be omitted, and join table name is 
+`[from table name]_[to table name]`, the shortest case 
 
 ```php
-$repo->hasOne($ordersRepo, $memberRepo, $orderEntity, [
-    'member_type' => 'type',
-    'member_code' => 'code',
-]);
-```
-
-
-
-HasMany
-----
-
-General code:
-
-In case, the `id` has different as in the sample below, 
-set `$convert` array. 
-
-```php
-$repo->hasMany($membersRepo, $ordersRepo, $memberEntity, [
-    'type' => 'member_type', 
-    'code' => 'member_code',
-]);
-```
-        
-
-
-HasJoin
-----
-
-
-
-
-To use a class as a repository, prepare the class and set 
-factory in the container. 
-
-
-More 
-====
-
-A generic repository. 
-----
-
-```php
-$repo  = $c->get(Repo::class);
-$users = $repo->getRepository('users', ['user_id'], true);
-$user1 = $users->create(['name' => 'my name']);
-$users->save($user1);
+$repo->hasMany('users', 'posts');
 ```
 
