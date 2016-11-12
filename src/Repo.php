@@ -188,7 +188,7 @@ class Repo
         if (is_string($joinRepo)) {
             $joinRepo = $this->getRepository($joinRepo);
         }
-        return new Join($fromRepo, $joinRepo, $toRepo, $from_convert, $to_convert);
+        return new Join($fromRepo, $toRepo, $joinRepo, $from_convert, $to_convert);
     }
 
     /**

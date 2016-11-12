@@ -47,8 +47,8 @@ class Join implements JoinRelationInterface
      */
     public function __construct(
         RepositoryInterface $fromRepo,
-        RepositoryInterface $joinRepo,
         RepositoryInterface $toRepo,
+        RepositoryInterface $joinRepo,
         array $from_convert = [],
         array $to_convert = []
     ) {
