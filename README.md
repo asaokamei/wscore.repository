@@ -215,8 +215,8 @@ then:
 // prepare $user1 and relation to posts
 $user1 = $users->findByKey(1);
 
-// get a list of posts
-$user1Posts = $user1->posts()->find();
+// get all of related posts
+$user1Posts = $user1->posts;
 
 // relate a new post to $user1.
 $newPost  = $posts->create(['contents' => 'test relation'])
