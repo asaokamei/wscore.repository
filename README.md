@@ -1,9 +1,9 @@
 WScore/Repository
 =================
 
-Yet-Another ORM for PHP based on (probably) a Repository Pattern, 
-entities and data-access-objects are represented by different classes, 
-and behaves like an ActiveRecord. 
+Yet-Another ORM package for PHP which is (probably) based on 
+a Repository Pattern; entities and data-access-objects are 
+represented by different classes. 
 
 Other than being able to read, create, update, delete, 
 and relate entities, `WScore/Repository` has following features. 
@@ -11,7 +11,7 @@ and relate entities, `WScore/Repository` has following features.
 * Uses **different classes for DAO and Entity layer**. 
   You can use your own DAO object to implement some special requirements if necessary. 
 * Works very well with **composite primary keys**. 
-* Yet, it is easy to use.
+* Behaves similar to ActiveRecord.
 
 On the other hand, it does not have followings. 
 
@@ -149,7 +149,7 @@ $users->save($user1);
 Relating Entities
 --------
 
-There are 3 relations: `HasOne`, `HasMany`, and `JoinBy`. 
+There are 3 relations: `BelongsTo`, `HasMany`, and `JoinBy`. 
 
 ### sample database
 
@@ -227,7 +227,7 @@ $newPost->save(); // save the post.
 Relations
 ====
 
-There are `HasOne`, `HasMany`, and `Join` relations.
+There are `BelongsTo`, `HasMany`, and `Join` relations.
 
 ### sample database
 
@@ -240,15 +240,16 @@ There are `HasOne`, `HasMany`, and `Join` relations.
 ```
 
 
-HasOne
+BelongsTo
 ----
 
-Use `HasOne` object to represent one-to-one relation. 
+Use `BelongsTo` object to represent a relation when the from table 
+contains the foreign key to other table. 
 
 ```php
-use WScore\Repository\Relations\HasOne;
+use WScore\Repository\Relations\BelongsTo;
 
-new HasOne(
+new BelongsTo(
     $fromRepo,     // repository to relate from 
     $toRepo,       // repository to relate to 
     $convertArray  // conversion of keys
@@ -261,23 +262,25 @@ where
 * `$toRepo` for `users` repository, and 
 * `$convertArray` is the key-map of `$fromRepo` to the `$toRepo`. 
 
-For the example above, the `posts` entity is related to 
-one `users` entity by mapping`posts:user_id` to `users:id`. 
+For the example above, the `posts` table contains `user_id` as a 
+foreign key to `users` table. To construct `BelongsTo` object, 
+provide `$posts` as from repository, `$users` repository as to 
+repository, and key map from `user_id` to `id`, such as; 
 
 ```php
-$userToPost = new HasOne($posts, $users, ['user_id' => 'id']);
+$userToPost = new BelongsTo($posts, $users, ['user_id' => 'id']);
 ```
 
 `$convertArray` maybe omitted if the primary keys of the `$toRepo` 
 is used as foreign keys and the column names in both repositories 
 are the same. 
 
-`Repo` object has a convenient method to construct a `HasOne` object; 
+`Repo` object has a convenient method to construct a `BelongsTo` object; 
 for instance following code will convert the repository name to 
 repository object.
 
 ```php
-$repo->hasOne('posts', 'users', ['user_id' => 'id']);
+$repo->belongsTo('posts', 'users', ['user_id' => 'id']);
 ```
 
 HasMany
@@ -299,8 +302,10 @@ new HasMany(
 * `$toRepo` for `users` repository, and 
 * `$convertArray` is the key-map of `$fromRepo` to the `$toRepo`. 
 
-For the example above, the `users` entity is related to 
-one `posts` entity by mapping`users:id` to `posts:user_id`. 
+For the example above, the `users` table has many related `posts` 
+records using the `users:id` as foreign key. To construct a `HasMany` 
+object, provide `$users` as from repository, `$posts` as to repository, 
+and key map from `id` to `user_id`, such as; 
 
 ```php
 $userToPost = new HasMany($users, $posts, ['id' => 'user_id']);
@@ -310,7 +315,7 @@ $userToPost = new HasMany($users, $posts, ['id' => 'user_id']);
 is used as foreign keys and the column names in both repositories 
 are the same. 
 
-`Repo` object has a convenient method to construct a `HasOne` object; 
+`Repo` object has a convenient method to construct a `HasMany` object; 
 for instance following code will convert the repository name to 
 repository object.
 
@@ -359,7 +364,7 @@ If all conversion array can be omitted, and join table name is
 `[from table name]_[to table name]`, the shortest case 
 
 ```php
-$repo->hasMany('users', 'posts');
+$repo->join('users', 'posts');
 ```
 
 Assembly for Eager Loading
