@@ -10,7 +10,7 @@ use tests\Utils\Composite\Member;
 use tests\Utils\Composite\Order;
 use tests\Utils\Container;
 use WScore\Repository\Relations\HasMany;
-use WScore\Repository\Relations\HasOne;
+use WScore\Repository\Relations\BelongsTo;
 use WScore\Repository\Repo;
 
 class CompositeKeyTest extends PHPUnit_Framework_TestCase
@@ -28,7 +28,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         class_exists(Fee::class);
         class_exists(Order::class);
         class_exists(HasMany::class);
-        class_exists(HasOne::class);
+        class_exists(BelongsTo::class);
 
         $c       = $this->getContainer();
         $fixture = $c->get(FixtureCompositeKey::class);

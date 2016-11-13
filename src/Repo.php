@@ -10,7 +10,7 @@ use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Relations\Join;
 use WScore\Repository\Repository\Repository;
 use WScore\Repository\Relations\HasMany;
-use WScore\Repository\Relations\HasOne;
+use WScore\Repository\Relations\BelongsTo;
 use WScore\Repository\Repository\RepositoryInterface;
 use WScore\Repository\Repository\RepositoryOptions;
 
@@ -125,9 +125,9 @@ class Repo
      * @param RepositoryInterface|string $sourceRepo
      * @param RepositoryInterface|string $repo
      * @param array               $convert
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function hasOne(
+    public function belongsTo(
         $sourceRepo,
         $repo,
         $convert = []
@@ -138,7 +138,7 @@ class Repo
         if (is_string($repo)) {
             $repo = $this->getRepository($repo);
         }
-        return new HasOne($sourceRepo, $repo, $convert);
+        return new BelongsTo($sourceRepo, $repo, $convert);
     }
 
     /**

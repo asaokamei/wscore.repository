@@ -88,7 +88,7 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $post3->getIdValue());
         $this->assertEquals(2, $post3->get('user_id'));
         
-        $hasOne = $this->repo->hasOne($posts, 'users', ['user_id' => 'id'])->withEntity($post3);
+        $hasOne = $this->repo->belongsTo($posts, 'users', ['user_id' => 'id'])->withEntity($post3);
         $this->assertEquals(1, $hasOne->count());
 
         $users = $hasOne->find();

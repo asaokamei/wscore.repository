@@ -2,7 +2,7 @@
 namespace tests\Utils\Composite;
 
 use WScore\Repository\Entity\EntityInterface;
-use WScore\Repository\Relations\HasOne;
+use WScore\Repository\Relations\BelongsTo;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\AbstractRepository;
 
@@ -26,11 +26,11 @@ class Order extends AbstractRepository
 
     /**
      * @param EntityInterface $order_11_2015
-     * @return HasOne
+     * @return BelongsTo
      */
     public function member($order_11_2015)
     {
-        return $this->repo->hasOne($this, 'member', [
+        return $this->repo->belongsTo($this, 'member', [
             'member_type' => 'type',
             'member_code' => 'code',
         ])->withEntity($order_11_2015);

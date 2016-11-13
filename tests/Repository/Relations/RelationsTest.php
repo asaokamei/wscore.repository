@@ -79,7 +79,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $post4->get('users_id'));
 
         // retrieve a user from a post entity.
-        $hasOne = $repo->hasOne($posts, $users)->withEntity($post1);
+        $hasOne = $repo->belongsTo($posts, $users)->withEntity($post1);
         $this->assertEquals(1, $hasOne->count());
         $post1users = $hasOne->find();
         $this->assertEquals(1, count($post1users));
@@ -146,7 +146,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
          */
         // put $post1 to user2
         $post1 = $posts->findByKey(1); // should belong to user1
-        $hasOne = $repo->hasOne('posts', 'users')->withEntity($post1);
+        $hasOne = $repo->belongsTo('posts', 'users')->withEntity($post1);
         $hasOne->relate($user2);
         $this->assertEquals(2, $post1->get('users_id'));
         $post1->save();

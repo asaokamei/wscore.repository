@@ -6,7 +6,7 @@ use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class HasOne implements RelationInterface
+class BelongsTo implements RelationInterface
 {
     /**
      * @var RepositoryInterface
