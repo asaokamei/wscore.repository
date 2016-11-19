@@ -68,6 +68,16 @@ class Collection implements CollectionInterface
     }
 
     /**
+     * 
+     */    
+    public function save()
+    {
+        $this->walk(function(EntityInterface $entity) {
+            $entity->save();
+        });
+    }
+
+    /**
      * @param string $name
      * @return CollectRelatedInterface
      */
@@ -107,6 +117,104 @@ class Collection implements CollectionInterface
         }
 
         return $related;
+    }
+
+    /**
+     * @param callable $callable
+     * @return CollectionInterface
+     */
+    public function filter(callable $callable)
+    {
+        $next = new Collection($this->repository);
+        $found = array_filter($this->entities, $callable);
+        $next->setEntities($found);
+        
+        return $next;
+    }
+
+    /**
+     * @param callable $callable
+     * @return $this
+     */
+    public function walk(callable $callable)
+    {
+        array_walk($this->entities, $callable);
+        return $this;
+    }
+
+    /**
+     * @param callable $callable
+     * @return array
+     */
+    public function map(callable $callable)
+    {
+        return array_map($callable, $this->entities);
+    }
+
+    /**
+     * @param string $column
+     * @return array
+     */
+    public function column($column)
+    {
+        return $this->map(function(EntityInterface $entity) use($column) {
+            return $entity->get($column);
+        });
+    }
+    
+    /**
+     * @param callable $callable
+     * @param null|mixed $initial
+     * @return mixed|EntityInterface
+     */
+    public function reduce(callable $callable, $initial = null)
+    {
+        return array_reduce($this->entities, $callable, $initial);
+    }
+
+    /**
+     * @param string $column
+     * @return int
+     */
+    public function sum($column)
+    {
+        return $this->reduce(function($sum, EntityInterface $entity) use($column) {
+            $value = $entity->get($column);
+            if (!is_numeric($value)) {
+                throw new \InvalidArgumentException("summation on non numeric column, {$column}.");
+            }
+            return $sum + $value; 
+        }, 0);
+    }
+
+    /**
+     * @param string $column
+     * @return int|mixed
+     */
+    public function max($column)
+    {
+        return $this->reduce(function($max, EntityInterface $entity) use($column) {
+            $value = $entity->get($column);
+            if (is_null($max)) {
+                return $value;
+            }
+            return $max < $value ? $value : $max;
+        }, null);
+    }
+
+    /**
+     * @param string $column
+     * @return int|mixed
+     */
+    public function min($column)
+    {
+        return $this->reduce(function($min, EntityInterface $entity) use($column) {
+            $value = $entity->get($column);
+            if (is_null($min)) {
+                return $value;
+            }
+            return $min > $value ? $value : $min;
+        }, null);
     }
 
     /**
