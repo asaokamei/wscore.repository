@@ -224,6 +224,23 @@ $user1->posts()->relate($newPost);
 $newPost->save(); // save the post. 
 ```
 
+### eager loading using Assembly 
+
+`Assembly` is essentially a collection of entities with ability to load 
+related entities _eagerly_. 
+
+```php
+$user12 = $users->collection(['user_id' => [1, 2]]); // collection of entity.
+$user12->load('posts'); // load related entities using repository's posts() method. 
+
+foreach($user12 as $user) {
+    echo $user->name;
+    foreach($user->posts as $post) {
+        echo $post->content;
+    }
+}
+```
+
 Relations
 ====
 
@@ -374,6 +391,8 @@ Assembly is a collection of entities that can eager load related entities.
 
 ### repositories 
 
+For `Assembly` to work, repositories must implement methods 
+that returns `RelationInterface` objects.
 Assumes the database table in the Relations section is used, 
 and all repositories are setup to produce relation object as;
 
@@ -387,15 +406,14 @@ $posts->tags();  // returns Join object to tags table
 First, create a list of users entities, 
 
 ```php
-$users = new EntityList($users);
-$users->execute('SELECT * FROM users WHERE id IN (?, ?)', [1, 3]);
+$users = new Collection($users);
+$users->find(['id' => [1, 3]]);
 ```
 
 then, load related entities using the repositories methods.  
 
 ```php
-$users->relate('posts');
-$users->relate('posts')->relate('tags');
+$users->load('posts')->load('tags');
 ```
 
 ### accessing related entities
