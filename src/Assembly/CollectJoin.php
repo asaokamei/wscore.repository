@@ -6,7 +6,7 @@ use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class Joined extends EntityList
+class CollectJoin extends Collection implements CollectRelatedInterface
 {
     /**
      * @var JoinRelationInterface
@@ -37,12 +37,12 @@ class Joined extends EntityList
      * @param RepositoryInterface   $repository
      * @param JoinRelationInterface $relation
      * @param EntityInterface[]     $fromEntities
-     * @return self
+     * @return CollectJoin
      */
     public static function forge($repository, $relation, array $fromEntities)
     {
         $self = new self($repository);
-        $self->load($relation, $fromEntities);
+        $self->loadRelatedEntities($relation, $fromEntities);
 
         return $self;
     }
@@ -51,7 +51,7 @@ class Joined extends EntityList
      * @param JoinRelationInterface $relation
      * @param EntityInterface[]     $fromEntities
      */
-    private function load($relation, array $fromEntities)
+    private function loadRelatedEntities($relation, array $fromEntities)
     {
         $this->relation = $relation;
         if (empty($fromEntities)) {
@@ -65,7 +65,7 @@ class Joined extends EntityList
      * @param EntityInterface $fromEntity
      * @return EntityInterface[]
      */
-    public function find($fromEntity)
+    public function getRelatedEntities($fromEntity)
     {
         $key = HelperMethods::flatKey($fromEntity, $this->convertJoin);
         if (!array_key_exists($key, $this->indexedJoin)) {

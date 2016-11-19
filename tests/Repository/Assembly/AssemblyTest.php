@@ -8,9 +8,9 @@ use tests\Utils\Repo\Fixture;
 use tests\Utils\Repo\Posts;
 use tests\Utils\Repo\PostsTags;
 use tests\Utils\Repo\Users;
-use WScore\Repository\Assembly\EntityList;
-use WScore\Repository\Assembly\Joined;
-use WScore\Repository\Assembly\Related;
+use WScore\Repository\Assembly\Collection;
+use WScore\Repository\Assembly\CollectJoin;
+use WScore\Repository\Assembly\CollectHasSome;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\Repository;
@@ -35,8 +35,8 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         class_exists(Repository::class);
         class_exists(PdoQuery::class);
         class_exists(Join::class);
-        class_exists(Related::class);
-        class_exists(Joined::class);
+        class_exists(CollectHasSome::class);
+        class_exists(CollectJoin::class);
 
         $this->c = $this->getFullContainer();
         $this->fix = $this->c->getFix();
@@ -83,11 +83,11 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
         $user2    = $userRepo->findByKey(2);
-        $userList = new EntityList($this->c->get('users'));
-        $userList->setEntities([$user2]);
-        $postList = $userList->relate('posts');
-        $this->assertEquals(2, count($postList->find($user2)));
-        foreach($postList->find($user2) as $post) {
+        $userList = new Collection($this->c->get('users'));
+        $userList->findByKey(2);
+        $postList = $userList->load('posts');
+        $this->assertEquals(2, count($postList->getRelatedEntities($user2)));
+        foreach($postList->getRelatedEntities($user2) as $post) {
             $this->assertEquals('2', $post->get('users_id'));
         }
     }
@@ -95,15 +95,15 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function use_collect()
+    function repository_collect_returns_collection()
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
         $userList    = $userRepo->collect(['users_id' => 2]);
 
-        $postList = $userList->relate('posts');
-        $this->assertEquals(2, count($postList->find($userList[0])));
-        foreach($postList->find($userList[0]) as $post) {
+        $postList = $userList->load('posts');
+        $this->assertEquals(2, count($postList->getRelatedEntities($userList[0])));
+        foreach($postList->getRelatedEntities($userList[0]) as $post) {
             $this->assertEquals('2', $post->get('users_id'));
         }
     }
@@ -114,15 +114,16 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $userRepo = $this->c->get('users');
         $user2    = $userRepo->findByKey(2);
         $user3    = $userRepo->findByKey(3);
-        $userList = new EntityList($this->c->get('users'));
-        $userList->setEntities([$user2, $user3]);
-        $postList = $userList->relate('posts');
-        $this->assertEquals(2, count($postList->find($user2)));
-        $this->assertEquals(1, count($postList->find($user3)));
-        foreach($postList->find($user2) as $post) {
+        $userList = new Collection($this->c->get('users'));
+        $userList[0] = $user2;
+        $userList[]  = $user3;
+        $postList = $userList->load('posts');
+        $this->assertEquals(2, count($postList->getRelatedEntities($user2)));
+        $this->assertEquals(1, count($postList->getRelatedEntities($user3)));
+        foreach($postList->getRelatedEntities($user2) as $post) {
             $this->assertEquals('2', $post->get('users_id'));
         }
-        foreach($postList->find($user3) as $post) {
+        foreach($postList->getRelatedEntities($user3) as $post) {
             $this->assertEquals('3', $post->get('users_id'));
         }
     }
@@ -136,9 +137,10 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $userRepo = $this->c->get('users');
         $user2    = $userRepo->findByKey(2);
         $user3    = $userRepo->findByKey(3);
-        $userList = new EntityList($userRepo);
-        $userList->setEntities([$user2, $user3]);
-        $userList->relate('posts');
+        
+        $userList = new Collection($userRepo);
+        $userList->find(['users_id' => [2,3]]);
+        $userList->load('posts');
 
         $this->assertEquals(2, count($user2->posts));
         $this->assertEquals(1, count($user3->posts));
@@ -155,13 +157,13 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
         $user1    = $userRepo->findByKey(1);
-        $userList = new EntityList($this->c->get('users'));
+        $userList = new Collection($this->c->get('users'));
         $userList->setEntities([$user1]);
-        $postList = $userList->relate('posts');
-        $this->assertEquals(1, count($postList->find($user1)));
+        $postList = $userList->load('posts');
+        $this->assertEquals(1, count($postList->getRelatedEntities($user1)));
         $post = $postList[0];
-        $tagsList = $postList->relate('tags');
-        $this->assertEquals(2, count($tagsList->find($post)));
+        $tagsList = $postList->load('tags');
+        $this->assertEquals(2, count($tagsList->getRelatedEntities($post)));
     }
 
     /**
@@ -171,11 +173,11 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $repo */
         $repo  = $this->c->get('users');
-        $list  = new EntityList($repo);
+        $list  = new Collection($repo);
         $list->execute('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 2]);
 
-        $list->relate('posts');
-        $list->relate('posts')->relate('tags');
+        $list->load('posts');
+        $list->load('posts')->load('tags');
 
         list($user1, $user2) = $list;
         $this->assertEquals(1, count($user1->posts));
@@ -197,7 +199,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $repo */
         $repo  = $this->c->get('users');
-        $list  = new EntityList($repo);
+        $list  = new Collection($repo);
         $list->execute('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 3]);
 
         $idList = [1, 3];

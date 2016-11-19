@@ -1,13 +1,12 @@
 <?php
 namespace WScore\Repository\Assembly;
 
-use IteratorAggregate;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class EntityList implements IteratorAggregate, \ArrayAccess, \Countable
+class Collection implements CollectionInterface
 {
     /**
      * @var RepositoryInterface
@@ -20,7 +19,7 @@ class EntityList implements IteratorAggregate, \ArrayAccess, \Countable
     private $entities = [];
 
     /**
-     * @var Joined[]|Related[]
+     * @var CollectJoin[]|CollectHasSome[]
      */
     private $related = [];
 
@@ -51,10 +50,28 @@ class EntityList implements IteratorAggregate, \ArrayAccess, \Countable
     }
 
     /**
-     * @param string $name
-     * @return Joined|Related
+     * @param array $key
      */
-    public function relate($name)
+    public function find(array $key)
+    {
+        $this->entities = $this->repository->find($key);
+    }
+
+    /**
+     * @param array|string $key
+     */
+    public function findByKey($key)
+    {
+        if ($entity = $this->repository->findByKey($key)) {
+            $this->entities = [$entity];
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return CollectRelatedInterface
+     */
+    public function load($name)
     {
         if (array_key_exists($name, $this->related)) {
             return $this->related[$name];
@@ -67,7 +84,7 @@ class EntityList implements IteratorAggregate, \ArrayAccess, \Countable
          * set related entities to the source entities. 
          */
         foreach($this->entities as $entity) {
-            $found = $related->find($entity);
+            $found = $related->getRelatedEntities($entity);
             $entity->setRelatedEntities($name, $found);
         }
 
@@ -77,14 +94,14 @@ class EntityList implements IteratorAggregate, \ArrayAccess, \Countable
     /**
      * @param $relation
      * @param $entities
-     * @return Joined|Related
+     * @return CollectRelatedInterface
      */
     private function getLoaded($relation, $entities)
     {
         if ($relation instanceof JoinRelationInterface) {
-            $related = Joined::forge($relation->getTargetRepository(), $relation, $entities);
+            $related = CollectJoin::forge($relation->getTargetRepository(), $relation, $entities);
         } elseif ($relation instanceof RelationInterface) {
-            $related = Related::forge($relation->getTargetRepository(), $relation, $entities);
+            $related = CollectHasSome::forge($relation->getTargetRepository(), $relation, $entities);
         } else {
             throw new \InvalidArgumentException();
         }
@@ -134,7 +151,11 @@ class EntityList implements IteratorAggregate, \ArrayAccess, \Countable
      */
     public function offsetSet($offset, $value)
     {
-        $this->entities[$offset] = $value;
+        if (is_null($offset)) {
+            $this->entities[] = $value;
+        } else {
+            $this->entities[$offset] = $value;
+        }
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 namespace WScore\Repository\Repository;
 
-use WScore\Repository\Assembly\EntityList;
+use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
 
@@ -53,7 +53,7 @@ interface RepositoryInterface
 
     /**
      * @param array $keys
-     * @return EntityList
+     * @return Collection
      */
     public function collect(array $keys);
     
