@@ -9,6 +9,7 @@ use tests\Utils\Repo\Posts;
 use tests\Utils\Repo\PostsTags;
 use tests\Utils\Repo\Users;
 use WScore\Repository\Assembly\Collection;
+use WScore\Repository\Assembly\CollectionInterface;
 use WScore\Repository\Assembly\CollectJoin;
 use WScore\Repository\Assembly\CollectHasSome;
 use WScore\Repository\Query\PdoQuery;
@@ -197,9 +198,8 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
      */    
     function entityList_iterates()
     {
-        /** @var Users $repo */
-        $repo  = $this->c->get('users');
-        $list  = new Collection($repo);
+        /** @var CollectionInterface $list */
+        $list  = $this->c->get(Repo::class)->getCollection('users');
         $list->execute('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 3]);
 
         $idList = [1, 3];

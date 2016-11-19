@@ -4,6 +4,7 @@ namespace WScore\Repository;
 use DateTimeImmutable;
 use Interop\Container\ContainerInterface;
 use PDO;
+use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Query\QueryInterface;
@@ -89,6 +90,18 @@ class Repo
             = new Repository($this, $this->getQuery(), $this->getCurrentDateTime(), $options);
 
         return $this->repositories[$tableName];
+    }
+
+    /**
+     * @param string|RepositoryInterface $repository
+     * @return Collection
+     */
+    public function getCollection($repository)
+    {
+        if (is_string($repository)) {
+            $repository = $this->getRepository($repository);
+        }
+        return new Collection($repository);
     }
 
     /**
