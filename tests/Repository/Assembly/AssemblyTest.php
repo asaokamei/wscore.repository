@@ -91,6 +91,22 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('2', $post->get('users_id'));
         }
     }
+
+    /**
+     * @test
+     */
+    function use_collect()
+    {
+        /** @var Users $userRepo */
+        $userRepo = $this->c->get('users');
+        $userList    = $userRepo->collect(['users_id' => 2]);
+
+        $postList = $userList->relate('posts');
+        $this->assertEquals(2, count($postList->find($userList[0])));
+        foreach($postList->find($userList[0]) as $post) {
+            $this->assertEquals('2', $post->get('users_id'));
+        }
+    }
     
     function test2()
     {

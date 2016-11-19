@@ -3,6 +3,7 @@ namespace WScore\Repository\Repository;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
+use WScore\Repository\Assembly\EntityList;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Helpers\HelperMethods;
@@ -215,6 +216,19 @@ abstract class AbstractRepository implements RepositoryInterface
         return $entity;
     }
 
+    /**
+     * @param array $keys
+     * @return EntityList
+     */
+    public function collect(array $keys)
+    {
+        $entities = $this->find($keys);
+        $list     = new EntityList($this);
+        $list->setEntities($entities);
+        
+        return $list;
+    }
+    
     /**
      * for auto-increment table, this method returns a new entity
      * with the new id.

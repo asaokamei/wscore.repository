@@ -1,6 +1,7 @@
 <?php
 namespace WScore\Repository\Repository;
 
+use WScore\Repository\Assembly\EntityList;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
 
@@ -50,6 +51,12 @@ interface RepositoryInterface
      */
     public function findByKey($keys);
 
+    /**
+     * @param array $keys
+     * @return EntityList
+     */
+    public function collect(array $keys);
+    
     /**
      * @param EntityInterface $entity
      * @return EntityInterface
