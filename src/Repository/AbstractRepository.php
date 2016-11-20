@@ -223,6 +223,20 @@ abstract class AbstractRepository implements RepositoryInterface
     {
         return new Collection($this);
     }
+
+    /**
+     * @param EntityInterface $entity
+     * @return EntityInterface
+     */
+    public function save(EntityInterface $entity)
+    {
+        if (!$entity->isFetched()) {
+            return $this->insert($entity);
+        }
+        $this->update($entity);
+        return $entity;
+        
+    }
     
     /**
      * for auto-increment table, this method returns a new entity

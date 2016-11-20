@@ -57,6 +57,12 @@ interface RepositoryInterface
      * @return Collection
      */
     public function collection();
+
+    /**
+     * @param EntityInterface $entity
+     * @return EntityInterface
+     */
+    public function save(EntityInterface $entity);
     
     /**
      * @param EntityInterface $entity

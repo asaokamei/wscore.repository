@@ -242,15 +242,12 @@ abstract class AbstractEntity implements EntityInterface
         $this->data = array_merge($this->data, $keys);
     }
 
-    /**
+    /**6
      * @return bool
      */
     public function save()
     {
-        if ($this->isFetched()) {
-            return $this->repo->update($this);
-        }
-        $this->repo->insert($this);
+        $this->repo->save($this);
         return true;
     }
     
