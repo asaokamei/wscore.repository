@@ -217,16 +217,11 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * @param array $keys
      * @return Collection
      */
-    public function collect(array $keys)
+    public function collection()
     {
-        $entities = $this->find($keys);
-        $list     = new Collection($this);
-        $list->setEntities($entities);
-        
-        return $list;
+        return new Collection($this);
     }
     
     /**

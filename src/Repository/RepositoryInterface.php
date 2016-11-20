@@ -52,10 +52,11 @@ interface RepositoryInterface
     public function findByKey($keys);
 
     /**
-     * @param array $keys
+     * returns a brand new Collection for this repository. 
+     * 
      * @return Collection
      */
-    public function collect(array $keys);
+    public function collection();
     
     /**
      * @param EntityInterface $entity

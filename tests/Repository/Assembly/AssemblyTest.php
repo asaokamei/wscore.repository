@@ -100,8 +100,9 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
-        $userList    = $userRepo->collect(['users_id' => 2]);
-
+        $userList    = $userRepo->collection();
+        $userList->find(['users_id' => 2]);
+        
         $postList = $userList->load('posts');
         $this->assertEquals(2, count($postList->getRelatedEntities($userList[0])));
         foreach($postList->getRelatedEntities($userList[0]) as $post) {
