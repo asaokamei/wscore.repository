@@ -15,6 +15,12 @@ interface JoinRelationInterface extends RelationInterface
     public function convertFromKeys(EntityInterface $fromEntity);
 
     /**
+     * @param EntityInterface $fromEntity
+     * @return array
+     */
+    public function getJoinKeys(EntityInterface $fromEntity);
+    
+    /**
      * @return bool
      */
     public function clear();

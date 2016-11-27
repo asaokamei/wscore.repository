@@ -14,6 +14,7 @@
     <testsuites>
         <testsuite name="testing repositories">
             <directory>./tests/Repository</directory>
+            <directory>./tests/Cases</directory>
         </testsuite>
     </testsuites>
     <filter>

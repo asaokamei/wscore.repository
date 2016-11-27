@@ -242,7 +242,7 @@ class Collection implements CollectionInterface
      * Offset to retrieve
      *
      * @param mixed 
-     * @return mixed
+     * @return EntityInterface
      */
     public function offsetGet($offset)
     {

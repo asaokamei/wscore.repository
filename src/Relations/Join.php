@@ -95,6 +95,18 @@ class Join implements JoinRelationInterface
     }
 
     /**
+     * @param EntityInterface $fromEntity
+     * @return array
+     */
+    public function getJoinKeys(EntityInterface $fromEntity)
+    {
+        $data = $fromEntity->toArray();
+        $keys = HelperMethods::filterDataByKeys($data, array_flip($this->from_convert));
+        $keys = HelperMethods::convertDataKeys($keys, $this->from_convert);
+        return $keys;
+    }
+
+    /**
      * @param EntityInterface $entity
      * @return array
      */

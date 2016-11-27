@@ -217,7 +217,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * @return Collection
+     * @return Collection|EntityInterface[]
      */
     public function collection()
     {
