@@ -30,4 +30,9 @@ class Posts extends AbstractRepository
     {
         return $this->repo->join($this, 'tags', 'posts_tags', ['id' => 'post_id'], ['tag_id' => 'id']);
     }
+    
+    public function user()
+    {
+        return $this->repo->belongsTo($this, 'users', ['user_id' => 'id']);
+    }
 }

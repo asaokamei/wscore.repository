@@ -4,6 +4,7 @@ namespace tests\Cases\SimpleId;
 use Interop\Container\ContainerInterface;
 use tests\Cases\SimpleId\Models\Fixture;
 use tests\Cases\SimpleId\Models\Services;
+use tests\Cases\SimpleId\Models\Tags;
 use tests\Cases\SimpleId\Models\Users;
 use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Assembly\CollectJoin;
@@ -65,6 +66,33 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
                     $tag_id = $this->tags[$user->getIdValue()][$post->getIdValue()][$idx];
                     $this->assertEquals($tag_id, $tag->get('id'));
                 }
+            }
+        }
+    }
+    
+    function test_reverse()
+    {
+        /** @var Tags $users */
+        $users = $this->c->get('tags');
+        $collection = $users->collection();
+        $collection->find(['id' => ['test', 'tag', 'blog']]);
+        $collection->load('posts');
+
+        $this->assertEquals(3, $collection->count());
+        $this->assertEquals('test', $collection[0]->getIdValue());
+        $this->assertEquals('tag', $collection[1]->getIdValue());
+        $this->assertEquals('blog', $collection[2]->getIdValue());
+        
+        $answer = [
+            'test' => [1, 3],
+            'tag'  => [1],
+            'blog' => [2, 3],
+        ];
+        foreach($collection as $tag) {
+            foreach($tag->posts as $idx => $post) {
+                $this->assertEquals($answer[$tag->getIdValue()][$idx], $post->getIdValue());
+                $user = $post->user[0];
+                $this->assertEquals($user->getIdValue(), $post->get('user_id'));
             }
         }
     }
