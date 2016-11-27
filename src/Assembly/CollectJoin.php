@@ -67,7 +67,7 @@ class CollectJoin extends Collection implements CollectRelatedInterface
      */
     public function getRelatedEntities($fromEntity)
     {
-        $key = $this->relation->convertFromKeys($fromEntity);
+        $key = $this->relation->getJoinKeys($fromEntity);
         $key = HelperMethods::flattenKey($key);
         if (!array_key_exists($key, $this->indexedJoin)) {
             return [];
@@ -89,7 +89,7 @@ class CollectJoin extends Collection implements CollectRelatedInterface
      */
     private function setConvertJoin($entity)
     {
-        $keys              = $this->relation->convertFromKeys($entity);
+        $keys              = $this->relation->getJoinKeys($entity);
         $this->convertJoin = array_keys($keys);
     }
 

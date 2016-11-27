@@ -64,12 +64,12 @@ class BelongsTo implements RelationInterface
     }
 
     /**
-     * @param EntityInterface $entity
+     * @param EntityInterface $joinEntity
      * @return array
      */
-    public function getTargetKeys(EntityInterface $entity)
+    public function getTargetKeys(EntityInterface $joinEntity)
     {
-        $keys = $entity->toArray();
+        $keys = $joinEntity->toArray();
         $keys = HelperMethods::filterDataByKeys($keys, array_flip($this->convert));
         $keys = HelperMethods::convertDataKeys($keys, $this->convert);
 
@@ -77,13 +77,13 @@ class BelongsTo implements RelationInterface
     }
 
     /**
-     * @param EntityInterface $entity
+     * @param EntityInterface $sourceEntity
      * @return static
      */
-    public function withEntity(EntityInterface $entity)
+    public function withEntity(EntityInterface $sourceEntity)
     {
         $self = clone $this;
-        $self->sourceEntity = $entity;
+        $self->sourceEntity = $sourceEntity;
 
         return $self;
     }

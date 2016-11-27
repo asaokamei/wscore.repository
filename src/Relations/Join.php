@@ -77,72 +77,65 @@ class Join implements JoinRelationInterface
     }
 
     /**
-     * @param EntityInterface $fromEntity
+     * get keys for join record from to-entity.
+     * 
+     * @param EntityInterface $targetEntity
      * @return array
      */
-    public function convertFromKeys(EntityInterface $fromEntity)
+    private function convertToKeys(EntityInterface $targetEntity)
     {
-        return HelperMethods::convertDataKeys($fromEntity->getKeys(), $this->from_convert);
+        return HelperMethods::convertDataKeys($targetEntity->getKeys(), array_flip($this->to_convert));
     }
 
     /**
-     * @param EntityInterface $toEntity
+     * @param EntityInterface $sourceEntity
      * @return array
      */
-    public function convertToKeys(EntityInterface $toEntity)
+    public function getJoinKeys(EntityInterface $sourceEntity)
     {
-        return HelperMethods::convertDataKeys($toEntity->getKeys(), array_flip($this->to_convert));
-    }
-
-    /**
-     * @param EntityInterface $fromEntity
-     * @return array
-     */
-    public function getJoinKeys(EntityInterface $fromEntity)
-    {
-        $data = $fromEntity->toArray();
+        $data = $sourceEntity->toArray();
         $keys = HelperMethods::filterDataByKeys($data, array_flip($this->from_convert));
         $keys = HelperMethods::convertDataKeys($keys, $this->from_convert);
         return $keys;
     }
 
     /**
-     * @param EntityInterface $entity
+     * @param EntityInterface $joinEntity
      * @return array
      */
-    public function getTargetKeys(EntityInterface $entity)
+    public function getTargetKeys(EntityInterface $joinEntity)
     {
-        $data = $entity->toArray();
+        $data = $joinEntity->toArray();
         $keys = HelperMethods::filterDataByKeys($data, array_flip($this->to_convert));
         $keys = HelperMethods::convertDataKeys($keys, $this->to_convert);
         return $keys;
     }
     
     /**
-     * @param EntityInterface $entity
+     * @param EntityInterface $sourceEntity
      * @return static
      */
-    public function withEntity(EntityInterface $entity)
+    public function withEntity(EntityInterface $sourceEntity)
     {
-        $this->sourceEntity = $entity;
+        $this->sourceEntity = $sourceEntity;
 
         return $this;
     }
 
     /**
-     * @param null|EntityInterface $entity
+     * @param null|EntityInterface $targetEntity
      * @return QueryInterface
      */
-    public function queryJoin($entity = null)
+    public function queryJoin($targetEntity = null)
     {
         $keys = [];
         if ($this->sourceEntity) {
-            $keys = $this->convertFromKeys($this->sourceEntity);
+            $keys = $this->getJoinKeys($this->sourceEntity);
         }
-        if ($entity) {
+        if ($targetEntity) {
             $keys = array_merge(
                 $keys,
-                $this->convertToKeys($entity)
+                $this->convertToKeys($targetEntity)
             );
         }
         return $this->joinRepo
@@ -163,15 +156,15 @@ class Join implements JoinRelationInterface
     }
 
     /**
-     * @param EntityInterface $entity
+     * @param EntityInterface $targetEntity
      * @return bool
      */
-    public function delete(EntityInterface $entity)
+    public function delete(EntityInterface $targetEntity)
     {
         if (!$this->sourceEntity) {
             throw new \BadMethodCallException('must have source entity to delete.');
         }
-        $keys = $this->convertToKeys($entity);
+        $keys = $this->convertToKeys($targetEntity);
         return $this->queryJoin()
             ->delete($keys);
     }
@@ -223,7 +216,7 @@ class Join implements JoinRelationInterface
             throw new \BadMethodCallException('must have source entity to relate.');
         }
         $keys = array_merge(
-            $this->convertFromKeys($this->sourceEntity),
+            $this->getJoinKeys($this->sourceEntity),
             $this->convertToKeys($entity));
         $join = $this->joinRepo->create($keys);
         $this->joinRepo->insert($join);

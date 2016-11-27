@@ -7,33 +7,34 @@ use WScore\Repository\Query\QueryInterface;
 interface JoinRelationInterface extends RelationInterface
 {
     /**
-     * get keys to find join-entities from $fromEntity.
-     *
-     * @param EntityInterface $fromEntity
+     * get keys from source entity to query join repository. 
+     * 
+     * @param EntityInterface $sourceEntity
      * @return array
      */
-    public function convertFromKeys(EntityInterface $fromEntity);
-
-    /**
-     * @param EntityInterface $fromEntity
-     * @return array
-     */
-    public function getJoinKeys(EntityInterface $fromEntity);
+    public function getJoinKeys(EntityInterface $sourceEntity);
     
     /**
+     * deletes all join records. 
+     * 
      * @return bool
      */
     public function clear();
 
     /**
-     * @param EntityInterface $entity
+     * un-relate target entity, i.e. deletes a join entity. 
+     * must set a sourceEntity using withEntity before. 
+     * 
+     * @param EntityInterface $targetEntity
      * @return bool
      */
-    public function delete(EntityInterface $entity);
+    public function delete(EntityInterface $targetEntity);
 
     /**
-     * @param null|EntityInterface $entity
+     * query join repository. 
+     * 
+     * @param null|EntityInterface $targetEntity
      * @return QueryInterface
      */
-    public function queryJoin($entity = null);
+    public function queryJoin($targetEntity = null);
 }
