@@ -296,7 +296,9 @@ abstract class AbstractEntity implements EntityInterface
             return $this->relatedEntities[$name];
         }
         if ($relation = $this->_getRelationObject($name)) {
-            return $relation->withEntity($this)->collect();
+            $collect = $relation->withEntity($this)->collect();
+            $this->relatedEntities[$name] = $collect;
+            return $collect;
         }
         
         return $this->get($name);

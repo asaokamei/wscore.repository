@@ -63,7 +63,7 @@ class CollectJoin extends Collection implements CollectRelatedInterface
 
     /**
      * @param EntityInterface $fromEntity
-     * @return EntityInterface[]
+     * @return Collection|EntityInterface[]
      */
     public function getRelatedEntities($fromEntity)
     {
@@ -81,7 +81,7 @@ class CollectJoin extends Collection implements CollectRelatedInterface
                 $found = array_merge($found, $this->indexedTo[$key]);
             }
         }
-        return $found;
+        return $this->repository->newCollection($found);
     }
 
     /**

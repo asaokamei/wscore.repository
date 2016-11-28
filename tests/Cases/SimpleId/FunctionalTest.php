@@ -59,6 +59,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $user2->getIdValue());
 
         $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user1->posts));
+        $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user1->posts[0]->tags));
         
         foreach($collection as $user) {
             foreach($user->posts as $post) {
