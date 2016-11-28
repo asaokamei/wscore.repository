@@ -11,7 +11,7 @@ class Collection implements CollectionInterface
     /**
      * @var RepositoryInterface
      */
-    private $repository;
+    protected $repository;
 
     /**
      * @var EntityInterface[]

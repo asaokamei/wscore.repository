@@ -1,6 +1,7 @@
 <?php
 namespace WScore\Repository\Relations;
 
+use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
@@ -103,11 +104,12 @@ class BelongsTo implements RelationInterface
 
     /**
      * @param array $keys
-     * @return EntityInterface[]
+     * @return Collection|EntityInterface[]
      */
-    public function find($keys = [])
+    public function collect($keys = [])
     {
-        return $this->query()->select($keys)->fetchAll();
+        $found = $this->query()->select($keys)->fetchAll();
+        return $this->targetRepo->newCollection($found);
     }
 
     /**

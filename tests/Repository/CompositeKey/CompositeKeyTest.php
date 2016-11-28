@@ -79,11 +79,11 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Main Member', $main->get('name'));
 
         $orders = $members->orders($main);
-        $this->assertEquals(3, count($orders->find()));
-        $this->assertEquals(1, count($orders->find(['fee_year' => 2015])));
-        $this->assertEquals(2, count($orders->find(['fee_year' => 2016])));
+        $this->assertEquals(3, count($orders->collect()));
+        $this->assertEquals(1, count($orders->collect(['fee_year' => 2015])));
+        $this->assertEquals(2, count($orders->collect(['fee_year' => 2016])));
 
-        $order2015 = $orders->find(['fee_year' => 2015])[0];
+        $order2015 = $orders->collect(['fee_year' => 2015])[0];
         $this->assertEquals([
             'member_type' => '1',
             'member_code' => '100',
@@ -105,7 +105,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
             'fee_year'    => '2015',
             'fee_code'    => 'MEMBER'
         ]);
-        $member11      = $order->member($order_11_2015)->find()[0];
+        $member11      = $order->member($order_11_2015)->collect()[0];
         $this->assertEquals(1, $member11->get('type'));
         $this->assertEquals(100, $member11->get('code'));
     }
@@ -121,7 +121,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Main Member', $main->get('name'));
 
         $feeJoined = $members->fees($main);
-        $fees      = $feeJoined->find();
+        $fees      = $feeJoined->collect();
         $this->assertEquals(3, count($fees));
     }
 
@@ -136,13 +136,13 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
 
         // retrieve associated fees.
         $joinedFees = $members->fees($main);
-        $fees       = $joinedFees->find();
+        $fees       = $joinedFees->collect();
         $this->assertEquals(3, count($fees));
 
         // this is the fee to remove.
         $feeRemove = $fees[1];
         $joinedFees->delete($feeRemove);
-        $fees2 = $joinedFees->find();
+        $fees2 = $joinedFees->collect();
         $this->assertEquals(2, count($fees2));
         // make sure the remaining 2 fees are not $feeRemove
         foreach($fees2 as $f) {
@@ -161,7 +161,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
 
         // retrieve associated fees.
         $joinedFees = $members->fees($subMem);
-        $fees1       = $joinedFees->find();
+        $fees1       = $joinedFees->collect();
         $this->assertEquals(2, count($fees1));
 
         // fees to add...
@@ -170,7 +170,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $joinedFees->relate($feeToAdd);
 
         // check if $feeToAdd is related
-        $fees2       = $joinedFees->find();
+        $fees2       = $joinedFees->collect();
         $this->assertEquals(3, count($fees2));
         $containsFeeToAdd = function() use($feeToAdd, $fees2) {
             foreach($fees2 as $f) {
@@ -194,10 +194,10 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
 
         // retrieve associated fees.
         $joinedFees = $members->fees($subMem);
-        $fees1       = $joinedFees->find();
+        $fees1       = $joinedFees->collect();
         $this->assertEquals(2, count($fees1));
 
         $joinedFees->clear();
-        $this->assertEmpty($joinedFees->find());
+        $this->assertEmpty($joinedFees->collect());
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace WScore\Repository\Relations;
 
+use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
@@ -42,9 +43,9 @@ interface RelationInterface
      * if an entity is set by withEntity, searches for entities related to the entity.
      * 
      * @param array $keys
-     * @return EntityInterface[]
+     * @return Collection
      */
-    public function find($keys = []);
+    public function collect($keys = []);
 
     /**
      * count the related entities.

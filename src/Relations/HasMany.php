@@ -103,9 +103,10 @@ class HasMany implements RelationInterface
      * @param array $keys
      * @return EntityInterface[]
      */
-    public function find($keys = [])
+    public function collect($keys = [])
     {
-        return $this->query()->select($keys)->fetchAll();
+        $found = $this->query()->select($keys)->fetchAll();
+        return $this->targetRepo->newCollection($found);
     }
 
     /**

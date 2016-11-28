@@ -217,11 +217,17 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * @param EntityInterface[] $entities
      * @return Collection|EntityInterface[]
      */
-    public function newCollection()
+    public function newCollection($entities = [])
     {
-        return new Collection($this);
+        $collection = new Collection($this);
+        if (!empty($entities)) {
+            $collection->setEntities($entities);
+        }
+
+        return $collection;
     }
 
     /**

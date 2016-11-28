@@ -76,7 +76,7 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
         $hasMany = $this->repo->hasMany($users, 'posts', ['id' => 'user_id'])->withEntity($user2);
         $this->assertEquals(2, $hasMany->count());
         
-        $posts = $hasMany->find();
+        $posts = $hasMany->collect();
         $this->assertEquals(2, $posts[0]->get('user_id'));
         $this->assertEquals(2, $posts[1]->get('user_id'));
     }
@@ -91,7 +91,7 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
         $hasOne = $this->repo->belongsTo($posts, 'users', ['user_id' => 'id'])->withEntity($post3);
         $this->assertEquals(1, $hasOne->count());
 
-        $users = $hasOne->find();
+        $users = $hasOne->collect();
         $this->assertEquals(2, $users[0]->getIdValue());
     }
     
@@ -114,7 +114,7 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $joins[0]->get('post_id'));
         $this->assertEquals(2, $joins[1]->get('post_id'));
 
-        $posts = $join->find();
+        $posts = $join->collect();
         $this->assertEquals(1, $posts[0]->getIdValue());
         $this->assertEquals(2, $posts[1]->getIdValue());
     }

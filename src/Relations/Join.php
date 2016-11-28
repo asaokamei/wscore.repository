@@ -191,10 +191,10 @@ class Join implements JoinRelationInterface
      * @param array $keys
      * @return EntityInterface[]
      */
-    public function find($keys = [])
+    public function collect($keys = [])
     {
-        return $this->query()
-            ->find($keys);
+        $found = $this->query()->find($keys);
+        return $this->toRepo->newCollection($found);
     }
 
     /**

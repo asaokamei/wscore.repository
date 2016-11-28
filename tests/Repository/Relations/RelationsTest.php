@@ -81,14 +81,15 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         // retrieve a user from a post entity.
         $hasOne = $repo->belongsTo($posts, $users)->withEntity($post1);
         $this->assertEquals(1, $hasOne->count());
-        $post1users = $hasOne->find();
+        $post1users = $hasOne->collect();
+        $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($post1users));
         $this->assertEquals(1, count($post1users));
         $this->assertEquals($user1->get('name'), $post1users[0]->get('name'));
 
         // retrieve posts from a user entity.
         $hasMany = $repo->hasMany($users, $posts)->withEntity($user2);
         $this->assertEquals(2, $hasMany->count());
-        $user2posts = $hasMany->find();
+        $user2posts = $hasMany->collect();
         $this->assertEquals(2, count($user2posts));
         $this->assertEquals($post2->get('contents'), $user2posts[0]->get('contents'));
         $this->assertEquals($post3->get('contents'), $user2posts[1]->get('contents'));

@@ -19,7 +19,7 @@ class CollectHasSome extends Collection implements CollectRelatedInterface
     private $convert = [];
 
     /**
-     * @var EntityInterface[][]
+     * @var Collection[]|EntityInterface[][]
      */
     private $indexed = [];
 
@@ -94,6 +94,10 @@ class CollectHasSome extends Collection implements CollectRelatedInterface
         foreach ($found as $entity) {
             $key                   = HelperMethods::flatKey($entity, $this->convert);
             $this->indexed[$key][] = $entity;
+        }
+        // convert to Collection.
+        foreach ($this->indexed as $key => $entities) {
+            $this->indexed[$key] = $this->repository->newCollection($entities);
         }
     }
 }
