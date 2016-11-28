@@ -125,11 +125,9 @@ class Collection implements CollectionInterface
      */
     public function filter(callable $callable)
     {
-        $next = new Collection($this->repository);
         $found = array_filter($this->entities, $callable);
-        $next->setEntities($found);
-        
-        return $next;
+
+        return $this->repository->newCollection($found);
     }
 
     /**

@@ -200,7 +200,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     function entityList_iterates()
     {
         /** @var CollectionInterface $list */
-        $list  = $this->c->get(Repo::class)->getCollection('users');
+        $list  = $this->c->get('users')->newCollection();
         $list->execute('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 3]);
 
         $idList = [1, 3];

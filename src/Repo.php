@@ -93,18 +93,6 @@ class Repo
     }
 
     /**
-     * @param string|RepositoryInterface $repository
-     * @return Collection
-     */
-    public function getCollection($repository)
-    {
-        if (is_string($repository)) {
-            $repository = $this->getRepository($repository);
-        }
-        return new Collection($repository);
-    }
-
-    /**
      * @param string $key
      * @return mixed
      */
