@@ -2,6 +2,7 @@
 namespace WScore\Repository\Entity;
 
 use BadMethodCallException;
+use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Relations\RelationInterface;
@@ -288,7 +289,7 @@ abstract class AbstractEntity implements EntityInterface
     
     /**
      * @param string $name
-     * @return null|EntityInterface[]
+     * @return null|Collection|EntityInterface[]
      */
     public function __get($name)
     {

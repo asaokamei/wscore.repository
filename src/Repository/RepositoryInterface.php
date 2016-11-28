@@ -4,6 +4,8 @@ namespace WScore\Repository\Repository;
 use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
+use WScore\Repository\Relations\JoinRelationInterface;
+use WScore\Repository\Relations\RelationInterface;
 
 interface RepositoryInterface
 {
@@ -55,9 +57,10 @@ interface RepositoryInterface
      * returns a brand new Collection for this repository.
      *
      * @param EntityInterface[] $entities
+     * @param null|RelationInterface|JoinRelationInterface $relation
      * @return Collection
      */
-    public function newCollection($entities = []);
+    public function newCollection($entities = [], $relation = null);
 
     /**
      * @param array $keys

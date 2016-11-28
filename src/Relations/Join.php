@@ -194,7 +194,7 @@ class Join implements JoinRelationInterface
     public function collect($keys = [])
     {
         $found = $this->query()->find($keys);
-        return $this->toRepo->newCollection($found);
+        return $this->toRepo->newCollection($found, $this);
     }
 
     /**

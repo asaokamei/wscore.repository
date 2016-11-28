@@ -8,6 +8,8 @@ use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
+use WScore\Repository\Relations\JoinRelationInterface;
+use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repo;
 
 abstract class AbstractRepository implements RepositoryInterface
@@ -218,11 +220,12 @@ abstract class AbstractRepository implements RepositoryInterface
 
     /**
      * @param EntityInterface[] $entities
+     * @param null|RelationInterface|JoinRelationInterface $relation
      * @return Collection|EntityInterface[]
      */
-    public function newCollection($entities = [])
+    public function newCollection($entities = [], $relation = null)
     {
-        $collection = new Collection($this);
+        $collection = new Collection($this, $relation);
         if (!empty($entities)) {
             $collection->setEntities($entities);
         }

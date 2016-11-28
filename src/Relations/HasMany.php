@@ -106,7 +106,7 @@ class HasMany implements RelationInterface
     public function collect($keys = [])
     {
         $found = $this->query()->select($keys)->fetchAll();
-        return $this->targetRepo->newCollection($found);
+        return $this->targetRepo->newCollection($found, $this);
     }
 
     /**

@@ -14,6 +14,11 @@ class Collection implements CollectionInterface
     protected $repository;
 
     /**
+     * @var RelationInterface|JoinRelationInterface
+     */
+    protected $relation;
+
+    /**
      * @var EntityInterface[]
      */
     private $entities = [];
@@ -25,10 +30,12 @@ class Collection implements CollectionInterface
 
     /**
      * @param RepositoryInterface $repository
+     * @param null|RelationInterface|JoinRelationInterface $relation
      */
-    public function __construct($repository)
+    public function __construct($repository, $relation = null)
     {
         $this->repository = $repository;
+        $this->relation   = $relation;
     }
 
     /**
@@ -75,6 +82,35 @@ class Collection implements CollectionInterface
         $this->walk(function(EntityInterface $entity) {
             $entity->save();
         });
+    }
+
+    /**
+     * @param EntityInterface $entity
+     */
+    public function relate(EntityInterface $entity)
+    {
+        if (!$this->relation) {
+            throw new \InvalidArgumentException('no relation set in Collection');
+        }
+        $this->relation->relate($entity);
+        $this->entities[] = $entity;
+    }
+
+    /**
+     * @param EntityInterface $entity
+     */
+    public function delete(EntityInterface $entity)
+    {
+        if (!$this->relation) {
+            throw new \InvalidArgumentException('no relation set in Collection');
+        }
+        $this->relation->delete($entity);
+        foreach($this->entities as $idx => $e) {
+            if ($e->getKeys() === $entity->getKeys()) {
+                unset($this->entities[$idx]);
+                break;
+            }
+        }
     }
 
     /**
@@ -262,6 +298,9 @@ class Collection implements CollectionInterface
         } else {
             $this->entities[$offset] = $value;
         }
+        if ($this->relation) {
+            $this->relation->relate($value);
+        }
     }
 
     /**
@@ -273,6 +312,9 @@ class Collection implements CollectionInterface
     public function offsetUnset($offset)
     {
         if (array_key_exists($offset, $this->entities)) {
+            if ($this->relation) {
+                $this->relation->delete($this->entities[$offset]);
+            }
             unset($this->entities[$offset]);
         }
     }

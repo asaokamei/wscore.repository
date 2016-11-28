@@ -9,11 +9,6 @@ use WScore\Repository\Repository\RepositoryInterface;
 class CollectHasSome extends Collection implements CollectRelatedInterface
 {
     /**
-     * @var RelationInterface
-     */
-    private $relation;
-
-    /**
      * @var array
      */
     private $convert = [];
@@ -31,19 +26,17 @@ class CollectHasSome extends Collection implements CollectRelatedInterface
      */
     public static function forge($repository, $relation, array $fromEntities)
     {
-        $self = new self($repository);
-        $self->loadRelatedEntities($relation, $fromEntities);
+        $self = new self($repository, $relation);
+        $self->loadRelatedEntities($fromEntities);
 
         return $self;
     }
 
     /**
-     * @param RelationInterface $relation
      * @param EntityInterface[] $fromEntities
      */
-    private function loadRelatedEntities($relation, array $fromEntities)
+    private function loadRelatedEntities(array $fromEntities)
     {
-        $this->relation = $relation;
         if (empty($fromEntities)) {
             return;
         }
@@ -53,14 +46,16 @@ class CollectHasSome extends Collection implements CollectRelatedInterface
 
     /**
      * @param EntityInterface $fromEntity
-     * @return EntityInterface[]
+     * @return Collection|EntityInterface[]
      */
     public function getRelatedEntities($fromEntity)
     {
         $keys = $this->relation->getTargetKeys($fromEntity);
         $key  = HelperMethods::flattenKey($keys);
-        return array_key_exists($key, $this->indexed) ?
-            $this->indexed[$key] : [];
+        if (!array_key_exists($key, $this->indexed)) {
+        }
+        $found = array_key_exists($key, $this->indexed) ? $this->indexed[$key] : [];
+        return $this->repository->newCollection($found, $this->relation->withEntity($fromEntity));
     }
 
     /**
@@ -94,10 +89,6 @@ class CollectHasSome extends Collection implements CollectRelatedInterface
         foreach ($found as $entity) {
             $key                   = HelperMethods::flatKey($entity, $this->convert);
             $this->indexed[$key][] = $entity;
-        }
-        // convert to Collection.
-        foreach ($this->indexed as $key => $entities) {
-            $this->indexed[$key] = $this->repository->newCollection($entities);
         }
     }
 }
