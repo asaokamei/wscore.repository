@@ -219,9 +219,35 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @return Collection|EntityInterface[]
      */
-    public function collection()
+    public function newCollection()
     {
         return new Collection($this);
+    }
+
+    /**
+     * @param array $keys
+     * @return Collection|EntityInterface[]
+     */
+    public function collectFor(array $keys)
+    {
+        $found = $this->find($keys);
+        $collection = $this->newCollection();
+        $collection->setEntities($found);
+
+        return $collection;
+    }
+
+    /**
+     * @param array|string $keys
+     * @return Collection|EntityInterface[]
+     */
+    public function collectByKey($keys)
+    {
+        $found = $this->findByKey($keys);
+        $collection = $this->newCollection();
+        $collection->setEntities([$found]);
+
+        return $collection;
     }
 
     /**

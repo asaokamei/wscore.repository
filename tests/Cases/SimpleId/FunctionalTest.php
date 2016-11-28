@@ -48,8 +48,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $users */
         $users = $this->c->get('users');
-        $collection = $users->collection();
-        $collection->find(['id' => [1,2]]);
+        $collection = $users->collectFor(['id' => [1,2]]);
         $collection->load('posts');
         $collection->load('posts')->load('tags');
         
@@ -74,7 +73,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Tags $users */
         $users = $this->c->get('tags');
-        $collection = $users->collection();
+        $collection = $users->newCollection();
         $collection->find(['id' => ['test', 'tag', 'blog']]);
         $collection->load('posts');
 

@@ -56,7 +56,19 @@ interface RepositoryInterface
      * 
      * @return Collection
      */
-    public function collection();
+    public function newCollection();
+
+    /**
+     * @param array $keys
+     * @return Collection
+     */
+    public function collectFor(array $keys);
+
+    /**
+     * @param array|string $keys
+     * @return Collection
+     */
+    public function collectByKey($keys);
 
     /**
      * @param EntityInterface $entity

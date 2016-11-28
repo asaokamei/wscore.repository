@@ -100,7 +100,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
-        $userList    = $userRepo->collection();
+        $userList    = $userRepo->newCollection();
         $userList->find(['users_id' => 2]);
         
         $postList = $userList->load('posts');
