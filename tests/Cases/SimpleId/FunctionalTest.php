@@ -3,6 +3,7 @@ namespace tests\Cases\SimpleId;
 
 use Interop\Container\ContainerInterface;
 use tests\Cases\SimpleId\Models\Fixture;
+use tests\Cases\SimpleId\Models\Posts;
 use tests\Cases\SimpleId\Models\Services;
 use tests\Cases\SimpleId\Models\Tags;
 use tests\Cases\SimpleId\Models\Users;
@@ -43,8 +44,11 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
             3 => [],
         ];
     }
-    
-    function test()
+
+    /**
+     * @test
+     */
+    function Collection_eagerly_loads_related_entities()
     {
         /** @var Users $users */
         $users = $this->c->get('users');
@@ -71,8 +75,11 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
             }
         }
     }
-    
-    function test_reverse()
+
+    /**
+     * @test
+     */
+    function Collection_eagerly_loads_relation_in_reverse_order()
     {
         /** @var Tags $users */
         $users = $this->c->get('tags');
@@ -96,6 +103,60 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
                 $user = $post->user[0];
                 $this->assertEquals($user->getIdValue(), $post->get('user_id'));
             }
+        }
+    }
+
+    /**
+     * @test
+     */
+    function add_relation_using_lazy_load()
+    {
+        /** @var Users $users */
+        /** @var Posts $posts */
+        $users = $this->c->get('users');
+        $posts = $this->c->get('posts');
+
+        $user2 = $users->findByKey(2);
+        $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user2->posts));
+        $this->assertEquals(2, count($user2->posts));
+
+        $post = $posts->create(['contents' => 'created post']);
+        $user2->posts->relate($post);
+        $user2->save();
+        $post->save();
+
+        $user2 = $users->findByKey(2);
+        $this->assertEquals(3, count($user2->posts));
+        foreach($user2->posts as $post) {
+            $this->assertEquals(2, $post->get('user_id'));
+        }
+    }
+
+    /**
+     * @test
+     */
+    function add_relation_using_eager_loaded_Collection()
+    {
+        /** @var Users $users */
+        /** @var Posts $posts */
+        $users = $this->c->get('users');
+        $posts = $this->c->get('posts');
+
+        $collection = $users->collectByKey(2);
+        $collection->load('posts');
+        $user2 = $collection[0];
+        $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user2->posts));
+        $this->assertEquals(2, count($user2->posts));
+
+        $post = $posts->create(['contents' => 'created post']);
+        $user2->posts->relate($post);
+        $user2->save();
+        $post->save();
+
+        $user2 = $users->findByKey(2);
+        $this->assertEquals(3, count($user2->posts));
+        foreach($user2->posts as $post) {
+            $this->assertEquals(2, $post->get('user_id'));
         }
     }
 }
