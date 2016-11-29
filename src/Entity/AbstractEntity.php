@@ -236,7 +236,7 @@ abstract class AbstractEntity implements EntityInterface
      * @param EntityInterface $entity
      * @param array           $convert
      */
-    public function relate(EntityInterface $entity, $convert = [])
+    public function setForeignKeys(EntityInterface $entity, $convert = [])
     {
         $keys = $entity->getKeys();
         $keys = HelperMethods::convertDataKeys($keys, $convert);

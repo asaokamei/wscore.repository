@@ -126,7 +126,7 @@ class BelongsTo implements RelationInterface
      */
     public function relate(EntityInterface $entity)
     {
-        $this->sourceEntity->relate($entity, $this->convert);
+        $this->sourceEntity->setForeignKeys($entity, $this->convert);
 
         return $entity;
     }

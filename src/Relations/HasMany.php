@@ -123,7 +123,7 @@ class HasMany implements RelationInterface
      */
     public function relate(EntityInterface $entity)
     {
-        $entity->relate($this->sourceEntity, $this->convert);
+        $entity->setForeignKeys($this->sourceEntity, $this->convert);
 
         return $entity;
     }
