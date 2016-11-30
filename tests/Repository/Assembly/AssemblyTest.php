@@ -40,42 +40,38 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         class_exists(CollectJoin::class);
 
         $this->c = $this->getFullContainer();
-        $this->fix = $this->c->getFix();
+        $this->fix = $this->c->get(Fixture::class);
         $this->fix->createTables();
         $this->fix->fillTables();
 
     }
 
     /**
-     * @return Container
+     * @return ContainerInterface
      */
     function getFullContainer()
     {
-        $c = new Container();
+        $c = new Repo();
         $c->set(PDO::class, function () {
             $pdo = new PDO('sqlite::memory:');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             return $pdo;
         });
-        $c->set(Fixture::class, function (ContainerInterface $c) {
+        $c->set(Fixture::class, function (Repo $c) {
             return new Fixture($c->get(PDO::class));
         });
-        $c->set('users', function (ContainerInterface $c) {
-            return new Users($c->get(Repo::class));
+        $c->set('users', function (Repo $c) {
+            return new Users($c);
         });
-        $c->set('posts', function (ContainerInterface $c) {
-            return new Posts($c->get(Repo::class));
+        $c->set('posts', function (Repo $c) {
+            return new Posts($c);
         });
-        $c->set('posts_tags', function (ContainerInterface $c) {
-            return new PostsTags($c->get(Repo::class));
-        });
-        $c->set(Repo::class, function (ContainerInterface $c) {
-            $repo = new Repo($c);
-            $repo->getRepository('tags', ['tag_id'], true);
-            return $repo;
+        $c->set('posts_tags', function (Repo $c) {
+            return new PostsTags($c);
         });
 
+        $c->getRepository('tags', ['tag_id'], true);
         return $c;
     }
 
@@ -176,6 +172,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         /** @var Users $repo */
         $repo  = $this->c->get('users');
         $list  = new Collection($repo);
+        /** @noinspection SqlResolve */
         $list->execute('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 2]);
 
         $list->load('posts');
@@ -201,6 +198,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var CollectionInterface $list */
         $list  = $this->c->get('users')->newCollection();
+        /** @noinspection SqlResolve */
         $list->execute('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 3]);
 
         $idList = [1, 3];

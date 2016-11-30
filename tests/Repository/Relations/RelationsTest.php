@@ -23,27 +23,24 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Container
+     * @return ContainerInterface|Repo
      */
     function getFullContainer()
     {
-        $c    = new Container();
+        $c    = new Repo();
         $c->set(PDO::class, function () {
             $pdo = new PDO('sqlite::memory:');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $pdo;
         });
-        $c->set(Fixture::class, function (ContainerInterface $c) {
+        $c->set(Fixture::class, function (Repo $c) {
             return new Fixture($c->get(PDO::class));
         });
-        $c->set('users', function(ContainerInterface $c ) {
-            return new Users($c->get(Repo::class));
+        $c->set('users', function(Repo $c ) {
+            return new Users($c);
         });
-        $c->set('posts', function(ContainerInterface $c ) {
-            return new Posts($c->get(Repo::class));
-        });
-        $c->set(Repo::class, function(ContainerInterface $c) {
-            return new Repo($c);
+        $c->set('posts', function(Repo $c ) {
+            return new Posts($c);
         });
 
         return $c;
@@ -55,11 +52,11 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     function retrieve_entities_using_hasOne_and_hasMany()
     {
         $c = $this->getFullContainer();
-        $fix = $c->getFix();
+        $fix = $c->get(Fixture::class);
         $fix->createTables();
         $fix->fillTables();
 
-        $repo = $c->getRepo();
+        $repo = $c;
 
         // get users
         $users = $repo->getRepository('users');
@@ -108,11 +105,11 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     function relate()
     {
         $c = $this->getFullContainer();
-        $fix = $c->getFix();
+        $fix = $c->get(Fixture::class);
         $fix->createTables();
         $fix->fillTables();
 
-        $repo = $c->getRepo();
+        $repo = $c;
 
         /**
          * get users and posts.

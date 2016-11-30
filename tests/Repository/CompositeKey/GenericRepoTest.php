@@ -24,7 +24,7 @@ class GenericRepoTest extends PHPUnit_Framework_TestCase
         $fixture = new FixtureCompositeKey($this->pdo);
         $fixture->createTables();
         $fixture->insertData();
-        $this->repo = new Repo(null, $this->pdo);
+        $this->repo = new Repo($this->pdo);
     }
 
     function test0()

@@ -4,19 +4,20 @@ namespace tests\Cases\SimpleId;
 use Interop\Container\ContainerInterface;
 use tests\Cases\SimpleId\Models\Fixture;
 use tests\Cases\SimpleId\Models\Posts;
-use tests\Cases\SimpleId\Models\Services;
+use tests\Cases\SimpleId\Models\RepoBuilder;
 use tests\Cases\SimpleId\Models\Tags;
 use tests\Cases\SimpleId\Models\Users;
 use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Assembly\CollectJoin;
 use WScore\Repository\Relations\Join;
+use WScore\Repository\Repo;
 
 class FunctionalTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|Repo
      */
-    private $c;
+    private $repo;
 
     /**
      * @var string[][]
@@ -28,9 +29,9 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         class_exists(Collection::class);
         class_exists(Join::class);
         class_exists(CollectJoin::class);
-        $this->c = Services::get();
+        $this->repo = RepoBuilder::get();
         /** @var Fixture $fix */
-        $fix = $this->c->get(Fixture::class);
+        $fix = $this->repo->get(Fixture::class);
         $fix->prepare();
         
         $this->tags = [
@@ -51,7 +52,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     function Collection_eagerly_loads_related_entities()
     {
         /** @var Users $users */
-        $users = $this->c->get('users');
+        $users = $this->repo->get('users');
         $collection = $users->collectFor(['id' => [1,2]]);
         $collection->load('posts');
         $collection->load('posts')->load('tags');
@@ -82,7 +83,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     function Collection_eagerly_loads_relation_in_reverse_order()
     {
         /** @var Tags $users */
-        $users = $this->c->get('tags');
+        $users = $this->repo->get('tags');
         $collection = $users->newCollection();
         $collection->find(['id' => ['test', 'tag', 'blog']]);
         $collection->load('posts');
@@ -113,8 +114,8 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $users */
         /** @var Posts $posts */
-        $users = $this->c->get('users');
-        $posts = $this->c->get('posts');
+        $users = $this->repo->get('users');
+        $posts = $this->repo->get('posts');
 
         $user2 = $users->findByKey(2);
         $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user2->posts));
@@ -139,8 +140,8 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $users */
         /** @var Posts $posts */
-        $users = $this->c->get('users');
-        $posts = $this->c->get('posts');
+        $users = $this->repo->get('users');
+        $posts = $this->repo->get('posts');
 
         $collection = $users->collectByKey(2);
         $collection->load('posts');

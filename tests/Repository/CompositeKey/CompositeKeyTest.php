@@ -34,35 +34,32 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $fixture = $c->get(FixtureCompositeKey::class);
         $fixture->createTables();
         $fixture->insertData();
-        $this->repo = $c->get(Repo::class);
+        $this->repo = $c;
     }
 
     /**
-     * @return Container
+     * @return ContainerInterface
      */
     function getContainer()
     {
-        $c = new Container();
+        $c = new Repo();
         $c->set(PDO::class, function () {
             $pdo = new PDO('sqlite::memory:');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             return $pdo;
         });
-        $c->set(FixtureCompositeKey::class, function (ContainerInterface $c) {
+        $c->set(FixtureCompositeKey::class, function (Repo $c) {
             return new FixtureCompositeKey($c->get(PDO::class));
         });
-        $c->set('member', function (ContainerInterface $c) {
-            return new Member($c->get(Repo::class));
+        $c->set('member', function (Repo $c) {
+            return new Member($c);
         });
-        $c->set('fee', function (ContainerInterface $c) {
-            return new Fee($c->get(Repo::class));
+        $c->set('fee', function (Repo $c) {
+            return new Fee($c);
         });
-        $c->set('order', function (ContainerInterface $c) {
-            return new Order($c->get(Repo::class));
-        });
-        $c->set(Repo::class, function (ContainerInterface $c) {
-            return new Repo($c);
+        $c->set('order', function (Repo $c) {
+            return new Order($c);
         });
 
         return $c;

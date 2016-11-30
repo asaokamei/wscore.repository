@@ -37,28 +37,25 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
         $this->f = $this->c->get(Fixture::class);
         $this->f->createTables();
         $this->f->fillTables(4);
-        $this->repo = $repo = $this->c->getRepo();
+        $this->repo = $repo = $this->c;
         $repo->getRepository('users', ['id'], true);
         $repo->getRepository('posts', ['id'], true);
         $repo->getRepository('user_post', ['user_id', 'post_id']);
     }
     
     /**
-     * @return Container
+     * @return ContainerInterface|Repo
      */
     function getFullContainer()
     {
-        $c    = new Container();
+        $c    = new Repo();
         $c->set(PDO::class, function () {
             $pdo = new PDO('sqlite::memory:');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $pdo;
         });
-        $c->set(Fixture::class, function (ContainerInterface $c) {
+        $c->set(Fixture::class, function (Repo $c) {
             return new Fixture($c->get(PDO::class));
-        });
-        $c->set(Repo::class, function(ContainerInterface $c) {
-            return new Repo($c);
         });
 
         return $c;

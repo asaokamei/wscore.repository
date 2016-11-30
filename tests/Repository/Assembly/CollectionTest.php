@@ -43,23 +43,19 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Container
+     * @return ContainerInterface
      */
     function getFullContainer()
     {
-        $c = new Container();
+        $c = new Repo();
         $c->set(PDO::class, function () {
             $pdo = new PDO('sqlite::memory:');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             return $pdo;
         });
-        $c->set(Repo::class, function (ContainerInterface $c) {
-            $repo = new Repo($c);
-            return $repo;
-        });
-        $c->set('u', function(ContainerInterface $c) {
-            $users = new Collection($c->get(Repo::class)->getRepository('users', ['user_id']));
+        $c->set('u', function(Repo $c) {
+            $users = new Collection($c->getRepository('users', ['user_id']));
             return $users;
         });
 
@@ -79,6 +75,7 @@ CREATE TABLE users (
 SQL;
         $pdo->exec($create);
 
+        /** @noinspection SqlResolve */
         $insert = <<<SQL
 INSERT INTO users (user_id, name, gender, score) VALUES (?, ?, ?, ?);
 SQL;

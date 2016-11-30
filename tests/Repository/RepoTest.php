@@ -7,7 +7,6 @@ use tests\Utils\Repo\Fixture;
 use tests\Utils\Container;
 use tests\Utils\Query;
 use tests\Utils\Repo\Users;
-use WScore\Repository\Entity\Entity;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Repository\Repository;
 use WScore\Repository\Query\QueryInterface;
@@ -34,26 +33,23 @@ class RepoTest extends \PHPUnit_Framework_TestCase
 
         $pdo  = new PDO('sqlite::memory:');
         $this->fix  = new Fixture($pdo);
-        $this->repo = new Repo(null, $pdo);
+        $this->repo = new Repo($pdo);
     }
 
     /**
-     * @return Container
+     * @return ContainerInterface|Repo
      */
     function getFullContainer()
     {
-        $c    = new Container();
+        $c    = new Repo();
         $c->set(PDO::class, function () {
             return new PDO('sqlite::memory:');
         });
-        $c->set(Fixture::class, function (ContainerInterface $c) {
+        $c->set(Fixture::class, function (Repo $c) {
             return new Fixture($c->get(PDO::class));
         });
-        $c->set('users', function(ContainerInterface $c ) {
-            return new Users($c->get(Repo::class));
-        });
-        $c->set(Repo::class, function(ContainerInterface $c) {
-            return new Repo($c);
+        $c->set('users', function(Repo $c ) {
+            return new Users($c);
         });
 
         return $c;
@@ -73,25 +69,13 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function entity_has_same_primary_keys_as_generic_repository()
-    {
-        $dao = $this->repo->getRepository('testing');
-        $this->assertEquals(Entity::class, $dao->getEntityClass());
-        $entity = $dao->create([]);
-        $this->assertEquals(Entity::class, get_class($entity));
-        $this->assertEquals($dao->getKeyColumns(), $entity->getKeyColumns());
-    }
-
-    /**
-     * @test
-     */
     function Repo_uses_container_to_retrieve_various_objects()
     {
-        $c    = new Container();
+        $c    = new Repo();
         $c->set('testing', 'tested');
         $c->set(QueryInterface::class, new PdoQuery(null));
         $c->set(\DateTimeImmutable::class, 'test-now');
-        $repo = new Repo($c);
+        $repo = $c;
 
         // retrieve repository, 'tested'.
         $this->assertEquals('tested', $repo->getRepository('testing'));
@@ -106,16 +90,6 @@ class RepoTest extends \PHPUnit_Framework_TestCase
 
         // retrieve CurrentDateTime
         $this->assertEquals('test-now', $repo->getCurrentDateTime());
-    }
-
-    /**
-     * @test
-     */
-    function Repo_retrieves_entities_from_database()
-    {
-        $this->do_Repo_retrieves_entities_from_database($this->fix, $this->repo);
-        $c = $this->getFullContainer();
-        $this->do_Repo_retrieves_entities_from_database($c->get(Fixture::class), $c->get(Repo::class));
     }
 
     /**
@@ -138,7 +112,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     * @ test
      */
     function Repo_inserts_entity_and_sets_auto_increment_key()
     {
@@ -172,7 +146,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     * @ test
      */
     function Repo_updates_only_the_entity_data()
     {
@@ -205,7 +179,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     * @ test
      */
     function Repo_save_insert_or_update_depending_on_entity_is_fetched()
     {
@@ -240,7 +214,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     * @ test
      */
     function Repo_deletes_entity()
     {

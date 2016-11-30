@@ -4,7 +4,7 @@ namespace WScore\Repository;
 use DateTimeImmutable;
 use Interop\Container\ContainerInterface;
 use PDO;
-use WScore\Repository\Assembly\Collection;
+use WScore\Repository\Helpers\ContainerTrait;
 use WScore\Repository\Helpers\CurrentDateTime;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Query\QueryInterface;
@@ -15,17 +15,9 @@ use WScore\Repository\Relations\BelongsTo;
 use WScore\Repository\Repository\RepositoryInterface;
 use WScore\Repository\Repository\RepositoryOptions;
 
-class Repo
+class Repo implements ContainerInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * @var mixed[]
-     */
-    private $repositories = [];
+    use ContainerTrait;
 
     /**
      * @var null|PDO
@@ -35,13 +27,13 @@ class Repo
     /**
      * Repo constructor.
      *
-     * @param ContainerInterface $container
      * @param PDO|null           $pdo
      */
-    public function __construct($container = null, $pdo = null)
+    public function __construct($pdo = null)
     {
-        $this->container = $container;
-        $this->pdo       = $pdo;
+        if ($pdo) {
+            $this->set(PDO::class, $pdo);
+        }
     }
 
     /**
@@ -49,11 +41,13 @@ class Repo
      */
     public function getQuery()
     {
-        if ($this->_has(QueryInterface::class)) {
-            return $this->_get(QueryInterface::class);
+        if (!$this->has(QueryInterface::class)) {
+            $this->set(
+                QueryInterface::class,
+                new PdoQuery($this->pdo ?: $this->get(PDO::class))
+            );
         }
-        return $this->repositories[QueryInterface::class] 
-            = new PdoQuery($this->pdo ?: $this->_get(PDO::class));
+        return $this->get(QueryInterface::class);
     }
 
     /**
@@ -62,10 +56,10 @@ class Repo
     public function getCurrentDateTime()
     {
         $key = DateTimeImmutable::class;
-        if ($this->_has($key)) {
-            return $this->_get($key);
+        if (!$this->has($key)) {
+            $this->set($key, CurrentDateTime::forge());
         }
-        return $this->repositories[$key] = CurrentDateTime::forge();
+        return $this->get($key);
     }
 
     /**
@@ -77,8 +71,8 @@ class Repo
      */
     public function getRepository($tableName, $primaryKeys = [], $autoIncrement = false, $options = null)
     {
-        if ($this->_has($tableName)) {
-            return $this->_get($tableName);
+        if ($this->has($tableName)) {
+            return $this->get($tableName);
         }
         if (!$options) {
             $options = new RepositoryOptions();
@@ -86,40 +80,12 @@ class Repo
         $options->table           = $tableName;
         $options->primaryKeys     = $primaryKeys ?: ["{$tableName}_id"];
         $options->useAutoInsertId = $autoIncrement;
-        $this->repositories[$tableName]
-            = new Repository($this, $this->getQuery(), $this->getCurrentDateTime(), $options);
+        $this->set(
+            $tableName,
+            new Repository($this, $this->getQuery(), $this->getCurrentDateTime(), $options)
+        );
 
-        return $this->repositories[$tableName];
-    }
-
-    /**
-     * @param string $key
-     * @return mixed
-     */
-    private function _get($key)
-    {
-        if (isset($this->repositories[$key])) {
-            return $this->repositories[$key];
-        }
-        if ($this->container && $this->container->has($key)) {
-            return $this->repositories[$key] = $this->container->get($key);
-        }
-        return null;
-    }
-
-    /**
-     * @param string $key
-     * @return bool
-     */
-    private function _has($key)
-    {
-        if (isset($this->repositories[$key])) {
-            return true;
-        }
-        if ($this->container && $this->container->has($key)) {
-            return true;
-        }
-        return false;
+        return $this->get($tableName);
     }
 
     /**
