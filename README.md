@@ -91,34 +91,22 @@ The `AbstractRepository` serves as a convenient way to create
 a repository but any class can be served as repository which 
 implements `WScore\Repository\Repository\RepositoryInterface`. 
 
-### setting up `Repo` and a container
+### setting up `Repo` container
 
-`WScore/Repository` uses a container that implements `ContainerInterface`. 
-Set up a container (assuming that the container has `set` method). 
+Set up `Repo` class, that is a container for repositories, 
+as well as some useful factories. 
 
 ```php
-$container = new Container();
-$container->set(PDO::class, function () {
+$repo = new Repo();
+$repo->set(PDO::class, function () {
     $pdo = new PDO('sqlite::memory:');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $pdo;
 });
-$container->set(Repo::class, function(ContainerInterface $c) {
-    return new Repo($c);
-});
-$container->set('users', function(ContainerInterface $c) {
-    new new Users($c->get(Repo::class));
+$repo->set('users', function(Repo $repo) {
+    new new Users($repo);
 });
 ```
-
-`Repo` is an object that manages the repository while providing 
-some convenient methods for repositories. 
-The `Repo` can be constructed as;
-
-```php
-$repo = new Repo($container); // inject the container. 
-```
-
 
 Working with Repository and Entity
 ----
@@ -130,7 +118,7 @@ Entity objects implementing `EntityInterface` are constructed from the fetched r
 To create an entity and save it: 
 
 ```php
-$users = $container->get('users');
+$users = $repo->get('users');
 $user1 = $users->create(['name' => 'my name']);
 $id    = $users->save($user1); // should return inserted id.
 ```
@@ -140,7 +128,7 @@ $id    = $users->save($user1); // should return inserted id.
 To retrieve an entity, modify it, and save it.
 
 ```php
-$users = $container->get('users');
+$users = $repo->get('users');
 $user1 = $users->findByKey(1);
 $user1->fill(['name' => 'your name']);
 $users->save($user1);
@@ -205,8 +193,8 @@ First, create repositories for `users` and `posts`.
 This example uses generic repository for `posts` table. 
 
 ```php
-$users = $container->get('users');
-$posts = $container->get('posts');
+$users = $repo->get('users');
+$posts = $repo->get('posts');
 ```
 
 then:
@@ -230,7 +218,7 @@ $newPost->save(); // save the post.
 related entities _eagerly_. 
 
 ```php
-$user12 = $users->collection(['user_id' => [1, 2]]); // collection of entity.
+$user12 = $users->collectFor(['user_id' => [1, 2]]); // collection of entity.
 $user12->load('posts'); // load related entities using repository's posts() method. 
 
 foreach($user12 as $user) {
