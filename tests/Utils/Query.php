@@ -47,14 +47,12 @@ class Query implements QueryInterface
     /**
      * sets the fetch mode of PDOStatement.
      *
-     * @param int    $mode
-     * @param string $fetch_args
-     * @param array  $ctor_args
+     * @param callable $callable
      * @return QueryInterface
      */
-    public function setFetchMode($mode, $fetch_args = null, $ctor_args = [])
+    public function setFetchMode(callable $callable)
     {
-        $this->fetchMode = [$mode, $fetch_args, $ctor_args];
+        $this->fetchMode = $callable;
         return $this;
     }
 

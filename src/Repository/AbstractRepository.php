@@ -336,7 +336,25 @@ abstract class AbstractRepository implements RepositoryInterface
     {
         return $this->query
             ->withTable($this->table, $this->defaultOrder)
-            ->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass, $this->getEntityCtorArgs());
+            ->setFetchMode([$this, 'applyFetchMode']);
+    }
+
+    /**
+     * @Override
+     * @param \PDOStatement $stmt
+     */
+    public function applyFetchMode(\PDOStatement $stmt)
+    {
+        if ($this->entityClass) {
+            /** @noinspection PhpMethodParametersCountMismatchInspection */
+            $stmt->setFetchMode(
+                \PDO::FETCH_CLASS,
+                $this->entityClass,
+                $this->getEntityCtorArgs()
+            );
+        } else {
+            $stmt->setFetchMode(\PDO::FETCH_ASSOC);
+        }
     }
 
     /**

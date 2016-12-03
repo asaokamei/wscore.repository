@@ -102,4 +102,10 @@ interface RepositoryInterface
      * @return QueryInterface
      */
     public function query();
+    
+    /**
+     * @Override
+     * @param \PDOStatement $stmt
+     */
+    public function applyFetchMode(\PDOStatement $stmt);
 }
