@@ -41,21 +41,26 @@ class HasMany extends AbstractRelation implements RelationInterface
     {
         $query = $this->targetRepo->query();
         $query->condition($this->condition);
-        if ($this->sourceEntity) {
-            $primaryKeys = $this->getTargetKeys($this->sourceEntity);
-            $query->condition($primaryKeys);
+        if (!empty($this->sourceEntity)) {
+            $keys = [];
+            foreach($this->sourceEntity as $entity) {
+                $keys[] = $this->getTargetKeys($entity);
+            }
+            $query->condition([$keys]);
         }
         return $query;
     }
 
     /**
-     * @param EntityInterface $entity
+     * @param EntityInterface $targetEntity
      * @return EntityInterface
      */
-    public function relate(EntityInterface $entity)
+    public function relate(EntityInterface $targetEntity)
     {
-        $entity->setForeignKeys($this->sourceEntity, $this->convert);
+        foreach($this->sourceEntity as $entity) {
+            $targetEntity->setForeignKeys($entity, $this->convert);
+        }
 
-        return $entity;
+        return $targetEntity;
     }
 }

@@ -44,6 +44,18 @@ class Join extends AbstractRelation implements JoinRelationInterface
         $this->to_convert   = $to_convert ?: $this->makeConvertKey($targetRepo->getKeyColumns());
     }
 
+    /**
+     * @param EntityInterface[] ...$sourceEntity
+     * @return AbstractRelation
+     */
+    public function withEntity(EntityInterface ...$sourceEntity)
+    {
+        $self = clone $this;
+        $self->sourceEntity = $sourceEntity[0];
+
+        return $self;
+    }
+
     private function makeConvertKey($keys)
     {
         $convert = [];
@@ -89,20 +101,13 @@ class Join extends AbstractRelation implements JoinRelationInterface
     }
     
     /**
-     * @param null|EntityInterface $targetEntity
      * @return QueryInterface
      */
-    public function queryJoin($targetEntity = null)
+    public function queryJoin()
     {
         $keys = [];
         if ($this->sourceEntity) {
             $keys = $this->getJoinKeys($this->sourceEntity);
-        }
-        if ($targetEntity) {
-            $keys = array_merge(
-                $keys,
-                $this->convertToKeys($targetEntity)
-            );
         }
         return $this->joinRepo
             ->query()
@@ -164,17 +169,17 @@ class Join extends AbstractRelation implements JoinRelationInterface
     }
 
     /**
-     * @param EntityInterface $entity
+     * @param EntityInterface $targetEntity
      * @return EntityInterface
      */
-    public function relate(EntityInterface $entity)
+    public function relate(EntityInterface $targetEntity)
     {
         if (!$this->sourceEntity) {
             throw new \BadMethodCallException('must have source entity to relate.');
         }
         $keys = array_merge(
             $this->getJoinKeys($this->sourceEntity),
-            $this->convertToKeys($entity));
+            $this->convertToKeys($targetEntity));
         $join = $this->joinRepo->create($keys);
         $this->joinRepo->insert($join);
         

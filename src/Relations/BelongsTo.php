@@ -44,21 +44,26 @@ class BelongsTo extends AbstractRelation implements RelationInterface
         $query = $this->targetRepo->query()
             ->condition($this->condition);
         
-        if ($this->sourceEntity) {
-            $primaryKeys = $this->getTargetKeys($this->sourceEntity);
-            $query->condition($primaryKeys);
+        if (!empty($this->sourceEntity)) {
+            $keys = [];
+            foreach($this->sourceEntity as $entity) {
+                $keys[] = $this->getTargetKeys($entity);
+            }
+            $query->condition([$keys]);
         }
         return $query;
     }
 
     /**
-     * @param EntityInterface $entity
+     * @param EntityInterface $targetEntity
      * @return EntityInterface
      */
-    public function relate(EntityInterface $entity)
+    public function relate(EntityInterface $targetEntity)
     {
-        $this->sourceEntity->setForeignKeys($entity, $this->convert);
+        foreach($this->sourceEntity as $sourceEntity) {
+            $sourceEntity->setForeignKeys($targetEntity, $this->convert);
+        }
 
-        return $entity;
+        return $targetEntity;
     }
 }

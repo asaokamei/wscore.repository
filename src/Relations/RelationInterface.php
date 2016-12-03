@@ -25,11 +25,11 @@ interface RelationInterface
     
     /**
      * sets from-entity to query target repository. 
-     * 
-     * @param EntityInterface $sourceEntity
-     * @return static
+     *
+     * @param EntityInterface[] ...$sourceEntity
+     * @return AbstractRelation
      */
-    public function withEntity(EntityInterface $sourceEntity);
+    public function withEntity(EntityInterface ...$sourceEntity);
 
     /**
      * @param array $key
@@ -63,8 +63,8 @@ interface RelationInterface
     /**
      * relate an entity to the source entity.
      * 
-     * @param EntityInterface $entity
+     * @param EntityInterface $targetEntity
      * @return EntityInterface
      */
-    public function relate(EntityInterface $entity);
+    public function relate(EntityInterface $targetEntity);
 }

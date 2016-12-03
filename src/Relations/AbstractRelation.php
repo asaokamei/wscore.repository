@@ -55,10 +55,10 @@ abstract class AbstractRelation
     }
 
     /**
-     * @param EntityInterface $sourceEntity
-     * @return static
+     * @param EntityInterface[] ...$sourceEntity
+     * @return AbstractRelation
      */
-    public function withEntity(EntityInterface $sourceEntity)
+    public function withEntity(EntityInterface ...$sourceEntity)
     {
         $self = clone $this;
         $self->sourceEntity = $sourceEntity;
