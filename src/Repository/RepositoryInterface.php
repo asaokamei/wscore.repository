@@ -85,7 +85,7 @@ interface RepositoryInterface
      * returns a Collection for given $keys as condition.
      *
      * @param array $keys
-     * @return Collection
+     * @return Collection|EntityInterface
      */
     public function collectFor(array $keys);
 
@@ -94,7 +94,7 @@ interface RepositoryInterface
      * throws an InvalidArgumentException if found more than one entity.
      *
      * @param array|string $keys
-     * @return Collection
+     * @return Collection|EntityInterface[]
      */
     public function collectByKey($keys);
 

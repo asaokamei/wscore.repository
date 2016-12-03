@@ -11,7 +11,7 @@ interface CollectRelatedInterface extends CollectionInterface
      * @param RepositoryInterface   $repository
      * @param JoinRelationInterface $relation
      * @param EntityInterface[]     $fromEntities
-     * @return CollectJoin
+     * @return CollectRelatedInterface
      */
     public static function forge($repository, $relation, array $fromEntities);
 
@@ -19,7 +19,7 @@ interface CollectRelatedInterface extends CollectionInterface
      * get the related entities for the $fromEntity.
      * 
      * @param EntityInterface $fromEntity
-     * @return EntityInterface[]
+     * @return Collection|EntityInterface[]
      */
     public function getRelatedEntities($fromEntity);
 }

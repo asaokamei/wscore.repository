@@ -22,7 +22,7 @@ class CollectHasSome extends Collection implements CollectRelatedInterface
      * @param RepositoryInterface $repository
      * @param RelationInterface   $relation
      * @param EntityInterface[]   $fromEntities
-     * @return CollectHasSome
+     * @return CollectRelatedInterface
      */
     public static function forge($repository, $relation, array $fromEntities)
     {

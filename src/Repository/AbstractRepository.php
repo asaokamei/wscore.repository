@@ -94,7 +94,7 @@ abstract class AbstractRepository implements RepositoryInterface
         if (!$this->now) {
             $this->now = $repo->getCurrentDateTime();
         }
-        if (!$this->defaultOrder) {
+        if (empty($this->defaultOrder)) {
             $this->defaultOrder = $this->primaryKeys;
         }
     }

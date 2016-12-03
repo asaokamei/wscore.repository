@@ -9,6 +9,11 @@ use WScore\Repository\Repository\RepositoryInterface;
 class CollectJoin extends Collection implements CollectRelatedInterface
 {
     /**
+     * @var JoinRelationInterface
+     */
+    protected $relation;
+    
+    /**
      * @var array
      */
     private $convertJoin = [];
@@ -32,10 +37,13 @@ class CollectJoin extends Collection implements CollectRelatedInterface
      * @param RepositoryInterface   $repository
      * @param JoinRelationInterface $relation
      * @param EntityInterface[]     $fromEntities
-     * @return CollectJoin
+     * @return CollectRelatedInterface
      */
     public static function forge($repository, $relation, array $fromEntities)
     {
+        if (!$relation instanceof JoinRelationInterface) {
+            throw new \InvalidArgumentException('$relation not JoinRelationInterface');
+        }
         $self = new self($repository,$relation);
         $self->loadRelatedEntities($fromEntities);
 

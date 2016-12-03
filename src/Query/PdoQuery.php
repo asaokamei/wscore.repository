@@ -13,7 +13,7 @@ class PdoQuery implements QueryInterface
     private $pdo;
     
     /**
-     * @var array
+     * @var callable
      */
     private $fetchMode = null;
 

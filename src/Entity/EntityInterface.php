@@ -104,7 +104,7 @@ interface EntityInterface
 
     /**
      * @param string $name
-     * @return string|EntityInterface[]
+     * @return null|string|Collection|EntityInterface[]
      */
     public function __get($name);
 

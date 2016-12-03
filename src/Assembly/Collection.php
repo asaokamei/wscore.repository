@@ -104,6 +104,9 @@ class Collection implements CollectionInterface
         if (!$this->relation) {
             throw new \InvalidArgumentException('no relation set in Collection');
         }
+        if (!$this->relation instanceof JoinRelationInterface) {
+            throw new \InvalidArgumentException('cannot delete relation');
+        }
         $this->relation->delete($entity);
         foreach($this->entities as $idx => $e) {
             if ($e->getKeys() === $entity->getKeys()) {
@@ -123,18 +126,18 @@ class Collection implements CollectionInterface
             return $this->related[$name];
         }
         $relation             = $this->repository->$name();
-        $related              = $this->getLoaded($relation, $this->entities);
-        $this->related[$name] = $related;
+        $relatedCollection    = $this->forgeRelatedCollection($relation, $this->entities);
+        $this->related[$name] = $relatedCollection;
 
         /**
          * set related entities to the source entities. 
          */
         foreach($this->entities as $entity) {
-            $found = $related->getRelatedEntities($entity);
+            $found = $relatedCollection->getRelatedEntities($entity);
             $entity->setRelatedEntities($name, $found);
         }
 
-        return $related;
+        return $relatedCollection;
     }
 
     /**
@@ -142,7 +145,7 @@ class Collection implements CollectionInterface
      * @param $entities
      * @return CollectRelatedInterface
      */
-    private function getLoaded($relation, $entities)
+    private function forgeRelatedCollection($relation, $entities)
     {
         if ($relation instanceof JoinRelationInterface) {
             $related = CollectJoin::forge($relation->getTargetRepository(), $relation, $entities);
@@ -313,9 +316,12 @@ class Collection implements CollectionInterface
     {
         if (array_key_exists($offset, $this->entities)) {
             if ($this->relation) {
-                $this->relation->delete($this->entities[$offset]);
+                $this->delete($this->entities[$offset]);
             }
-            unset($this->entities[$offset]);
+            if (isset($this->entities[$offset])) {
+                // maybe already deleted by delete method...
+                unset($this->entities[$offset]);
+            }
         }
     }
 

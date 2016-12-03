@@ -119,7 +119,7 @@ abstract class AbstractEntity implements EntityInterface
     }
     
     /**
-     * @return array
+     * @return string[]
      */
     public function getKeyColumns()
     {
@@ -215,7 +215,7 @@ abstract class AbstractEntity implements EntityInterface
     public function getIdName()
     {
         $keys = $this->getKeyColumns();
-        if (!$keys) {
+        if (empty($keys)) {
             throw new \BadMethodCallException('keys not set.');
         }
         if (count($keys) !== 1) {
@@ -317,7 +317,7 @@ abstract class AbstractEntity implements EntityInterface
     
     /**
      * @param string $name
-     * @return null|Collection|EntityInterface[]
+     * @return null|string|Collection|EntityInterface[]
      */
     public function __get($name)
     {
