@@ -160,4 +160,38 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(2, $post->get('user_id'));
         }
     }
+
+    /**
+     * @test
+     */
+    function transaction_rollbacks_when_exception_is_thrown()
+    {
+        /** @var Users $users */
+        $repo  = $this->repo;
+        $users = $this->repo->get('users');
+        $user1 = $users->findByKey(1);
+        
+        $this->assertEquals('name-1', $user1->name);
+
+        $repo->transaction()->run(function () use($user1) {
+            $user1->fill(['name' => 'test transaction']);
+            $user1->save();
+        });
+
+        $user1 = $users->findByKey(1);
+        $this->assertEquals('test transaction', $user1->name);
+
+        try {
+
+            $repo->transaction()->run(function () use($user1) {
+                $user1->fill(['name' => 'rollback transaction']);
+                $user1->save();
+                throw new \Exception();
+            });
+
+        } catch (\Exception $e) {}
+
+        $user1 = $users->findByKey(1);
+        $this->assertEquals('test transaction', $user1->name);
+    }
 }

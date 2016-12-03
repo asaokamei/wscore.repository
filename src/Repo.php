@@ -6,6 +6,7 @@ use Interop\Container\ContainerInterface;
 use PDO;
 use WScore\Repository\Helpers\ContainerTrait;
 use WScore\Repository\Helpers\CurrentDateTime;
+use WScore\Repository\Helpers\Transaction;
 use WScore\Repository\Query\PdoQuery;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Relations\Join;
@@ -29,6 +30,23 @@ class Repo implements ContainerInterface
         if ($pdo) {
             $this->set(PDO::class, $pdo);
         }
+    }
+
+    /**
+     * @param array $list
+     * @return Transaction
+     */
+    public function transaction(...$list)
+    {
+        if (empty($list)) {
+            $list = [$this->get(PDO::class)];
+        }
+        foreach($list as $idx => $pdo) {
+            if (is_string($pdo)) {
+                $list[$idx] = $this->get($pdo);
+            }
+        }
+        return new Transaction($list);
     }
 
     /**
@@ -66,20 +84,12 @@ class Repo implements ContainerInterface
      */
     public function getRepository($tableName, $primaryKeys = [], $autoIncrement = false, $options = null)
     {
-        if ($this->has($tableName)) {
-            return $this->get($tableName);
+        if (!$this->has($tableName)) {
+            $this->set(
+                $tableName,
+                makeGenericRepository($this, $tableName, $primaryKeys, $autoIncrement, $options)
+            );
         }
-        if (!$options) {
-            $options = new RepositoryOptions();
-        }
-        $options->table           = $tableName;
-        $options->primaryKeys     = $primaryKeys ?: ["{$tableName}_id"];
-        $options->useAutoInsertId = $autoIncrement;
-        $this->set(
-            $tableName,
-            new Repository($this, $this->getQuery(), $this->getCurrentDateTime(), $options)
-        );
-
         return $this->get($tableName);
     }
 
@@ -145,28 +155,49 @@ class Repo implements ContainerInterface
             $toRepo = $this->getRepository($toRepo);
         }
         if (!$joinRepo) {
-            $joinRepo = $this->makeJoinTableName($toRepo, $fromRepo);
+            $joinRepo = makeJoinTableName($toRepo, $fromRepo);
         }
         if (is_string($joinRepo)) {
             $joinRepo = $this->getRepository($joinRepo);
         }
         return new Join($fromRepo, $toRepo, $joinRepo, $from_convert, $to_convert);
     }
+}
 
-    /**
-     * create a join table name from 2 joined tables.
-     * sort table name by alphabetical order.
-     *
-     * @param RepositoryInterface $sourceRepo
-     * @param RepositoryInterface $targetRepo
-     * @return string
-     */
-    private function makeJoinTableName(
-        RepositoryInterface $sourceRepo,
-        RepositoryInterface $targetRepo
-    ) {
-        $list = [$targetRepo->getTable(), $sourceRepo->getTable()];
-        sort($list);
-        return implode('_', $list);
+/**
+ * create a join table name from 2 joined tables.
+ * sort table name by alphabetical order.
+ *
+ * @param RepositoryInterface $sourceRepo
+ * @param RepositoryInterface $targetRepo
+ * @return string
+ */
+function makeJoinTableName(
+    RepositoryInterface $sourceRepo,
+    RepositoryInterface $targetRepo
+) {
+    $list = [$targetRepo->getTable(), $sourceRepo->getTable()];
+    sort($list);
+    return implode('_', $list);
+}
+
+
+/**
+ * @param Repo   $repo
+ * @param string $tableName
+ * @param array  $primaryKeys
+ * @param bool   $autoIncrement
+ * @param null   $options
+ * @return Repository
+ */
+function makeGenericRepository($repo, $tableName, $primaryKeys = [], $autoIncrement = false, $options = null)
+{
+    if (!$options) {
+        $options = new RepositoryOptions();
     }
+    $options->table           = $tableName;
+    $options->primaryKeys     = $primaryKeys ?: ["{$tableName}_id"];
+    $options->useAutoInsertId = $autoIncrement;
+
+    return new Repository($repo, $repo->getQuery(), $repo->getCurrentDateTime(), $options);
 }
