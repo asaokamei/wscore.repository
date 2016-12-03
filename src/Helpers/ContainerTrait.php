@@ -33,7 +33,7 @@ trait ContainerTrait
      * @param string $id Identifier of the entry to look for.
      *
      * @throws ContainerNotFoundException  No entry was found for this identifier.
-     * @throws ContainerException Error while retrieving the entry.
+     * @throws ContainerErrorException Error while retrieving the entry.
      *
      * @return mixed Entry.
      */
