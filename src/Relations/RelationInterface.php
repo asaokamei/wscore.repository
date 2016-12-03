@@ -64,7 +64,6 @@ interface RelationInterface
      * relate an entity to the source entity.
      * 
      * @param EntityInterface $targetEntity
-     * @return EntityInterface
      */
     public function relate(EntityInterface $targetEntity);
 }

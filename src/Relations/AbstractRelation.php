@@ -19,9 +19,9 @@ abstract class AbstractRelation
     protected $targetRepo;
 
     /**
-     * @var EntityInterface
+     * @var EntityInterface[]
      */
-    protected $sourceEntity;
+    protected $sourceEntities;
 
     /**
      * @var array
@@ -61,7 +61,7 @@ abstract class AbstractRelation
     public function withEntity(EntityInterface ...$sourceEntity)
     {
         $self = clone $this;
-        $self->sourceEntity = $sourceEntity;
+        $self->sourceEntities = $sourceEntity;
 
         return $self;
     }
