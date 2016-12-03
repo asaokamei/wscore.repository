@@ -19,6 +19,11 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
     public function setEntities($entities);
 
     /**
+     * @return EntityInterface[]
+     */
+    public function toArray();
+    
+    /**
      * executes SQL statement and stores the result entities.
      * 
      * @param string $sql

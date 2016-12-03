@@ -47,6 +47,14 @@ class Collection implements CollectionInterface
     }
 
     /**
+     * @return EntityInterface[]
+     */
+    public function toArray()
+    {
+        return $this->entities;
+    }
+
+    /**
      * @param string $sql
      * @param array $data
      */

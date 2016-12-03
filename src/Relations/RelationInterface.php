@@ -27,7 +27,7 @@ interface RelationInterface
      * sets from-entity to query target repository. 
      *
      * @param EntityInterface[] ...$sourceEntity
-     * @return AbstractRelation
+     * @return RelationInterface|JoinRelationInterface
      */
     public function withEntity(...$sourceEntity);
 

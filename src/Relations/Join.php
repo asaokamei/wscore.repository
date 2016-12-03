@@ -146,22 +146,22 @@ class Join extends AbstractRelation implements JoinRelationInterface
     public function query()
     {
         $joins = $this->queryJoin()->find();
-        $keys  = [];
-        foreach($joins as $j) {
-            $keys[] = $this->getTargetKeys($j);
-        }
-        if (empty($joins)) {
-            $keys = ['false'];
-        }
-        return $this->queryTarget([$keys]);
+        return $this->queryTarget(...$joins);
     }
 
     /**
-     * @param array $keys
+     * @param EntityInterface[] ...$joinEntities
      * @return QueryInterface
      */    
-    public function queryTarget(array $keys = [])
+    public function queryTarget(...$joinEntities)
     {
+        if (empty($joinEntities)) {
+            return null;
+        }
+        $keys  = [];
+        foreach($joinEntities as $j) {
+            $keys[] = $this->getTargetKeys($j);
+        }
         return $this->targetRepo
             ->query()
             ->condition($this->condition)

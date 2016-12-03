@@ -99,14 +99,10 @@ class CollectJoin extends Collection implements CollectRelatedInterface
      */
     private function findJoinEntities($fromEntities)
     {
-        $keys = [];
-        foreach ($fromEntities as $entity) {
-            $keys[] = $this->relation->getJoinKeys($entity);
-        }
-        $found = $this->relation->queryJoin()->condition([$keys])->find();
+        $found = $this->relation->withEntity(...$fromEntities)->queryJoin()->find();
 
         /** @var EntityInterface[] $found */
-        foreach ($found as $join) {
+        foreach ($found as $join) {        
             $key                       = HelperMethods::flatKey($join, $this->convertJoin);
             $this->indexedJoin[$key][] = $join;
         }
@@ -122,28 +118,12 @@ class CollectJoin extends Collection implements CollectRelatedInterface
         if (empty($joinEntities)) {
             return;
         }
-        $this->setConvertTo($joinEntities[0]);
-
-        $keys = [];
-        foreach ($joinEntities as $entity) {
-            $keys[] = $this->relation->getTargetKeys($entity);
-        }
-        $found = $this->relation->queryTarget([$keys])->find();
+        $found = $this->relation->queryTarget(...$joinEntities)->find();
         $this->setEntities($found);
         /** @var EntityInterface[] $found */
         foreach ($found as $toEntity) {
             $key                     = HelperMethods::flatKey($toEntity, $this->convertTo);
             $this->indexedTo[$key][] = $toEntity;
         }
-    }
-
-    /**
-     * @param EntityInterface $entity
-     */
-    private function setConvertTo($entity)
-    {
-        $keys            = $this->relation->getTargetKeys($entity);
-        $this->convertTo = array_keys($keys);
-
     }
 }

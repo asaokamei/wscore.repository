@@ -63,11 +63,7 @@ class CollectHasSome extends Collection implements CollectRelatedInterface
      */
     private function findEntities(array $entities)
     {
-        $keys = [];
-        foreach ($entities as $entity) {
-            $keys[] = $this->relation->getTargetKeys($entity);
-        }
-        $found = $this->relation->query()->condition([$keys])->find();
+        $found = $this->relation->withEntity(...$entities)->collect()->toArray();
         $this->setEntities($found);
         $this->indexFound($found);
     }

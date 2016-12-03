@@ -90,7 +90,8 @@ abstract class AbstractRelation implements RelationInterface
      */
     public function collect($keys = [])
     {
-        $found = $this->query()->select($keys)->fetchAll();
+        $query = $this->query();
+        $found = $query ? $query->select($keys)->fetchAll() : [];
         return $this->targetRepo->newCollection($found, $this);
     }
 
