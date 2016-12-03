@@ -13,6 +13,7 @@ class PdoQuery implements QueryInterface
     private $pdo;
     
     /**
+     * todo: fix default value. 
      * @var array
      */
     private $fetchMode = [PDO::FETCH_ASSOC, null, null];
@@ -143,13 +144,7 @@ class PdoQuery implements QueryInterface
     {
         $sql  = $this->builder->getSql();
         $data = $this->builder->getBindData();
-        $stmt = $this->pdo->prepare($sql);
-        if ($stmt instanceof PDOStatement) {
-            if ($stmt->execute($data)) {
-                $this->applyFetchModeToStmt($stmt);
-            }
-        }
-        return $stmt;
+        return $this->execute($sql, $data);
     }
 
     /**
