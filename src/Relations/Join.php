@@ -6,27 +6,12 @@ use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class Join implements JoinRelationInterface
+class Join extends AbstractRelation implements JoinRelationInterface
 {
     /**
      * @var RepositoryInterface
      */
-    private $fromRepo;
-
-    /**
-     * @var RepositoryInterface
-     */
     private $joinRepo;
-
-    /**
-     * @var RepositoryInterface
-     */
-    private $toRepo;
-
-    /**
-     * @var EntityInterface
-     */
-    private $sourceEntity;
 
     /**
      * @var array
@@ -39,32 +24,24 @@ class Join implements JoinRelationInterface
     private $to_convert = [];
 
     /**
-     * @param RepositoryInterface $fromRepo
+     * @param RepositoryInterface $sourceRepo
      * @param RepositoryInterface $joinRepo
-     * @param RepositoryInterface $toRepo
+     * @param RepositoryInterface $targetRepo
      * @param array               $from_convert
      * @param array               $to_convert
      */
     public function __construct(
-        RepositoryInterface $fromRepo,
-        RepositoryInterface $toRepo,
+        RepositoryInterface $sourceRepo,
+        RepositoryInterface $targetRepo,
         RepositoryInterface $joinRepo,
         array $from_convert = [],
         array $to_convert = []
     ) {
         $this->joinRepo     = $joinRepo;
-        $this->fromRepo     = $fromRepo;
-        $this->toRepo       = $toRepo;
-        $this->from_convert = $from_convert ?: $this->makeConvertKey($fromRepo->getKeyColumns());
-        $this->to_convert   = $to_convert ?: $this->makeConvertKey($toRepo->getKeyColumns());
-    }
-
-    /**
-     * @return RepositoryInterface
-     */
-    public function getTargetRepository()
-    {
-        return $this->toRepo;
+        $this->sourceRepo   = $sourceRepo;
+        $this->targetRepo   = $targetRepo;
+        $this->from_convert = $from_convert ?: $this->makeConvertKey($sourceRepo->getKeyColumns());
+        $this->to_convert   = $to_convert ?: $this->makeConvertKey($targetRepo->getKeyColumns());
     }
 
     private function makeConvertKey($keys)
@@ -111,17 +88,6 @@ class Join implements JoinRelationInterface
         return $keys;
     }
     
-    /**
-     * @param EntityInterface $sourceEntity
-     * @return static
-     */
-    public function withEntity(EntityInterface $sourceEntity)
-    {
-        $this->sourceEntity = $sourceEntity;
-
-        return $this;
-    }
-
     /**
      * @param null|EntityInterface $targetEntity
      * @return QueryInterface
@@ -182,28 +148,9 @@ class Join implements JoinRelationInterface
         if (empty($joins)) {
             $keys = ['false'];
         }
-        return $this->toRepo
+        return $this->targetRepo
             ->query()
             ->condition([$keys]);
-    }
-
-    /**
-     * @param array $keys
-     * @return EntityInterface[]
-     */
-    public function collect($keys = [])
-    {
-        $found = $this->query()->find($keys);
-        return $this->toRepo->newCollection($found, $this);
-    }
-
-    /**
-     * @return int
-     */
-    public function count()
-    {
-        return $this->query()
-            ->count();
     }
 
     /**

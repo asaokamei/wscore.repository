@@ -30,6 +30,12 @@ interface RelationInterface
      * @return static
      */
     public function withEntity(EntityInterface $sourceEntity);
+
+    /**
+     * @param array $key
+     * @return static
+     */
+    public function setCondition(array $key);
     
     /**
      * returns an QueryInterface object to query target repository.

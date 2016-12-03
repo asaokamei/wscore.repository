@@ -6,28 +6,8 @@ use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class HasMany implements RelationInterface
+class HasMany extends AbstractRelation implements RelationInterface
 {
-    /**
-     * @var RepositoryInterface
-     */
-    private $sourceRepo;
-
-    /**
-     * @var RepositoryInterface
-     */
-    private $targetRepo;
-
-    /**
-     * @var EntityInterface
-     */
-    private $sourceEntity;
-
-    /**
-     * @var array
-     */
-    private $convert;
-
     /**
      * @param RepositoryInterface $sourceRepo
      * @param RepositoryInterface $targetRepo
@@ -40,27 +20,7 @@ class HasMany implements RelationInterface
     ) {
         $this->sourceRepo   = $sourceRepo;
         $this->targetRepo   = $targetRepo;
-        $this->convert      = $convert ?: $this->makeConversion();
-    }
-
-    /**
-     * @return RepositoryInterface
-     */
-    public function getTargetRepository()
-    {
-        return $this->targetRepo;
-    }
-
-    /**
-     * @return array
-     */
-    private function makeConversion()
-    {
-        $convert = [];
-        foreach($this->sourceRepo->getKeyColumns() as $key) {
-            $convert[$key] = $key;
-        }
-        return $convert;
+        $this->convert      = $convert ?: $this->makeConversion($sourceRepo);
     }
 
     /**
@@ -75,18 +35,6 @@ class HasMany implements RelationInterface
     }
     
     /**
-     * @param EntityInterface $sourceEntity
-     * @return static
-     */
-    public function withEntity(EntityInterface $sourceEntity)
-    {
-        $self = clone $this;
-        $self->sourceEntity = $sourceEntity;
-
-        return $self;
-    }
-
-    /**
      * @return QueryInterface
      */
     public function query()
@@ -97,24 +45,6 @@ class HasMany implements RelationInterface
             $query->condition($primaryKeys);
         }
         return $query;
-    }
-
-    /**
-     * @param array $keys
-     * @return EntityInterface[]
-     */
-    public function collect($keys = [])
-    {
-        $found = $this->query()->select($keys)->fetchAll();
-        return $this->targetRepo->newCollection($found, $this);
-    }
-
-    /**
-     * @return int
-     */
-    public function count()
-    {
-        return $this->query()->count();
     }
 
     /**
