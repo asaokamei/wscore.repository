@@ -13,10 +13,9 @@ class PdoQuery implements QueryInterface
     private $pdo;
     
     /**
-     * todo: fix default value. 
      * @var array
      */
-    private $fetchMode = [PDO::FETCH_ASSOC, null, null];
+    private $fetchMode = null;
 
     /**
      * @var SqlBuilder
@@ -49,13 +48,18 @@ class PdoQuery implements QueryInterface
     }
 
     /**
+     * set fetch mode for PDOStatement. 
+     * use fetchMode callable if set, or use FETCH_ASSOC as default. 
+     * 
      * @param PDOStatement $stmt
      */
     private function applyFetchModeToStmt($stmt)
     {
         if (is_callable($this->fetchMode)) {
             call_user_func($this->fetchMode, $stmt);
+            return;
         }
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
     }
 
     /**
