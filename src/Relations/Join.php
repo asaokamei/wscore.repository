@@ -44,18 +44,6 @@ class Join extends AbstractRelation implements JoinRelationInterface
         $this->to_convert   = $to_convert ?: $this->makeConvertKey($targetRepo->getKeyColumns());
     }
 
-    /**
-     * @param EntityInterface[] ...$sourceEntity
-     * @return AbstractRelation
-     */
-    public function withEntity(EntityInterface ...$sourceEntity)
-    {
-        $self = clone $this;
-        $self->sourceEntities = $sourceEntity;
-
-        return $self;
-    }
-
     private function makeConvertKey($keys)
     {
         $convert = [];

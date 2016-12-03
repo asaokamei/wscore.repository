@@ -6,7 +6,7 @@ use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-abstract class AbstractRelation
+abstract class AbstractRelation implements RelationInterface
 {
     /**
      * @var RepositoryInterface
@@ -58,7 +58,7 @@ abstract class AbstractRelation
      * @param EntityInterface[] ...$sourceEntity
      * @return AbstractRelation
      */
-    public function withEntity(EntityInterface ...$sourceEntity)
+    public function withEntity(...$sourceEntity)
     {
         $self = clone $this;
         $self->sourceEntities = $sourceEntity;

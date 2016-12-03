@@ -29,7 +29,7 @@ interface RelationInterface
      * @param EntityInterface[] ...$sourceEntity
      * @return AbstractRelation
      */
-    public function withEntity(EntityInterface ...$sourceEntity);
+    public function withEntity(...$sourceEntity);
 
     /**
      * @param array $key
