@@ -67,7 +67,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user1->posts[0]->tags));
         
         foreach($collection as $user) {
-            foreach($user->posts as $post) {
+            foreach($user->getRelatedEntities('posts') as $post) {
                 $this->assertEquals($user->getIdValue(), $post->get('user_id'));
                 foreach($post->tags as $idx => $tag) {
                     $tag_id = $this->tags[$user->getIdValue()][$post->getIdValue()][$idx];
@@ -101,7 +101,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         foreach($collection as $tag) {
             foreach($tag->posts as $idx => $post) {
                 $this->assertEquals($answer[$tag->getIdValue()][$idx], $post->getIdValue());
-                $user = $post->user[0];
+                $user = $post->getRelatedEntities('user')[0];
                 $this->assertEquals($user->getIdValue(), $post->get('user_id'));
             }
         }
@@ -122,7 +122,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, count($user2->posts));
 
         $post = $posts->create(['contents' => 'created post']);
-        $user2->posts->relate($post);
+        $user2->posts[] = $post;
         $user2->save();
         $post->save();
 

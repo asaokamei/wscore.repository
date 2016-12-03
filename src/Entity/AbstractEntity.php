@@ -14,18 +14,18 @@ abstract class AbstractEntity implements EntityInterface
      * @Override
      * @var string
      */
-    private $table;
+    protected $table;
 
     /**
      * @var array|string[]
      */
-    private $data = [];
+    protected $data = [];
 
     /**
      * @Override
      * @var string[]
      */
-    private $primaryKeys = [];
+    protected $primaryKeys = [];
 
     /**
      * sets value object class name for each column.
@@ -63,12 +63,12 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * @var EntityInterface[][]
      */
-    private $relatedEntities = [];
+    protected $relatedEntities = [];
 
     /**
      * @var RelationInterface[]|JoinRelationInterface[]
      */
-    private $relations = [];
+    protected $relations = [];
 
     /**
      * AbstractEntity constructor.
@@ -259,8 +259,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function __call($name, $args)
     {
-        if ($relation = $this->_getRelationObject($name)) {
-            $relation = $relation->withEntity($this);
+        if ($relation = $this->getRelationObject($name)) {
             return $relation;
         }
 
@@ -286,6 +285,35 @@ abstract class AbstractEntity implements EntityInterface
         }
         return null;
     }
+
+    /**
+     * @param string $name
+     * @return null|JoinRelationInterface|RelationInterface
+     */
+    public function getRelationObject($name)
+    {
+        if ($relation = $this->_getRelationObject($name)) {
+            return $relation->withEntity($this);
+        }
+        return null;
+    }
+
+    /**
+     * @param string $name
+     * @return null|Collection|EntityInterface[]
+     */
+    public function getRelatedEntities($name)
+    {
+        if (array_key_exists($name, $this->relatedEntities)) {
+            return $this->relatedEntities[$name];
+        }
+        if ($relation = $this->getRelationObject($name)) {
+            $collect = $relation->collect();
+            $this->relatedEntities[$name] = $collect;
+            return $collect;
+        }
+        return null;
+    }
     
     /**
      * @param string $name
@@ -293,12 +321,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function __get($name)
     {
-        if (array_key_exists($name, $this->relatedEntities)) {
-            return $this->relatedEntities[$name];
-        }
-        if ($relation = $this->_getRelationObject($name)) {
-            $collect = $relation->withEntity($this)->collect();
-            $this->relatedEntities[$name] = $collect;
+        if ($collect = $this->getRelatedEntities($name)) {
             return $collect;
         }
         
@@ -307,7 +330,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $name
-     * @param EntityInterface[] $entities
+     * @param Collection|EntityInterface[] $entities
      */
     public function setRelatedEntities($name, $entities)
     {
