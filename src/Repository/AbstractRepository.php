@@ -43,7 +43,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
     /**
      * @Override
-     * @var string[]
+     * @var string[]        default orderBy when querying
      */
     protected $defaultOrder = [];
     
@@ -116,7 +116,8 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * get argument for entity's constructor argument
+     * get argument for entity's constructor argument. 
+     * override this method when using own entity class. 
      * 
      * @override
      * @return array
@@ -173,6 +174,8 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * filters out the entity data using getColumnList. 
+     * 
      * @param array $data
      * @return array
      */
@@ -185,6 +188,8 @@ abstract class AbstractRepository implements RepositoryInterface
     }
     
     /**
+     * returns primary key name in string if there is only one primary key.
+     * 
      * @return string
      */
     protected function getIdName()
@@ -358,6 +363,8 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * adds time stamps to data before insert/update. 
+     * 
      * @param array  $data
      * @param string $type
      * @return array
