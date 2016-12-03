@@ -65,12 +65,14 @@ class PdoQuery implements QueryInterface
      * should return a new object so that the object can be reused safely.
      *
      * @param string $table
+     * @param null|string[]   $orderDefault
      * @return QueryInterface
      */
-    public function withTable($table)
+    public function withTable($table, $orderDefault = null)
     {
-        $this->builder = SqlBuilder::forge($table);
-        return $this;
+        $self = clone($this);
+        $self->builder = SqlBuilder::forge($table, $orderDefault);
+        return $self;
     }
 
     /**

@@ -8,7 +8,7 @@ class PostsTags extends AbstractRepository
 {
     protected $table = 'posts_tags';
 
-    protected $primaryKeys = ['user_id', 'post_id'];
+    protected $primaryKeys = ['post_id', 'tag_id'];
 
     /**
      * Users constructor.

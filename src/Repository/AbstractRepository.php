@@ -43,6 +43,12 @@ abstract class AbstractRepository implements RepositoryInterface
 
     /**
      * @Override
+     * @var string[]
+     */
+    protected $defaultOrder = [];
+    
+    /**
+     * @Override
      * @var string[]        list of columns for filtering input data by keys
      */
     protected $columnList = [];
@@ -87,6 +93,9 @@ abstract class AbstractRepository implements RepositoryInterface
         }
         if (!$this->now) {
             $this->now = $repo->getCurrentDateTime();
+        }
+        if (!$this->defaultOrder) {
+            $this->defaultOrder = $this->primaryKeys;
         }
     }
 
@@ -326,7 +335,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function query()
     {
         return $this->query
-            ->withTable($this->table)
+            ->withTable($this->table, $this->defaultOrder)
             ->setFetchMode(\PDO::FETCH_CLASS, $this->entityClass, $this->getEntityCtorArgs());
     }
 

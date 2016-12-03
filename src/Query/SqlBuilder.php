@@ -26,6 +26,11 @@ class SqlBuilder
     /**
      * @var array
      */
+    private $order_default = [];
+    
+    /**
+     * @var array
+     */
     private $orderBy = [];
 
     /**
@@ -47,12 +52,23 @@ class SqlBuilder
 
     /**
      * @param string $table
+     * @param null|string[]   $orderDefault
      * @return SqlBuilder
      */
-    public static function forge($table)
+    public static function forge($table, $orderDefault = null)
     {
         $self = new self();
         $self->table = $table;
+        if ($orderDefault) {
+            if (is_string($orderDefault)) {
+                $self->order_default = [[$orderDefault]];
+            }
+            elseif (is_array($orderDefault)) {
+                foreach($orderDefault as $column) {
+                    $self->order_default[] = [$column];
+                }
+            } 
+        }
         
         return $self;
     }
@@ -291,10 +307,11 @@ class SqlBuilder
      */
     private function makeOrder()
     {
+        $orderBy = $this->orderBy ?: $this->order_default;
         $order   = [];
-        foreach ($this->orderBy as $spec) {
+        foreach ($orderBy as $spec) {
             $column  = $spec[0];
-            $dir     = $spec[1];
+            $dir     = isset($spec[1]) ? $spec[1] : 'ASC';
             $order[] = "{$column} {$dir}";
         }
 

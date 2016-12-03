@@ -12,15 +12,16 @@ interface QueryInterface
      * @return PDOStatement
      */
     public function execute($sql, $data = []);
-    
+
     /**
      * sets database table name to query.
      * should return a new object so that the object can be reused safely.
      *
      * @param string $table
+     * @param null|string[]   $orderDefault
      * @return QueryInterface
      */
-    public function withTable($table);
+    public function withTable($table, $orderDefault = null);
 
     /**
      * returns the table name.

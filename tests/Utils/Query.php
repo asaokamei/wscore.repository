@@ -25,9 +25,10 @@ class Query implements QueryInterface
      * should return a new object so that the object can be reused safely.
      *
      * @param string $table
+     * @param null|string|array   $orderDefault
      * @return QueryInterface
      */
-    public function withTable($table)
+    public function withTable($table, $orderDefault = null)
     {
         $this->table = $table;
         return $this;

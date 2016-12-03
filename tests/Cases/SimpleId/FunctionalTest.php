@@ -36,11 +36,11 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         
         $this->tags = [
             1 => [
-                1 => ['test', 'tag'],
+                1 => ['tag', 'test',],
             ],
             2 => [
                 2 => ['blog', 'post'],
-                3 => ['test', 'blog'],
+                3 => ['blog', 'test'],
             ],
             3 => [],
         ];
@@ -89,9 +89,9 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $collection->load('posts');
 
         $this->assertEquals(3, $collection->count());
-        $this->assertEquals('test', $collection[0]->getIdValue());
+        $this->assertEquals('blog', $collection[0]->getIdValue());
         $this->assertEquals('tag', $collection[1]->getIdValue());
-        $this->assertEquals('blog', $collection[2]->getIdValue());
+        $this->assertEquals('test', $collection[2]->getIdValue());
         
         $answer = [
             'test' => [1, 3],
