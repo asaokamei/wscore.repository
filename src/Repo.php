@@ -20,11 +20,6 @@ class Repo implements ContainerInterface
     use ContainerTrait;
 
     /**
-     * @var null|PDO
-     */
-    private $pdo;
-
-    /**
      * Repo constructor.
      *
      * @param PDO|null           $pdo
@@ -44,7 +39,7 @@ class Repo implements ContainerInterface
         if (!$this->has(QueryInterface::class)) {
             $this->set(
                 QueryInterface::class,
-                new PdoQuery($this->pdo ?: $this->get(PDO::class))
+                new PdoQuery($this->get(PDO::class))
             );
         }
         return $this->get(QueryInterface::class);
