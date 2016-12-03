@@ -35,4 +35,26 @@ class Posts extends AbstractRepository
     {
         return $this->repo->belongsTo($this, 'users', ['user_id' => 'id']);
     }
+    
+    public function male()
+    {
+        return $this->repo->belongsTo($this, 'users', ['user_id' => 'id'])
+            ->setCondition(['gender' => 'M']);
+    }
+
+    public function female()
+    {
+        return $this->repo->belongsTo($this, 'users', ['user_id' => 'id'])
+            ->setCondition(['gender' => 'F']);
+    }
+
+    /**
+     * @return Join
+     */
+    public function testBlog()
+    {
+        return $this->repo->join($this, 'tags', 'posts_tags', ['id' => 'post_id'], ['tag_id' => 'id'])
+            ->setCondition(['id' => ['test', 'blog']]);
+
+    }
 }

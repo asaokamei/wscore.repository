@@ -40,6 +40,7 @@ class HasMany extends AbstractRelation implements RelationInterface
     public function query()
     {
         $query = $this->targetRepo->query();
+        $query->condition($this->condition);
         if ($this->sourceEntity) {
             $primaryKeys = $this->getTargetKeys($this->sourceEntity);
             $query->condition($primaryKeys);

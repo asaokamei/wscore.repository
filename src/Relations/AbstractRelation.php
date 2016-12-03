@@ -68,7 +68,7 @@ abstract class AbstractRelation
 
     /**
      * @param array $key
-     * @return static
+     * @return $this
      */
     public function setCondition(array $key)
     {

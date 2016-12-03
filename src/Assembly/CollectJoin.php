@@ -120,7 +120,7 @@ class CollectJoin extends Collection implements CollectRelatedInterface
         foreach ($joinEntities as $entity) {
             $keys[] = $this->relation->getTargetKeys($entity);
         }
-        $found = $this->relation->query()->condition($keys)->find();
+        $found = $this->relation->queryTarget([$keys])->find();
         $this->setEntities($found);
         /** @var EntityInterface[] $found */
         foreach ($found as $toEntity) {

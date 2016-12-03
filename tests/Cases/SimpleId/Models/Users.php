@@ -30,4 +30,24 @@ class Users extends AbstractRepository
     {
         return $this->repo->hasMany($this, 'posts', ['id' => 'user_id']);
     }
+
+    /**
+     * @return HasMany
+     */
+    public function tests()
+    {
+        return $this->repo
+            ->hasMany($this, 'posts', ['id' => 'user_id'])
+            ->setCondition(['category' => 'test']);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function orm()
+    {
+        return $this->repo
+            ->hasMany($this, 'posts', ['id' => 'user_id'])
+            ->setCondition(['category' => 'orm']);
+    }
 }

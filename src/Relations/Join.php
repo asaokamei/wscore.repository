@@ -148,9 +148,19 @@ class Join extends AbstractRelation implements JoinRelationInterface
         if (empty($joins)) {
             $keys = ['false'];
         }
+        return $this->queryTarget([$keys]);
+    }
+
+    /**
+     * @param array $keys
+     * @return QueryInterface
+     */    
+    public function queryTarget(array $keys = [])
+    {
         return $this->targetRepo
             ->query()
-            ->condition([$keys]);
+            ->condition($this->condition)
+            ->condition($keys);
     }
 
     /**

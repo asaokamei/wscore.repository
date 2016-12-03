@@ -37,4 +37,12 @@ interface JoinRelationInterface extends RelationInterface
      * @return QueryInterface
      */
     public function queryJoin($targetEntity = null);
+
+    /**
+     * query target repository. 
+     * 
+     * @param array $keys
+     * @return QueryInterface
+     */
+    public function queryTarget(array $keys = []);
 }

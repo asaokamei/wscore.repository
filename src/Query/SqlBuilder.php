@@ -268,13 +268,15 @@ class SqlBuilder
         $andOr = 'OR';
         $where = [];
         foreach ($value as $column => $v) {
+            if (!is_numeric($column)) {
+                $andOr = 'AND';
+            }
             if (is_array($v)) {
                 $where[] = is_numeric($column)
                     ? $this->makeWhereList($v)
                     : $this->makeWhereIn($column, $v);
                 continue;
             }
-            $andOr = 'AND';
             $where[] = "{$column} = " . $this->getHolderName($v);
         }
 

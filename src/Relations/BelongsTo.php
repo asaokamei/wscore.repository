@@ -41,12 +41,14 @@ class BelongsTo extends AbstractRelation implements RelationInterface
      */
     public function query()
     {
-        $primaryKeys = $this->getTargetKeys($this->sourceEntity);
-        if ($this->sourceEntity && empty($primaryKeys)) {
-            throw new \InvalidArgumentException('cannot convert primary key.');
+        $query = $this->targetRepo->query()
+            ->condition($this->condition);
+        
+        if ($this->sourceEntity) {
+            $primaryKeys = $this->getTargetKeys($this->sourceEntity);
+            $query->condition($primaryKeys);
         }
-        return $this->targetRepo->query()
-                                ->condition($primaryKeys);
+        return $query;
     }
 
     /**

@@ -194,4 +194,80 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $user1 = $users->findByKey(1);
         $this->assertEquals('test transaction', $user1->name);
     }
+
+    /**
+     * @test
+     */    
+    function hasMany_relation_setCondition()
+    {
+        /** @var Users $users */
+        $users = $this->repo->get('users');
+        $collection   = $users->collectFor([]);
+
+        $collection->load('tests');
+        foreach($collection as $user) {
+            foreach($user->getRelatedEntities('tests') as $post) {
+                $this->assertEquals('test', $post->get('category'));
+            }
+        }
+
+        $collection->load('orm');
+        foreach($collection as $user) {
+            foreach($user->getRelatedEntities('orm') as $post) {
+                $this->assertEquals('orm', $post->get('category'));
+            }
+        }
+    }
+
+    /**
+     * @test
+     */
+    function BelongTo_relation_setCondition()
+    {
+        /** @var Posts $posts */
+        $posts = $this->repo->get('posts');
+        $collection   = $posts->collectFor([]);
+
+        $collection->load('male');
+        foreach($collection as $post) {
+            $users = $post->getRelatedEntities('male');
+            if (!$users) continue;
+            foreach($users as $user) {
+                $this->assertEquals('M', $user->get('gender'));
+            }
+        }
+
+        $collection->load('female');
+        foreach($collection as $post) {
+            $users = $post->getRelatedEntities('female');
+            if (!$users) continue;
+            foreach($users as $user) {
+                $this->assertEquals('F', $user->get('gender'));
+            }
+        }
+    }
+
+    /**
+     * @test
+     */
+    function Join_relation_setCondition()
+    {
+        /** @var Users $users */
+        $users = $this->repo->get('users');
+        $collection = $users->collectFor(['id' => [1,2]]);
+        $collection->load('posts');
+        $collection->load('posts')->load('testBlog');
+
+        foreach($collection as $user) {
+            foreach($user->getRelatedEntities('posts') as $post) {
+                $this->assertEquals($user->getIdValue(), $post->get('user_id'));
+                $tags = $post->testBlog;
+                if (!$tags) continue;
+                foreach($tags as $idx => $tag) {
+                    $tag_id = $tag->getIdValue();
+                    $this->assertContains($tag_id, ['test', 'blog']);
+                }
+            }
+        }
+    }
 }

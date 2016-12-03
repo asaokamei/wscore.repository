@@ -100,6 +100,7 @@ SQL;
 CREATE TABLE posts (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id     INTEGER,
+    category    VARCHAR(16),
     contents    VARCHAR(256)
 );
 SQL;
@@ -112,11 +113,13 @@ SQL;
     private function insertPosts($count = 4)
     {
         $insert =<<<SQL
-INSERT INTO posts (user_id, contents) VALUES (?, ?);
+INSERT INTO posts (user_id, category, contents) VALUES (?, ?, ?);
 SQL;
+        $categories = ['test', 'orm'];
         foreach(range(1, $count) as $idx) {
             $rec = [
                 (int) (($idx/2) + 1),
+                $categories[(int) (($idx-1)/2)],
                 'contents for post #'.$idx,
             ];
             $stmt = $this->pdo->prepare($insert);
