@@ -1,8 +1,6 @@
 <?php
 namespace WScore\Repository\Helpers;
 
-use Interop\Container\Exception\ContainerException;
-
 trait ContainerTrait
 {
     /**

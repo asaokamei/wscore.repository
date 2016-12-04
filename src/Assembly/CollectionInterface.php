@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: asao
- * Date: 2016/11/19
- * Time: 11:27
- */
 namespace WScore\Repository\Assembly;
 
 use WScore\Repository\Entity\EntityInterface;
