@@ -24,6 +24,11 @@ interface QueryInterface
     public function withTable($table, $orderDefault = null);
 
     /**
+     * @return QueryInterface
+     */
+    public function newQuery();
+
+    /**
      * returns the table name.
      *
      * @return string

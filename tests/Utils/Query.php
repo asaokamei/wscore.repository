@@ -35,6 +35,14 @@ class Query implements QueryInterface
     }
 
     /**
+     * @return QueryInterface
+     */
+    public function newQuery()
+    {
+        return $this;
+    }
+
+    /**
      * returns the table name.
      *
      * @return string

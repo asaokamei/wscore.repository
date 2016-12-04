@@ -148,7 +148,17 @@ interface RepositoryInterface
      * @return QueryInterface
      */
     public function query();
-    
+
+    /**
+     * apply scope$Name method in the repository to alter the query object. 
+     * this method should return a new repository object so that original 
+     * repository would not affected by the scope. 
+     * 
+     * @param string $name
+     * @param array ...$args
+     */
+    public function scope($name, ...$args);
+
     /**
      * sets fetch mode for a PDOStatement after query.
      * override this method to use unsupported fetch mode.

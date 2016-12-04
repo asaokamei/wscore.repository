@@ -17,8 +17,6 @@ class Fee extends AbstractRepository
      */
     public function __construct($repo)
     {
-        $this->repo            = $repo;
-        $this->query           = $repo->getQuery();
-        $this->now             = $repo->getCurrentDateTime();
+        parent::__construct($repo);
     }
 }

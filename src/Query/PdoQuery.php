@@ -11,7 +11,7 @@ class PdoQuery implements QueryInterface
      * @var PDO
      */
     private $pdo;
-    
+
     /**
      * @var callable
      */
@@ -74,6 +74,17 @@ class PdoQuery implements QueryInterface
     {
         $self = clone($this);
         $self->builder = SqlBuilder::forge($table, $orderDefault);
+        
+        return $self;
+    }
+
+    /**
+     * @return QueryInterface
+     */
+    public function newQuery()
+    {
+        $self = clone($this);
+        $self->builder = clone $self->builder;
         return $self;
     }
 

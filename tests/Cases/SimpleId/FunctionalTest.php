@@ -269,4 +269,32 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
             }
         }
     }
+
+    /**
+     * @test
+     */
+    function scopeMale_returns_only_male_users()
+    {
+        /** @var Users $users */
+        $users = $this->repo->get('users');
+        $list = $users->scope('males')->find([]);
+        $this->assertEquals(2, count($list));
+        foreach($list as $u) {
+            $this->assertEquals('M', $u->gender);
+        }
+        // make sure scope would not affect original $users repository. 
+        $list = $users->find([]);
+        $this->assertEquals(4, count($list));
+        $genders = [];
+        foreach($list as $u) {
+            $g = $u->gender;
+            if (isset($genders[$g])) {
+                $genders[$g] += 1;
+            } else {
+                $genders[$g] = 1;
+            }
+        }
+        $this->assertEquals(2, $genders['M']);
+        $this->assertEquals(2, $genders['F']);
+    }
 }

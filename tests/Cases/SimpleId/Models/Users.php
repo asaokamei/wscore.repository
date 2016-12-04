@@ -1,6 +1,7 @@
 <?php
 namespace tests\Cases\SimpleId\Models;
 
+use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Repo;
 use WScore\Repository\Repository\AbstractRepository;
@@ -21,6 +22,16 @@ class Users extends AbstractRepository
     public function __construct($repo)
     {
         parent::__construct($repo);
+    }
+
+    /**
+     * @param QueryInterface $query
+     * @return QueryInterface
+     */
+    public function scopeMales($query)
+    {
+        $query->condition(['gender' => 'M']);
+        return $query;
     }
 
     /**

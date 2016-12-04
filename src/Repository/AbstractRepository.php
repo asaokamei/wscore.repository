@@ -91,12 +91,17 @@ abstract class AbstractRepository implements RepositoryInterface
         if (!$this->query) {
             $this->query = $repo->getQuery();
         }
+        
         if (!$this->now) {
             $this->now = $repo->getCurrentDateTime();
         }
         if (empty($this->defaultOrder)) {
             $this->defaultOrder = $this->primaryKeys;
         }
+
+        // set table, default order, and fetch mode, when start. 
+        $this->query = $this->query->withTable($this->table, $this->defaultOrder);
+        $this->query->setFetchMode([$this, 'applyFetchMode']);
     }
 
     /**
@@ -127,6 +132,27 @@ abstract class AbstractRepository implements RepositoryInterface
         return [$this->table, $this->primaryKeys, $this];
     }
 
+    /**
+     * @return QueryInterface
+     */
+    public function query()
+    {
+        return $this->query->newQuery();
+    }
+
+    /**
+     * @param string $name
+     * @param array  ...$args
+     * @return RepositoryInterface
+     */
+    public function scope($name, ...$args)
+    {
+        $method = 'scope' . ucwords($name);
+        $self   = clone($this);
+        $self->query = $this->$method($this->query(), ...$args);
+        return $self;
+    }
+    
     /**
      * @param array $data
      * @return EntityInterface
@@ -344,16 +370,6 @@ abstract class AbstractRepository implements RepositoryInterface
     public function delete(EntityInterface $entity)
     {
         return $this->query()->delete($entity->getKeys());
-    }
-
-    /**
-     * @return QueryInterface
-     */
-    public function query()
-    {
-        return $this->query
-            ->withTable($this->table, $this->defaultOrder)
-            ->setFetchMode([$this, 'applyFetchMode']);
     }
 
     /**
