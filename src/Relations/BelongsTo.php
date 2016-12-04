@@ -5,7 +5,7 @@ use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class BelongsTo extends AbstractRelation implements RelationInterface
+class BelongsTo extends AbstractRelation
 {
     /**
      * @param RepositoryInterface $sourceRepo
@@ -15,7 +15,7 @@ class BelongsTo extends AbstractRelation implements RelationInterface
     public function __construct(
         RepositoryInterface $sourceRepo,
         RepositoryInterface $targetRepo,
-        $convert = []
+        array $convert = []
     ) {
         $this->sourceRepo   = $sourceRepo;
         $this->targetRepo   = $targetRepo;

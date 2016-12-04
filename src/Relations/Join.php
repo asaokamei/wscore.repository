@@ -44,7 +44,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
         $this->to_convert   = $to_convert ?: $this->makeConvertKey($targetRepo->getKeyColumns());
     }
 
-    private function makeConvertKey($keys)
+    private function makeConvertKey(array $keys)
     {
         $convert = [];
         foreach($keys as $k) {
@@ -70,8 +70,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
      */
     public function getJoinKeys(EntityInterface $sourceEntity)
     {
-        $keys = $this->extractKeys($sourceEntity, $this->from_convert);
-        return $keys;
+        return $this->extractKeys($sourceEntity, $this->from_convert);
     }
 
     /**
@@ -80,8 +79,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
      */
     public function getTargetKeys(EntityInterface $joinEntity)
     {
-        $keys = $this->extractKeys($joinEntity, $this->to_convert);
-        return $keys;
+        return $this->extractKeys($joinEntity, $this->to_convert);
     }
     
     /**
@@ -112,6 +110,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
 
     /**
      * @return bool
+     * @throws \BadMethodCallException
      */
     public function clear()
     {
@@ -125,6 +124,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
     /**
      * @param EntityInterface $targetEntity
      * @return bool
+     * @throws \BadMethodCallException
      */
     public function delete(EntityInterface $targetEntity)
     {
@@ -166,6 +166,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
 
     /**
      * @param EntityInterface $targetEntity
+     * @throws \BadMethodCallException
      */
     public function relate(EntityInterface $targetEntity)
     {

@@ -148,7 +148,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function scope($name, ...$args)
     {
         $method = 'scope' . ucwords($name);
-        $self   = clone($this);
+        $self   = clone $this;
         $self->query = $this->$method($this->query(), ...$args);
         return $self;
     }
@@ -212,11 +212,12 @@ abstract class AbstractRepository implements RepositoryInterface
         }
         return HelperMethods::filterDataByKeys($data, $columns);
     }
-    
+
     /**
      * returns primary key name in string if there is only one primary key.
-     * 
+     *
      * @return string
+     * @throws \InvalidArgumentException
      */
     protected function getIdName()
     {
@@ -243,6 +244,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @param array|string $keys
      * @return EntityInterface|null
+     * @throws \InvalidArgumentException
      */
     public function findByKey($keys)
     {
