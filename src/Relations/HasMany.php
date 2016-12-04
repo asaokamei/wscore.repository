@@ -2,7 +2,6 @@
 namespace WScore\Repository\Relations;
 
 use WScore\Repository\Entity\EntityInterface;
-use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
@@ -24,14 +23,12 @@ class HasMany extends AbstractRelation implements RelationInterface
     }
 
     /**
-     * @param EntityInterface $joinEntity
+     * @param EntityInterface $entity
      * @return array
      */
-    public function getTargetKeys(EntityInterface $joinEntity)
+    public function getTargetKeys(EntityInterface $entity)
     {
-        $keys = $joinEntity->toArray();
-        $keys = HelperMethods::filterDataByKeys($keys, array_flip($this->convert));
-        return HelperMethods::convertDataKeys($keys, $this->convert);
+        return $this->extractKeys($entity, $this->convert);
     }
     
     /**

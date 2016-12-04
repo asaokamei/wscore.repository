@@ -3,6 +3,7 @@ namespace WScore\Repository\Relations;
 
 use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Entity\EntityInterface;
+use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
@@ -93,6 +94,22 @@ abstract class AbstractRelation implements RelationInterface
         $query = $this->query();
         $found = $query ? $query->select($keys)->fetchAll() : [];
         return $this->targetRepo->newCollection($found, $this);
+    }
+
+    /**
+     * extract keys for querying entity.
+     * 
+     * @param EntityInterface $entity
+     * @param $conversion
+     * @return array
+     */
+    protected function extractKeys($entity, $conversion)
+    {
+        $data = $entity->toArray();
+        $keys = HelperMethods::filterDataByKeys($data, array_flip($conversion));
+        $keys = HelperMethods::convertDataKeys($keys, $conversion);
+
+        return $keys;
     }
 
     /**

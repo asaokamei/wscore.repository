@@ -54,12 +54,12 @@ class Join extends AbstractRelation implements JoinRelationInterface
     }
 
     /**
-     * get keys for join record from to-entity.
+     * get keys for join record from target-entity.
      * 
      * @param EntityInterface $targetEntity
      * @return array
      */
-    private function convertToKeys(EntityInterface $targetEntity)
+    private function getJoinKeyFromTargetEntity(EntityInterface $targetEntity)
     {
         return HelperMethods::convertDataKeys($targetEntity->getKeys(), array_flip($this->to_convert));
     }
@@ -70,9 +70,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
      */
     public function getJoinKeys(EntityInterface $sourceEntity)
     {
-        $data = $sourceEntity->toArray();
-        $keys = HelperMethods::filterDataByKeys($data, array_flip($this->from_convert));
-        $keys = HelperMethods::convertDataKeys($keys, $this->from_convert);
+        $keys = $this->extractKeys($sourceEntity, $this->from_convert);
         return $keys;
     }
 
@@ -82,9 +80,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
      */
     public function getTargetKeys(EntityInterface $joinEntity)
     {
-        $data = $joinEntity->toArray();
-        $keys = HelperMethods::filterDataByKeys($data, array_flip($this->to_convert));
-        $keys = HelperMethods::convertDataKeys($keys, $this->to_convert);
+        $keys = $this->extractKeys($joinEntity, $this->to_convert);
         return $keys;
     }
     
@@ -135,7 +131,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
         if (empty($this->sourceEntities)) {
             throw new \BadMethodCallException('must have source entity to delete.');
         }
-        $keys = $this->convertToKeys($targetEntity);
+        $keys = $this->getJoinKeyFromTargetEntity($targetEntity);
         return $this->queryJoin()
             ->delete($keys);
     }
@@ -176,7 +172,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
         if (empty($this->sourceEntities)) {
             throw new \BadMethodCallException('must have source entity to relate.');
         }
-        $targetKeys = $this->convertToKeys($targetEntity);
+        $targetKeys = $this->getJoinKeyFromTargetEntity($targetEntity);
         foreach($this->sourceEntities as $sourceEntity) {
             $keys = array_merge(
                 $this->getJoinKeys($sourceEntity),

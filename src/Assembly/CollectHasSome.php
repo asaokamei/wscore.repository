@@ -52,8 +52,6 @@ class CollectHasSome extends Collection implements CollectRelatedInterface
     {
         $keys = $this->relation->getTargetKeys($fromEntity);
         $key  = HelperMethods::flattenKey($keys);
-        if (!array_key_exists($key, $this->indexed)) {
-        }
         $found = array_key_exists($key, $this->indexed) ? $this->indexed[$key] : [];
         return $this->repository->newCollection($found, $this->relation->withEntity($fromEntity));
     }
