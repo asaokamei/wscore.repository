@@ -49,7 +49,7 @@ trait ContainerTrait
             }
             return $this->container[$id] = $factory;
         }
-        throw new ContainerNotFoundException();
+        throw new ContainerNotFoundException('cannot find id: '.(string) $id);
     }
 
     /**

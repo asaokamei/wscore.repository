@@ -84,8 +84,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Tags $users */
         $users = $this->repo->get('tags');
-        $collection = $users->newCollection();
-        $collection->find(['id' => ['test', 'tag', 'blog']]);
+        $collection = $users->collectFor(['id' => ['test', 'tag', 'blog']]);
         $collection->load('posts');
 
         $this->assertEquals(3, $collection->count());

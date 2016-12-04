@@ -17,7 +17,7 @@ use WScore\Repository\Repository\Repository;
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ContainerInterface
+     * @var Repo
      */
     private $c;
 
@@ -37,9 +37,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         class_exists(CollectJoin::class);
 
         $this->c = $this->getFullContainer();
-        $this->setDb($this->c->get(PDO::class));
         $this->users = $this->c->get('u');
-        $this->users->find([]);
+        $this->users->setEntities($this->setDb($this->c));
     }
 
     /**
@@ -52,43 +51,42 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             $pdo = new PDO('sqlite::memory:');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            return $pdo;
+            return null;
         });
         $c->set('u', function(Repo $c) {
-            $users = new Collection($c->getRepository('users', ['user_id']));
+            $users = new Collection($c->getRepository('users'));
             return $users;
         });
+        $c->getRepository('users', ['user_id']);
 
         return $c;
     }
 
-    function setDb(PDO $pdo)
+    /**
+     * @param Repo $repo
+     * @return EntityInterface[]
+     */
+    function setDb(Repo $repo)
     {
-        $create /** @lang SQLite */
-            = <<<SQL
-CREATE TABLE users (
-    user_id     INTEGER PRIMARY KEY AUTOINCREMENT,
-    name        VARCHAR(64) NOT NULL,
-    gender      INTEGER,
-    score       INTEGER
-);
-SQL;
-        $pdo->exec($create);
-
-        /** @noinspection SqlResolve */
-        $insert = <<<SQL
-INSERT INTO users (user_id, name, gender, score) VALUES (?, ?, ?, ?);
-SQL;
         $list   = [
             [1, 'test', 'male', 10],
             [2, 'more', 'female', 20],
             [3, 'done', 'male', 30],
             [4, 'test', 'female', 40],
         ];
-        $stmt   = $pdo->prepare($insert);
-        foreach ($list as $rec) {
-            $stmt->execute($rec);
+        $columns = [
+            'user_id',
+            'name',
+            'gender',
+            'score'
+        ];
+        $users = $repo->getRepository('users');
+        $created  = [];
+        foreach($list as $values) {
+            $data = array_combine($columns, $values);
+            $created[] = $users->create($data);
         }
+        return $created;
     }
 
     /**

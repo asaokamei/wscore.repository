@@ -82,6 +82,15 @@ interface RepositoryInterface
     public function newCollection($entities = [], $relation = null);
 
     /**
+     * executes an SQL statement and returns a collection. 
+     * 
+     * @param string $sql
+     * @param array  $data
+     * @return Collection|EntityInterface[]
+     */
+    public function collect($sql, array $data = []);
+
+    /**
      * returns a Collection for given $keys as condition.
      *
      * @param array $keys

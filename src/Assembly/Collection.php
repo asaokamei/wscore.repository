@@ -55,34 +55,6 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @param string $sql
-     * @param array $data
-     */
-    public function execute($sql, $data = [])
-    {
-        $stmt = $this->repository->query()->execute($sql, $data);
-        $this->entities = $stmt->fetchAll();
-    }
-
-    /**
-     * @param array $key
-     */
-    public function find(array $key)
-    {
-        $this->entities = $this->repository->find($key);
-    }
-
-    /**
-     * @param array|string $key
-     */
-    public function findByKey($key)
-    {
-        if ($entity = $this->repository->findByKey($key)) {
-            $this->entities = [$entity];
-        }
-    }
-
-    /**
      * 
      */    
     public function save()

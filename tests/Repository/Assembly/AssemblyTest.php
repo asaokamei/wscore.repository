@@ -80,8 +80,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
         $user2    = $userRepo->findByKey(2);
-        $userList = new Collection($this->c->get('users'));
-        $userList->findByKey(2);
+        $userList = $userRepo->collectByKey(2);
         $postList = $userList->load('posts');
         $this->assertEquals(2, count($postList->getRelatedEntities($user2)));
         foreach($postList->getRelatedEntities($user2) as $post) {
@@ -96,8 +95,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
-        $userList    = $userRepo->newCollection();
-        $userList->find(['users_id' => 2]);
+        $userList = $userRepo->collectFor(['users_id' => 2]);
         
         $postList = $userList->load('posts');
         $this->assertEquals(2, count($postList->getRelatedEntities($userList[0])));
@@ -136,8 +134,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $user2    = $userRepo->findByKey(2);
         $user3    = $userRepo->findByKey(3);
         
-        $userList = new Collection($userRepo);
-        $userList->find(['users_id' => [2,3]]);
+        $userList = $userRepo->collectFor(['users_id' => [2,3]]);
         $userList->load('posts');
 
         $this->assertEquals(2, count($user2->posts));
@@ -171,9 +168,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $repo */
         $repo  = $this->c->get('users');
-        $list  = new Collection($repo);
-        /** @noinspection SqlResolve */
-        $list->execute('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 2]);
+        $list  = $repo->collect('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 2]);
 
         $list->load('posts');
         $list->load('posts')->load('tags');
@@ -197,9 +192,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     function entityList_iterates()
     {
         /** @var CollectionInterface $list */
-        $list  = $this->c->get('users')->newCollection();
-        /** @noinspection SqlResolve */
-        $list->execute('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 3]);
+        $list  = $this->c->get('users')->collect('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 3]);
 
         $idList = [1, 3];
         foreach($list as $entity) {

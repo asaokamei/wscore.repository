@@ -274,6 +274,18 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * @param string $sql
+     * @param array  $data
+     * @return Collection|EntityInterface[]
+     */
+    public function collect($sql, array $data = [])
+    {
+        $stmt = $this->query()->execute($sql, $data);
+        $found = $stmt instanceof \PDOStatement ? $stmt->fetchAll() : [];
+        return $this->newCollection($found);
+    }
+
+    /**
      * @param EntityInterface $entity
      * @return EntityInterface
      */
