@@ -66,6 +66,7 @@ class Collection implements CollectionInterface
 
     /**
      * @param EntityInterface $entity
+     * @throws \InvalidArgumentException
      */
     public function relate(EntityInterface $entity)
     {
@@ -78,6 +79,7 @@ class Collection implements CollectionInterface
 
     /**
      * @param EntityInterface $entity
+     * @throws \InvalidArgumentException
      */
     public function delete(EntityInterface $entity)
     {
@@ -124,6 +126,7 @@ class Collection implements CollectionInterface
      * @param $relation
      * @param $entities
      * @return CollectRelatedInterface
+     * @throws \InvalidArgumentException
      */
     private function forgeRelatedCollection($relation, $entities)
     {
@@ -192,6 +195,7 @@ class Collection implements CollectionInterface
     /**
      * @param string $column
      * @return int
+     * @throws \InvalidArgumentException
      */
     public function sum($column)
     {
@@ -212,7 +216,7 @@ class Collection implements CollectionInterface
     {
         return $this->reduce(function($max, EntityInterface $entity) use($column) {
             $value = $entity->get($column);
-            if (is_null($max)) {
+            if ($max === null) {
                 return $value;
             }
             return $max < $value ? $value : $max;
@@ -227,7 +231,7 @@ class Collection implements CollectionInterface
     {
         return $this->reduce(function($min, EntityInterface $entity) use($column) {
             $value = $entity->get($column);
-            if (is_null($min)) {
+            if ($min === null) {
                 return $value;
             }
             return $min > $value ? $value : $min;
@@ -276,7 +280,7 @@ class Collection implements CollectionInterface
      */
     public function offsetSet($offset, $value)
     {
-        if (is_null($offset)) {
+        if ($offset === null) {
             $this->entities[] = $value;
         } else {
             $this->entities[$offset] = $value;

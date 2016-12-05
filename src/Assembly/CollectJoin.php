@@ -34,17 +34,27 @@ class CollectJoin extends Collection implements CollectRelatedInterface
     private $indexedTo = [];
 
     /**
+     * @param RepositoryInterface $repository
+     * @param JoinRelationInterface $relation
+     */
+    public function __construct($repository, $relation)
+    {
+        parent::__construct($repository, $relation);
+    }
+
+    /**
      * @param RepositoryInterface   $repository
      * @param JoinRelationInterface $relation
      * @param EntityInterface[]     $fromEntities
      * @return CollectRelatedInterface
+     * @throws \InvalidArgumentException
      */
     public static function forge($repository, $relation, array $fromEntities)
     {
         if (!$relation instanceof JoinRelationInterface) {
             throw new \InvalidArgumentException('$relation not JoinRelationInterface');
         }
-        $self = new self($repository,$relation);
+        $self = new self($repository, $relation);
         $self->loadRelatedEntities($fromEntities);
 
         return $self;

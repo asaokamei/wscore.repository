@@ -129,6 +129,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * @param string $key
      * @param mixed  $value
+     * @throws \BadMethodCallException
      */
     public function __set($key, $value)
     {
@@ -140,7 +141,24 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
+     * @param string $key
+     * @return bool
+     */
+    public function __isset($key)
+    {
+        // just check repository's method. may not return relation object though...
+        if (method_exists($this->repo, $key)) {
+            return true;
+        }
+        if (array_key_exists($key, $this->data)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * @param string $id
+     * @throws \BadMethodCallException
      */
     public function setPrimaryKeyOnCreatedEntity($id)
     {
@@ -203,6 +221,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @return string
+     * @throws \BadMethodCallException
      */
     public function getIdValue()
     {
@@ -211,6 +230,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @return string
+     * @throws \BadMethodCallException
      */
     public function getIdName()
     {
@@ -251,11 +271,12 @@ abstract class AbstractEntity implements EntityInterface
         $this->repo->save($this);
         return true;
     }
-    
+
     /**
      * @param string $name
      * @param array  $args
      * @return JoinRelationInterface|RelationInterface|mixed
+     * @throws \BadMethodCallException
      */
     public function __call($name, $args)
     {

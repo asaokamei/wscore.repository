@@ -23,9 +23,13 @@ class CollectHasSome extends Collection implements CollectRelatedInterface
      * @param RelationInterface   $relation
      * @param EntityInterface[]   $fromEntities
      * @return CollectRelatedInterface
+     * @throws \InvalidArgumentException
      */
     public static function forge($repository, $relation, array $fromEntities)
     {
+        if (!$relation instanceof RelationInterface) {
+            throw new \InvalidArgumentException('$relation not JoinRelationInterface');
+        }
         $self = new self($repository, $relation);
         $self->loadRelatedEntities($fromEntities);
 
