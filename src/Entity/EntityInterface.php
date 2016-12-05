@@ -61,7 +61,7 @@ interface EntityInterface
      * returns column value. 
      * 
      * @param string $key
-     * @return mixed
+     * @return null|string|Collection|EntityInterface[]
      */
     public function get($key);
     
@@ -134,7 +134,8 @@ interface EntityInterface
      * gets relation object from repository's $name method. 
      * 
      * @param string $name
-     * @return null|JoinRelationInterface|RelationInterface
+     * @return JoinRelationInterface|RelationInterface
+     * @throws \InvalidArgumentException
      */
     public function getRelationObject($name);
 
@@ -145,6 +146,7 @@ interface EntityInterface
      * 
      * @param string $name
      * @return Collection|EntityInterface[]
+     * @throws \InvalidArgumentException
      */
     public function getRelatedEntities($name);
 }

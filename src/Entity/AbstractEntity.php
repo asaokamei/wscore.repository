@@ -178,10 +178,13 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $key
-     * @return mixed
+     * @return null|string|Collection|EntityInterface[]
      */
     public function get($key)
     {
+        if ($collection = $this->_getRelatedEntities($key)) {
+            return $collection;
+        }
         $value = array_key_exists($key, $this->data) ? $this->data[$key] : null;
         if (isset($this->valueObjectClasses[$key])) {
             return HelperMethods::convertToObject($value, $this->valueObjectClasses[$key]);
@@ -280,7 +283,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function __call($name, $args)
     {
-        if ($relation = $this->getRelationObject($name)) {
+        if ($relation = $this->_getRelationObject($name)) {
             return $relation;
         }
 
@@ -294,7 +297,7 @@ abstract class AbstractEntity implements EntityInterface
     private function _getRelationObject($name)
     {
         if (isset($this->relations[$name])) {
-            return $this->relations[$name];
+            return $this->relations[$name]->withEntity($this);
         }
         if (!method_exists($this->repo, $name)) {
             return null;
@@ -302,18 +305,6 @@ abstract class AbstractEntity implements EntityInterface
         $relation = $this->repo->$name();
         if ($relation instanceof RelationInterface) {
             $this->relations[$name] = $relation;
-            return $relation;
-        }
-        return null;
-    }
-
-    /**
-     * @param string $name
-     * @return null|JoinRelationInterface|RelationInterface
-     */
-    public function getRelationObject($name)
-    {
-        if ($relation = $this->_getRelationObject($name)) {
             return $relation->withEntity($this);
         }
         return null;
@@ -321,29 +312,51 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $name
+     * @return JoinRelationInterface|RelationInterface
+     * @throws \InvalidArgumentException
+     */
+    public function getRelationObject($name)
+    {
+        if ($relation = $this->_getRelationObject($name)) {
+            return $relation->withEntity($this);
+        }
+        throw new \InvalidArgumentException('no such method: ' . (string) $name);
+    }
+
+    /**
+     * @param string $name
      * @return Collection|EntityInterface[]
      */
-    public function getRelatedEntities($name)
+    protected function _getRelatedEntities($name)
     {
         if (array_key_exists($name, $this->relatedEntities)) {
             return $this->relatedEntities[$name];
         }
-        if ($relation = $this->getRelationObject($name)) {
+        if ($relation = $this->_getRelationObject($name)) {
             return $relation->collect();
         }
         return null;
     }
-    
+
+    /**
+     * @param string $name
+     * @return Collection|EntityInterface[]
+     * @throws \InvalidArgumentException
+     */
+    public function getRelatedEntities($name)
+    {
+        if ($collection = $this->_getRelatedEntities($name)) {
+            return $collection;
+        }
+        throw new \InvalidArgumentException('no such relation: ' . (string) $name);
+    }
+
     /**
      * @param string $name
      * @return null|string|Collection|EntityInterface[]
      */
     public function __get($name)
     {
-        if ($collect = $this->getRelatedEntities($name)) {
-            return $collect;
-        }
-        
         return $this->get($name);
     }
 
