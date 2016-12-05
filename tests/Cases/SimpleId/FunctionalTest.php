@@ -24,7 +24,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
      */
     private $tags;
 
-    function setup()
+    public function setup()
     {
         class_exists(Collection::class);
         class_exists(Join::class);
@@ -49,7 +49,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function Collection_eagerly_loads_related_entities()
+    public function Collection_eagerly_loads_related_entities()
     {
         /** @var Users $users */
         $users = $this->repo->get('users');
@@ -69,7 +69,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         foreach($collection as $user) {
             foreach($user->getRelatedEntities('posts') as $post) {
                 $this->assertEquals($user->getIdValue(), $post->get('user_id'));
-                foreach($post->tags as $idx => $tag) {
+                foreach($post->getRelatedEntities('tags') as $idx => $tag) {
                     $tag_id = $this->tags[$user->getIdValue()][$post->getIdValue()][$idx];
                     $this->assertEquals($tag_id, $tag->get('id'));
                 }
@@ -80,7 +80,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function Collection_eagerly_loads_relation_in_reverse_order()
+    public function Collection_eagerly_loads_relation_in_reverse_order()
     {
         /** @var Tags $users */
         $users = $this->repo->get('tags');
@@ -98,7 +98,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
             'blog' => [2, 3],
         ];
         foreach($collection as $tag) {
-            foreach($tag->posts as $idx => $post) {
+            foreach($tag->getRelatedEntities('posts') as $idx => $post) {
                 $this->assertEquals($answer[$tag->getIdValue()][$idx], $post->getIdValue());
                 $user = $post->getRelatedEntities('user')[0];
                 $this->assertEquals($user->getIdValue(), $post->get('user_id'));
@@ -109,7 +109,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function add_relation_using_lazy_load()
+    public function add_relation_using_lazy_load()
     {
         /** @var Users $users */
         /** @var Posts $posts */
@@ -118,7 +118,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
         $user2 = $users->findByKey(2);
         $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user2->posts));
-        $this->assertEquals(2, count($user2->posts));
+        $this->assertCount(2, $user2->posts);
 
         $post = $posts->create(['contents' => 'created post']);
         $user2->posts[] = $post;
@@ -127,7 +127,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
         $user2 = $users->findByKey(2);
         $this->assertEquals(3, count($user2->posts));
-        foreach($user2->posts as $post) {
+        foreach($user2->getRelatedEntities('posts') as $post) {
             $this->assertEquals(2, $post->get('user_id'));
         }
     }
@@ -135,7 +135,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function add_relation_using_eager_loaded_Collection()
+    public function add_relation_using_eager_loaded_Collection()
     {
         /** @var Users $users */
         /** @var Posts $posts */
@@ -146,7 +146,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $collection->load('posts');
         $user2 = $collection[0];
         $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user2->posts));
-        $this->assertEquals(2, count($user2->posts));
+        $this->assertCount(2, $user2->posts);
 
         $post = $posts->create(['contents' => 'created post']);
         $user2->posts->relate($post);
@@ -154,8 +154,8 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $post->save();
 
         $user2 = $users->findByKey(2);
-        $this->assertEquals(3, count($user2->posts));
-        foreach($user2->posts as $post) {
+        $this->assertCount(3, $user2->posts);
+        foreach($user2->getRelatedEntities('posts') as $post) {
             $this->assertEquals(2, $post->get('user_id'));
         }
     }
@@ -163,7 +163,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function transaction_rollbacks_when_exception_is_thrown()
+    public function transaction_rollbacks_when_exception_is_thrown()
     {
         /** @var Users $users */
         $repo  = $this->repo;
@@ -196,8 +196,8 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     */    
-    function hasMany_relation_setCondition()
+     */
+    public function hasMany_relation_setCondition()
     {
         /** @var Users $users */
         $users = $this->repo->get('users');
@@ -221,7 +221,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function BelongTo_relation_setCondition()
+    public function BelongTo_relation_setCondition()
     {
         /** @var Posts $posts */
         $posts = $this->repo->get('posts');
@@ -249,7 +249,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function Join_relation_setCondition()
+    public function Join_relation_setCondition()
     {
         /** @var Users $users */
         $users = $this->repo->get('users');
@@ -260,7 +260,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         foreach($collection as $user) {
             foreach($user->getRelatedEntities('posts') as $post) {
                 $this->assertEquals($user->getIdValue(), $post->get('user_id'));
-                $tags = $post->testBlog;
+                $tags = $post->getRelatedEntities('testBlog');
                 if (!$tags) continue;
                 foreach($tags as $idx => $tag) {
                     $tag_id = $tag->getIdValue();
@@ -273,7 +273,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function scopeMale_returns_only_male_users()
+    public function scopeMale_returns_only_male_users()
     {
         /** @var Users $users */
         $users = $this->repo->get('users');

@@ -29,7 +29,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
      */
     private $fix;
 
-    function setup()
+    public function setup()
     {
         class_exists(Container::class);
         class_exists(Repo::class);
@@ -49,7 +49,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     /**
      * @return ContainerInterface
      */
-    function getFullContainer()
+    public function getFullContainer()
     {
         $c = new Repo();
         $c->set(PDO::class, function () {
@@ -75,7 +75,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         return $c;
     }
 
-    function test()
+    public function test()
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
@@ -91,7 +91,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function repository_collect_returns_collection()
+    public function repository_collect_returns_collection()
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
@@ -104,7 +104,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         }
     }
     
-    function test2()
+    public function test2()
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
@@ -127,7 +127,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function user2_and_user3_hasMany_posts()
+    public function user2_and_user3_hasMany_posts()
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
@@ -137,17 +137,17 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $userList = $userRepo->collectFor(['users_id' => [2,3]]);
         $userList->load('posts');
 
-        $this->assertEquals(2, count($user2->posts));
-        $this->assertEquals(1, count($user3->posts));
-        foreach($user2->posts as $post) {
+        $this->assertCount(2, $user2->posts);
+        $this->assertCount(1, $user3->posts);
+        foreach($user2->getRelatedEntities('posts') as $post) {
             $this->assertEquals('2', $post->users_id);
         }
-        foreach($user3->posts as $post) {
+        foreach($user3->getRelatedEntities('posts') as $post) {
             $this->assertEquals('3', $post->users_id);
         }
     }
     
-    function test3()
+    public function test3()
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
@@ -164,11 +164,12 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function user1_hasOne_post_and_joined_with_tags()
+    public function user1_hasOne_post_and_joined_with_tags()
     {
         /** @var Users $repo */
         $repo  = $this->c->get('users');
-        $list  = $repo->collect('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 2]);
+        $list  = $repo->collect(/** @lang SQLite */
+            'SELECT * FROM users WHERE users_id IN(?, ?);', [1, 2]);
 
         $list->load('posts');
         $list->load('posts')->load('tags');
@@ -189,7 +190,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */    
-    function entityList_iterates()
+    public function entityList_iterates()
     {
         /** @var CollectionInterface $list */
         $list  = $this->c->get('users')->collect('SELECT * FROM users WHERE users_id IN(?, ?);', [1, 3]);
