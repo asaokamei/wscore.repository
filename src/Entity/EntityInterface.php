@@ -86,7 +86,7 @@ interface EntityInterface
      * @param EntityInterface $entity
      * @param array           $convert
      */
-    public function setForeignKeys(EntityInterface $entity, $convert = []);
+    public function setForeignKeys(EntityInterface $entity, array $convert = []);
 
     /**
      * saves the entity to database. 
@@ -107,6 +107,19 @@ interface EntityInterface
      * @return null|string|Collection|EntityInterface[]
      */
     public function __get($name);
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     * @throws \BadMethodCallException
+     */
+    public function __set($key, $value);
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function __isset($key);
 
     /**
      * sets related entities (as Collection) for relation $name,
