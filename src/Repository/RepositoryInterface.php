@@ -94,7 +94,7 @@ interface RepositoryInterface
      * returns a Collection for given $keys as condition.
      *
      * @param array $keys
-     * @return Collection|EntityInterface
+     * @return Collection|EntityInterface[]
      */
     public function collectFor(array $keys);
 

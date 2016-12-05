@@ -6,6 +6,9 @@ use WScore\Repository\Repository\AbstractRepository;
 
 class Fee extends AbstractRepository
 {
+    const MEMBER = 'MEMBER';
+    const SYSTEM = 'SYSTEM';
+    
     protected $table = 'fees';
 
     protected $primaryKeys = ['year', 'code', 'type'];

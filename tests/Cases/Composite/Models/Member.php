@@ -1,7 +1,6 @@
 <?php
 namespace tests\Cases\Composite\Models;
 
-use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Relations\HasMany;
 use WScore\Repository\Relations\Join;
 use WScore\Repository\Repo;
@@ -9,9 +8,17 @@ use WScore\Repository\Repository\AbstractRepository;
 
 class Member extends AbstractRepository
 {
+    const TYPE_MAIN = '1';
+    const TYPE_SUB  = '2';
+    
     protected $table = 'members';
 
     protected $primaryKeys = ['type', 'code'];
+    
+    protected $timeStamps = [
+        'created_at' => 'created_at',
+        'updated_at' => 'updated_at',
+    ];
 
     /**
      * GenericRepository constructor.
