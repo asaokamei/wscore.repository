@@ -321,7 +321,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $name
-     * @return null|Collection|EntityInterface[]
+     * @return Collection|EntityInterface[]
      */
     public function getRelatedEntities($name)
     {
@@ -329,9 +329,7 @@ abstract class AbstractEntity implements EntityInterface
             return $this->relatedEntities[$name];
         }
         if ($relation = $this->getRelationObject($name)) {
-            $collect = $relation->collect();
-            $this->relatedEntities[$name] = $collect;
-            return $collect;
+            return $relation->collect();
         }
         return null;
     }

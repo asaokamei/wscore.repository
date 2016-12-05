@@ -131,7 +131,7 @@ interface EntityInterface
      * using relation object from repository's $name method. 
      * 
      * @param string $name
-     * @return null|Collection|EntityInterface[]
+     * @return Collection|EntityInterface[]
      */
     public function getRelatedEntities($name);
 }
