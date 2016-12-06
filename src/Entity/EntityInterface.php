@@ -33,6 +33,7 @@ interface EntityInterface
      * returns primary key value if entity has only one key. 
      * 
      * @return string
+     * @throws \BadMethodCallException
      */
     public function getIdValue();
 
@@ -40,6 +41,7 @@ interface EntityInterface
      * returns primary key column name if entity has only one key.
      * 
      * @return string
+     * @throws \BadMethodCallException
      */
     public function getIdName();
 
@@ -54,6 +56,7 @@ interface EntityInterface
      * sets primary key value for auto-inserted id. 
      * 
      * @param string $id
+     * @throws \BadMethodCallException
      */
     public function setPrimaryKeyOnCreatedEntity($id);
 
@@ -99,6 +102,7 @@ interface EntityInterface
      * @param string $name
      * @param array  $args
      * @return JoinRelationInterface|RelationInterface|mixed
+     * @throws \BadMethodCallException
      */
     public function __call($name, $args);
 

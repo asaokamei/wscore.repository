@@ -58,10 +58,9 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $collection->load('posts')->load('tags');
         
         $user1 = $collection[0];
-        $user2 = $collection[1];
         $this->assertEquals(2, $collection->count());
         $this->assertEquals(1, $user1->getIdValue());
-        $this->assertEquals(2, $user2->getIdValue());
+        $this->assertEquals(2, $collection[1]->getIdValue());
 
         $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user1->posts));
         $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user1->posts[0]->tags));
@@ -126,7 +125,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $post->save();
 
         $user2 = $users->findByKey(2);
-        $this->assertEquals(3, count($user2->posts));
+        $this->assertCount(3, $user2->posts);
         foreach($user2->getRelatedEntities('posts') as $post) {
             $this->assertEquals(2, $post->get('user_id'));
         }
@@ -185,7 +184,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
             $repo->transaction()->run(function () use($user1) {
                 $user1->fill(['name' => 'rollback transaction']);
                 $user1->save();
-                throw new \Exception();
+                throw new \RuntimeException();
             });
 
         } catch (\Exception $e) {}
@@ -229,8 +228,9 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
         $collection->load('male');
         foreach($collection as $post) {
-            $users = $post->getRelatedEntities('male');
-            if (!$users) continue;
+            if (!$users = $post->getRelatedEntities('male')) {
+                continue;
+            }
             foreach($users as $user) {
                 $this->assertEquals('M', $user->get('gender'));
             }
@@ -238,8 +238,9 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
         $collection->load('female');
         foreach($collection as $post) {
-            $users = $post->getRelatedEntities('female');
-            if (!$users) continue;
+            if (!$users = $post->getRelatedEntities('female')) {
+                continue;
+            }
             foreach($users as $user) {
                 $this->assertEquals('F', $user->get('gender'));
             }
@@ -260,8 +261,9 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         foreach($collection as $user) {
             foreach($user->getRelatedEntities('posts') as $post) {
                 $this->assertEquals($user->getIdValue(), $post->get('user_id'));
-                $tags = $post->getRelatedEntities('testBlog');
-                if (!$tags) continue;
+                if (!$tags = $post->getRelatedEntities('testBlog')) {
+                    continue;
+                }
                 foreach($tags as $idx => $tag) {
                     $tag_id = $tag->getIdValue();
                     $this->assertContains($tag_id, ['test', 'blog']);
@@ -278,16 +280,16 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         /** @var Users $users */
         $users = $this->repo->get('users');
         $list = $users->scope('males')->find([]);
-        $this->assertEquals(2, count($list));
+        $this->assertCount(2, $list);
         foreach($list as $u) {
             $this->assertEquals('M', $u->gender);
         }
         // make sure scope would not affect original $users repository. 
         $list = $users->find([]);
-        $this->assertEquals(4, count($list));
+        $this->assertCount(4, $list);
         $genders = [];
         foreach($list as $u) {
-            $g = $u->gender;
+            $g = $u->get('gender');
             if (isset($genders[$g])) {
                 $genders[$g] += 1;
             } else {

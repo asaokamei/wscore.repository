@@ -10,25 +10,29 @@ and relate entities, `WScore/Repository` has following features.
 
 * Uses **different classes for DAO and Entity layer**. 
   You can use your own DAO object to implement some special requirements if necessary. 
-* Works very well with **composite primary keys**. 
+* Works with **composite primary keys**.
+* Lazy and eager loading of related entities are supported. 
+* retrieving related entities issues a database query (not using SQL's join statement).  
 * Behaves similar to ActiveRecord.
 
 On the other hand, it does not have followings. 
 
-* **No eager loading**;
-  instead, use `Assembly` object or other libraries. 
 * **No caching of entities**; most of the operations results in database access. 
+* No code generation, no annotation, no xml configuration. 
 * No complex SQL construction. 
 
 Under development. Not ready for production. 
 
 Installation: `git clone https://github.com/asaokamei/wscore.repository`
 
-### Separation of Layers
+### interfaces
 
-There are three layers. 
+Various interfaces are used to define the API of 
+this ORM behavior.  
 
 ```
+         CollectionInterface
+            ↑          ↑
   EntityInterface　↔ RelationInterface
             ↑          ↕
         RepositoryInterface
@@ -36,21 +40,25 @@ There are three layers.
           QueryInterface
 ```
 
-* The top layer is the `EntityInterface`, which is mostly 
-  independent from the bottom layers but provides methods 
-  necessary for bottom layers to work with. 
-  `RelationInterface` relates entities using repositories, 
-  which has some dependencies on bottom layer. 
-* The `RepositoryInterface` layer is a gateway to database tables 
-  that persist the entities. 
-* The `QueryInterface` layer is at the bottom of the layers 
-  responsible of querying database. 
+* **`CollectionInterface`**:<br>
+  manages a collection of entities as well as eager-loads related entities. 
+  Yes, it is sort of an *ActiveCollection*. 
+* **`EntityInterface`**:<br>
+  represents a database record of a database table. 
+  It is an *ActiveRecord* that can persists itself 
+  and lazy-load relations from/to database. 
+* **`RelationInterface`**:<br>
+  relates entities to an entity. 
+  There is a `JoinRelationInterface` for many-to-many (join) relation.
+* **`RepositoryInterface`**:<br>
+  defines a gateway to a database table that retrieves and persist the entities. 
+* **`QueryInterface`**:<br>
+  current repository classes uses this interface to 
+  access database. repositories can have independent 
+  `QueryInterface` objects. 
 
-There is a `Repo` class which serves as a container as well as 
+There is a **`Repo` class** which serves as a container as well as 
 a factory for repositories and relations. 
-Requires a container that implements `ContainerInterface`. 
-
-There is `JoinRelationInterface` for many-to-many (join) relation.
 
 Sample Code
 ===========
@@ -137,7 +145,7 @@ $users->save($user1);
 Relating Entities
 --------
 
-There are 3 relations: `BelongsTo`, `HasMany`, and `JoinBy`. 
+There are 3 relations: `BelongsTo`, `HasMany`, and `Join`. 
 
 ### sample database
 
@@ -189,12 +197,13 @@ class Users extends AbstractRepository
 ### relating `users` and `posts`
 
 Now try to related users and posts. 
-First, create repositories for `users` and `posts`. 
-This example uses generic repository for `posts` table. 
+This example uses `getRepository` method whose 
+return object is `RepositoryInterface`. 
 
 ```php
 $users = $repo->get('users');
-$posts = $repo->get('posts');
+// same as simply use *get* method as:
+$posts = $repo->getRepository('posts');
 ```
 
 then:
@@ -212,21 +221,28 @@ $user1->posts()->relate($newPost);
 $newPost->save(); // save the post. 
 ```
 
-### eager loading using Assembly 
+### eager loading using `Collection` 
 
-`Assembly` is essentially a collection of entities with ability to load 
-related entities _eagerly_. 
+Repositories can return entities as `Collection` object, 
+which can *eager load* related entities. 
 
 ```php
-$user12 = $users->collectFor(['user_id' => [1, 2]]); // collection of entity.
-$user12->load('posts'); // load related entities using repository's posts() method. 
+$user1_2 = $users->collectFor(['user_id' => [1, 2]]); // collection of entity.
+$user1_2->load('posts'); // load related entities using repository's posts() method. 
 
-foreach($user12 as $user) {
+// access all related post data. 
+foreach($user1_2 as $user) {
     echo $user->name;
     foreach($user->posts as $post) {
         echo $post->content;
     }
 }
+// relate a new post to $user1,
+$user1 = $user1_2[0];
+$user1->posts[] = $newPost;
+// and $user2.
+$user2 = $user1_2->getById(1);
+$user2->posts->add($newPost);
 ```
 
 Relations
