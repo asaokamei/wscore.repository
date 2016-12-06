@@ -66,14 +66,12 @@ class Collection implements CollectionInterface
 
     /**
      * @param EntityInterface $entity
-     * @throws \InvalidArgumentException
      */
     public function add(EntityInterface $entity)
     {
-        if (!$this->relation) {
-            throw new \InvalidArgumentException('no relation set in Collection');
+        if ($this->relation) {
+            $this->relation->relate($entity);
         }
-        $this->relation->relate($entity);
         $this->entities[] = $entity;
     }
 
@@ -186,7 +184,7 @@ class Collection implements CollectionInterface
     /**
      * @param callable $callable
      * @param null|mixed $initial
-     * @return mixed|EntityInterface
+     * @return mixed
      */
     public function reduce(callable $callable, $initial = null)
     {
@@ -264,7 +262,7 @@ class Collection implements CollectionInterface
      * Offset to retrieve
      *
      * @param mixed 
-     * @return EntityInterface
+     * @return EntityInterface|null
      */
     public function offsetGet($offset)
     {
@@ -281,14 +279,7 @@ class Collection implements CollectionInterface
      */
     public function offsetSet($offset, $value)
     {
-        if ($offset === null) {
-            $this->entities[] = $value;
-        } else {
-            $this->entities[$offset] = $value;
-        }
-        if ($this->relation) {
-            $this->relation->relate($value);
-        }
+        $this->add($value);
     }
 
     /**

@@ -33,12 +33,20 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
     public function load($name);
 
     /**
+     * adds the $entity to a collection. 
+     * if relation object is set, the entity is also related
+     * to the sourceEntity of the relation object. 
+     * 
      * @param EntityInterface $entity
      * @throws \InvalidArgumentException
      */
     public function add(EntityInterface $entity);
 
     /**
+     * deletes the $entity from the collection. 
+     * if relation object is set, the entity is also removed 
+     * from the relation (delete only works for Join relation). 
+     * 
      * @param EntityInterface $entity
      * @throws \InvalidArgumentException
      */
