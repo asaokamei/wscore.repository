@@ -93,6 +93,36 @@ class Collection implements CollectionInterface
     }
 
     /**
+     * @param array $keys
+     * @return null|EntityInterface
+     */
+    public function getByKeys(array $keys)
+    {
+        foreach($this->entities as $entity) {
+            /** @noinspection TypeUnsafeComparisonInspection */
+            if ($entity->getKeys() == $keys) {
+                return $entity;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param string $keys
+     * @return null|EntityInterface
+     * @throws \BadMethodCallException
+     */    
+    public function getById($keys)
+    {
+        foreach($this->entities as $entity) {
+            if ($entity->getIdValue() === $keys) {
+                return $entity;
+            }
+        }
+        return null;
+    }
+
+    /**
      * @param string $name
      * @return CollectRelatedInterface
      * @throws \InvalidArgumentException
@@ -144,7 +174,7 @@ class Collection implements CollectionInterface
     {
         $found = array_filter($this->entities, $callable);
 
-        return $this->repository->newCollection($found);
+        return $this->repository->newCollection($found, $this->relation);
     }
 
     /**

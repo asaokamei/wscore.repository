@@ -33,6 +33,22 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
     public function load($name);
 
     /**
+     * gets entities from collection based on the $keys condition. 
+     * 
+     * @param array $keys
+     * @return null|EntityInterface
+     */
+    public function getByKeys(array $keys);
+
+    /**
+     * gets an entity from collection for the primary key value. 
+     * 
+     * @param string $keys
+     * @return null|EntityInterface
+     */
+    public function getById($keys);
+    
+    /**
      * adds the $entity to a collection. 
      * if relation object is set, the entity is also related
      * to the sourceEntity of the relation object. 
