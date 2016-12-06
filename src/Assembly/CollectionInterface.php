@@ -38,7 +38,6 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
      * to the sourceEntity of the relation object. 
      * 
      * @param EntityInterface $entity
-     * @throws \InvalidArgumentException
      */
     public function add(EntityInterface $entity);
 
@@ -48,7 +47,6 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
      * from the relation (delete only works for Join relation). 
      * 
      * @param EntityInterface $entity
-     * @throws \InvalidArgumentException
      */
     public function delete(EntityInterface $entity);
 

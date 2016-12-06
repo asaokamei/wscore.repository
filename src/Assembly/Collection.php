@@ -77,15 +77,11 @@ class Collection implements CollectionInterface
 
     /**
      * @param EntityInterface $entity
-     * @throws \InvalidArgumentException
      */
     public function delete(EntityInterface $entity)
     {
-        if (!$this->relation) {
-            throw new \InvalidArgumentException('no relation set in Collection');
-        }
-        if (!$this->relation instanceof RelationInterface) {
-            throw new \InvalidArgumentException('cannot delete relation');
+        if ($this->relation) {
+            $this->relation->delete($entity);
         }
         $this->relation->delete($entity);
         foreach($this->entities as $idx => $e) {
@@ -287,7 +283,6 @@ class Collection implements CollectionInterface
      *
      * @param mixed
      * @return void
-     * @throws \InvalidArgumentException
      */
     public function offsetUnset($offset)
     {
