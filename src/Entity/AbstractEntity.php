@@ -71,19 +71,6 @@ abstract class AbstractEntity implements EntityInterface
     protected $relations = [];
 
     /**
-     * AbstractEntity constructor.
-     *
-     * @param string $table
-     * @param array  $primaryKeys
-     */
-    public function __construct($table, array $primaryKeys)
-    {
-        $this->table       = $table;
-        $this->primaryKeys = $primaryKeys;
-        $this->_setFetchDone();
-    }
-
-    /**
      * call this method in constructor. 
      * it will protect from using __set method to 
      * overwrite entity data. 
@@ -325,7 +312,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $name
-     * @return Collection|EntityInterface[]
+     * @return null|Collection|EntityInterface[]
      */
     protected function _getRelatedEntities($name)
     {
