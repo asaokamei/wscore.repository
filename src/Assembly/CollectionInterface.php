@@ -33,6 +33,18 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
     public function load($name);
 
     /**
+     * @param EntityInterface $entity
+     * @throws \InvalidArgumentException
+     */
+    public function add(EntityInterface $entity);
+
+    /**
+     * @param EntityInterface $entity
+     * @throws \InvalidArgumentException
+     */
+    public function delete(EntityInterface $entity);
+
+    /**
      * returns a new collection with entities filtered out
      * by $callable returning false. 
      * $callable = function(EntityInterface): bool

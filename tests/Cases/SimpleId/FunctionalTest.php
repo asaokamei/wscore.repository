@@ -149,7 +149,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $user2->posts);
 
         $post = $posts->create(['contents' => 'created post']);
-        $user2->posts->relate($post);
+        $user2->posts->add($post);
         $user2->save();
         $post->save();
 

@@ -43,7 +43,7 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
         // relate fees to the $user1001.
         foreach ($feesMain as $fee) {
             $this->assertEquals(Member::TYPE_MAIN, $fee->type);
-            $user1001->getRelatedEntities('fees')->relate($fee);
+            $user1001->getRelatedEntities('fees')->add($fee);
         }
 
         // retrieve the user1001 as member1001. 

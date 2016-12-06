@@ -68,7 +68,7 @@ class Collection implements CollectionInterface
      * @param EntityInterface $entity
      * @throws \InvalidArgumentException
      */
-    public function relate(EntityInterface $entity)
+    public function add(EntityInterface $entity)
     {
         if (!$this->relation) {
             throw new \InvalidArgumentException('no relation set in Collection');
@@ -86,7 +86,7 @@ class Collection implements CollectionInterface
         if (!$this->relation) {
             throw new \InvalidArgumentException('no relation set in Collection');
         }
-        if (!$this->relation instanceof JoinRelationInterface) {
+        if (!$this->relation instanceof RelationInterface) {
             throw new \InvalidArgumentException('cannot delete relation');
         }
         $this->relation->delete($entity);
@@ -101,6 +101,7 @@ class Collection implements CollectionInterface
     /**
      * @param string $name
      * @return CollectRelatedInterface
+     * @throws \InvalidArgumentException
      */
     public function load($name)
     {
@@ -295,6 +296,7 @@ class Collection implements CollectionInterface
      *
      * @param mixed
      * @return void
+     * @throws \InvalidArgumentException
      */
     public function offsetUnset($offset)
     {
