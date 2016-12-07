@@ -9,6 +9,7 @@ use tests\Cases\SimpleId\Models\Tags;
 use tests\Cases\SimpleId\Models\Users;
 use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Assembly\CollectJoin;
+use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Relations\Join;
 use WScore\Repository\Repo;
 
@@ -298,5 +299,29 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertEquals(2, $genders['M']);
         $this->assertEquals(2, $genders['F']);
+    }
+
+    /**
+     * @test
+     */
+    public function all_entities_are_unique()
+    {
+        /** @var Users $users */
+        $users = $this->repo->get('users');
+        $list = $users->collectFor([]);
+        $list->load('posts')->load('tags');
+        $allTags = [];
+        foreach($list as $user) {
+            foreach($user->getRelatedEntities('posts') as $post) {
+                foreach ($post->getRelatedEntities('tags') as $tag) {
+                    $key = HelperMethods::flatKey($tag);
+                    if (isset($allTags[$key])) {
+                        $this->assertSame($allTags[$key], $tag);
+                    } else {
+                        $allTags[$key] = $tag;
+                    }
+                }
+            }
+        }
     }
 }

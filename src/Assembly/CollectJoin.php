@@ -81,7 +81,7 @@ class CollectJoin extends Collection implements CollectRelatedInterface
         $key = $this->relation->getJoinKeys($fromEntity);
         $key = HelperMethods::flattenKey($key);
         if (!array_key_exists($key, $this->indexedJoin)) {
-            return [];
+            return $this->repository->newCollection([], $this->relation);
         }
         $joinKeys = $this->indexedJoin[$key];
         $found    = [];
