@@ -89,6 +89,7 @@ class CollectJoin extends Collection implements CollectRelatedInterface
             $key = $this->relation->getTargetKeys($join);
             $key = HelperMethods::flattenKey($key);
             if (array_key_exists($key, $this->indexedTo)) {
+                /** @noinspection SlowArrayOperationsInLoopInspection */
                 $found = array_merge($found, $this->indexedTo[$key]);
             }
         }
