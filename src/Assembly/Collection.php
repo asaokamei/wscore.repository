@@ -124,8 +124,20 @@ class Collection implements CollectionInterface
     }
 
     /**
+     * get the related entities for the $fromEntity.
+     *
+     * @param EntityInterface $fromEntity
+     * @return Collection
+     * @throws \BadMethodCallException
+     */
+    public function getRelatedEntities($fromEntity)
+    {
+        throw new \BadMethodCallException('no relation is set.');
+    }
+    
+    /**
      * @param string $name
-     * @return CollectRelatedInterface
+     * @return CollectionInterface
      * @throws \InvalidArgumentException
      */
     public function load($name)
@@ -151,7 +163,7 @@ class Collection implements CollectionInterface
     /**
      * @param $relation
      * @param $entities
-     * @return CollectRelatedInterface
+     * @return CollectionInterface
      * @throws \InvalidArgumentException
      */
     private function forgeRelatedCollection($relation, $entities)

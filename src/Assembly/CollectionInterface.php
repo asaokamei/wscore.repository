@@ -28,7 +28,7 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
      * that returns RelationInterface object.
      * 
      * @param string $name
-     * @return CollectRelatedInterface
+     * @return CollectionInterface
      */
     public function load($name);
 
@@ -47,7 +47,16 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
      * @return null|EntityInterface
      */
     public function getById($keys);
-    
+
+    /**
+     * get the related entities for the $fromEntity.
+     *
+     * @param EntityInterface $fromEntity
+     * @return Collection
+     * @throws \BadMethodCallException
+     */
+    public function getRelatedEntities($fromEntity);
+
     /**
      * adds the $entity to a collection. 
      * if relation object is set, the entity is also related

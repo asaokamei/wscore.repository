@@ -6,7 +6,7 @@ use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
-class CollectHasSome extends Collection implements CollectRelatedInterface
+class CollectHasSome extends Collection
 {
     /**
      * @var array
@@ -22,7 +22,7 @@ class CollectHasSome extends Collection implements CollectRelatedInterface
      * @param RepositoryInterface $repository
      * @param RelationInterface   $relation
      * @param EntityInterface[]   $fromEntities
-     * @return CollectRelatedInterface
+     * @return CollectionInterface
      * @throws \InvalidArgumentException
      */
     public static function forge($repository, $relation, array $fromEntities)
