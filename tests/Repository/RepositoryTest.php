@@ -21,6 +21,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     public function setup()
     {
         $this->q    = new Query();
+        /** @noinspection PhpParamsInspection */
         $this->repo = new Repository(
             'testTable',
             ['p1', 'p2'],
@@ -56,6 +57,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function repository_passes_info_to_entity()
     {
+        /** @noinspection PhpParamsInspection */
         $repo = new Repository(
             'testTable',
             ['p1', 'p2'],
@@ -91,6 +93,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function findByKey_accepts_simple_value()
     {
+        /** @noinspection PhpParamsInspection */
         $repo = new Repository(
             'testTable',
             ['p1',],
@@ -138,6 +141,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function update_filters_columns_not_in_getColumns()
     {
+        /** @noinspection PhpParamsInspection */
         $repo = new Repository(
             'testTable',
             ['p1', 'p2'],
@@ -162,6 +166,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function deletes_passes_primaryKeys_to_Query_instance()
     {
+        /** @noinspection PhpParamsInspection */
         $repo = new Repository(
             'testTable',
             ['p1', 'p2'],

@@ -26,7 +26,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
      */
     private $users;
 
-    function setup()
+    public function setup()
     {
         class_exists(Container::class);
         class_exists(Repo::class);
@@ -44,7 +44,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @return ContainerInterface
      */
-    function getFullContainer()
+    public function getFullContainer()
     {
         $c = new Repo();
         $c->set(PDO::class, function () {
@@ -54,8 +54,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             return null;
         });
         $c->set('u', function(Repo $c) {
-            $users = new Collection($c->getRepository('users'));
-            return $users;
+            return new Collection($c->getRepository('users'));
         });
         $c->getRepository('users', ['user_id']);
 
@@ -66,7 +65,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
      * @param Repo $repo
      * @return EntityInterface[]
      */
-    function setDb(Repo $repo)
+    public function setDb(Repo $repo)
     {
         $list   = [
             [1, 'test', 'male', 10],
@@ -92,7 +91,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function count_returns_number_of_entities()
+    public function count_returns_number_of_entities()
     {
         $users = $this->users;
         $this->assertEquals(4, $users->count());
@@ -101,11 +100,11 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function filter_creates_subset_of_new_collection()
+    public function filter_creates_subset_of_new_collection()
     {
         $users = $this->users;
         $females = $users->filter(function($entity) {
-            return $entity->gender == 'female';
+            return $entity->gender === 'female';
         });
         $this->assertEquals(4, $users->count());
         $this->assertEquals(2, $females->count());
@@ -114,7 +113,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function walk_alters_all_entities()
+    public function walk_alters_all_entities()
     {
         $users = $this->users;
         $users->walk(function (EntityInterface $entity) {
@@ -128,7 +127,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function map_will_extract_array()
+    public function map_will_extract_array()
     {
         $users = $this->users;
         $scores = $users->map(function (EntityInterface $entity) {
@@ -143,7 +142,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function sum_max_min_return_some_int()
+    public function sum_max_min_return_some_int()
     {
         $users = $this->users;
         $this->assertEquals(100, $users->sum('score'));

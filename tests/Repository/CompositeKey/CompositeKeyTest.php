@@ -20,7 +20,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
      */
     private $repo;
 
-    function setup()
+    public function setup()
     {
         class_exists(Repo::class);
         class_exists(Container::class);
@@ -40,7 +40,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     /**
      * @return ContainerInterface
      */
-    function getContainer()
+    public function getContainer()
     {
         $c = new Repo();
         $c->set(PDO::class, function () {
@@ -68,7 +68,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function HasMany_returns_related_entities()
+    public function HasMany_returns_related_entities()
     {
         /** @var Member $members */
         $members = $this->repo->getRepository('member');
@@ -76,9 +76,9 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Main Member', $main->get('name'));
 
         $orders = $members->orders($main);
-        $this->assertEquals(3, count($orders->collect()));
-        $this->assertEquals(1, count($orders->collect(['fee_year' => 2015])));
-        $this->assertEquals(2, count($orders->collect(['fee_year' => 2016])));
+        $this->assertCount(3, $orders->collect());
+        $this->assertCount(1, $orders->collect(['fee_year' => 2015]));
+        $this->assertCount(2, $orders->collect(['fee_year' => 2016]));
 
         $order2015 = $orders->collect(['fee_year' => 2015])[0];
         $this->assertEquals([
@@ -92,7 +92,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function hasOne_returns_related_entity()
+    public function hasOne_returns_related_entity()
     {
         /** @var Order $order */
         $order         = $this->repo->getRepository('order');
@@ -110,7 +110,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function hasJoin_returns_related_entities()
+    public function hasJoin_returns_related_entities()
     {
         /** @var Member $members */
         $members = $this->repo->getRepository('member');
@@ -119,13 +119,13 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
 
         $feeJoined = $members->fees($main);
         $fees      = $feeJoined->collect();
-        $this->assertEquals(3, count($fees));
+        $this->assertCount(3, $fees);
     }
 
     /**
      * @test
      */
-    function hasJoin_remove_deletes_a_relation()
+    public function hasJoin_remove_deletes_a_relation()
     {
         /** @var Member $members */
         $members = $this->repo->getRepository('member');
@@ -134,13 +134,13 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         // retrieve associated fees.
         $joinedFees = $members->fees($main);
         $fees       = $joinedFees->collect();
-        $this->assertEquals(3, count($fees));
+        $this->assertCount(3, $fees);
 
         // this is the fee to remove.
         $feeRemove = $fees[1];
         $joinedFees->delete($feeRemove);
         $fees2 = $joinedFees->collect();
-        $this->assertEquals(2, count($fees2));
+        $this->assertCount(2, $fees2);
         // make sure the remaining 2 fees are not $feeRemove
         foreach($fees2 as $f) {
             $this->assertNotEquals($feeRemove->getKeys(), $f->getKeys());
@@ -150,7 +150,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function hasJoin_relate_adds_a_new_entity()
+    public function hasJoin_relate_adds_a_new_entity()
     {
         /** @var Member $members */
         $members = $this->repo->getRepository('member');
@@ -159,7 +159,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         // retrieve associated fees.
         $joinedFees = $members->fees($subMem);
         $fees1       = $joinedFees->collect();
-        $this->assertEquals(2, count($fees1));
+        $this->assertCount(2, $fees1);
 
         // fees to add...
         $feeToAdd = $this->repo->getRepository('fee')->findByKey(['year' => 2016, 'type' => 2, 'code' => 'SYSTEM']);
@@ -168,10 +168,10 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
 
         // check if $feeToAdd is related
         $fees2       = $joinedFees->collect();
-        $this->assertEquals(3, count($fees2));
+        $this->assertCount(3, $fees2);
         $containsFeeToAdd = function() use($feeToAdd, $fees2) {
             foreach($fees2 as $f) {
-                if ($feeToAdd->getKeys() == $f->getKeys()) {
+                if ($feeToAdd->getKeys() === $f->getKeys()) {
                     return true;
                 }
             }
@@ -183,7 +183,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function hasJoin_clean_removes_all_relations()
+    public function hasJoin_clean_removes_all_relations()
     {
         /** @var Member $members */
         $members = $this->repo->getRepository('member');
@@ -192,7 +192,7 @@ class CompositeKeyTest extends PHPUnit_Framework_TestCase
         // retrieve associated fees.
         $joinedFees = $members->fees($subMem);
         $fees1       = $joinedFees->collect();
-        $this->assertEquals(2, count($fees1));
+        $this->assertCount(2, $fees1);
 
         $joinedFees->clear();
         $this->assertEmpty($joinedFees->collect());

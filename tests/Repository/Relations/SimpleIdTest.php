@@ -61,9 +61,6 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
         return $c;
     }
 
-    /**
-     * @test
-     */
     public function test_hasOne()
     {
         $users = $this->repo->getRepository('users');

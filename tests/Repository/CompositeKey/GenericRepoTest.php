@@ -18,7 +18,7 @@ class GenericRepoTest extends PHPUnit_Framework_TestCase
      */
     private $repo;
 
-    function setup()
+    public function setup()
     {
         $this->pdo = new PDO('sqlite::memory:');
         $fixture = new FixtureCompositeKey($this->pdo);
@@ -27,11 +27,11 @@ class GenericRepoTest extends PHPUnit_Framework_TestCase
         $this->repo = new Repo($this->pdo);
     }
 
-    function test0()
+    public function test0()
     {
         $fees = $this->repo->getRepository('fees', ['year', 'type', 'code']);
         $fee2016 = $fees->find(['year' => 2016]);
-        $this->assertEquals(4, count($fee2016));
+        $this->assertCount(4, $fee2016);
         foreach($fee2016 as $f) {
             $this->assertEquals(2016, $f->get('year'));
         }
@@ -40,7 +40,7 @@ class GenericRepoTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function findByKey_works_for_composite_keys()
+    public function findByKey_works_for_composite_keys()
     {
         $members = $this->repo->getRepository('members', ['type', 'code']);
         $main    = $members->findByKey(['type' => 1, 'code' => 100]);

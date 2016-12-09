@@ -80,21 +80,21 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $hasOne->count());
         $post1users = $hasOne->collect();
         $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($post1users));
-        $this->assertEquals(1, count($post1users));
+        $this->assertCount(1, $post1users);
         $this->assertEquals($user1->get('name'), $post1users[0]->get('name'));
 
         // retrieve posts from a user entity.
         $hasMany = $repo->hasMany($users, $posts)->withEntity($user2);
         $this->assertEquals(2, $hasMany->count());
         $user2posts = $hasMany->collect();
-        $this->assertEquals(2, count($user2posts));
+        $this->assertCount(2, $user2posts);
         $this->assertEquals($post2->get('contents'), $user2posts[0]->get('contents'));
         $this->assertEquals($post3->get('contents'), $user2posts[1]->get('contents'));
 
         // retrieve posts in opposite order.
         /** @var EntityInterface[] $user2posts */
         $user2posts = $hasMany->query()->orderBy('post_id', 'DESC')->find();
-        $this->assertEquals(2, count($user2posts));
+        $this->assertCount(2, $user2posts);
         $this->assertEquals($post3->get('contents'), $user2posts[0]->get('contents'));
         $this->assertEquals($post2->get('contents'), $user2posts[1]->get('contents'));
     }

@@ -24,7 +24,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      */
     private $fix;
 
-    function setup()
+    public function setup()
     {
         class_exists(Container::class);
         class_exists(Repo::class);
@@ -39,7 +39,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     /**
      * @return ContainerInterface|Repo
      */
-    function getFullContainer()
+    public function getFullContainer()
     {
         $c    = new Repo();
         $c->set(PDO::class, function () {
@@ -58,7 +58,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function repo_returns_generic_repository()
+    public function repo_returns_generic_repository()
     {
         $dao = $this->repo->getRepository('testing');
         $this->assertEquals(Repository::class, get_class($dao));
@@ -69,7 +69,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function Repo_uses_container_to_retrieve_various_objects()
+    public function Repo_uses_container_to_retrieve_various_objects()
     {
         $c    = new Repo();
         $c->set('testing', 'tested');
@@ -82,7 +82,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
 
         // retrieve QueryInterface
         $query = $repo->getQuery();
-        $this->assertTrue($query instanceof QueryInterface);
+        $this->assertInstanceOf(QueryInterface::class, $query);
 
         // retrieve query-table repository, which has query object with table 'query-table'
         $query = $repo->getRepository('query-table')->query();
@@ -96,7 +96,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      * @param Fixture $fix
      * @param Repo    $repo
      */
-    function do_Repo_retrieves_entities_from_database($fix, $repo)
+    public function do_Repo_retrieves_entities_from_database($fix, $repo)
     {
         $fix->createUsers();
         $fix->insertUsers(2);
@@ -114,7 +114,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     /**
      * @ test
      */
-    function Repo_inserts_entity_and_sets_auto_increment_key()
+    public function Repo_inserts_entity_and_sets_auto_increment_key()
     {
         $this->do_Repo_inserts_entity_and_sets_auto_increment_key($this->fix, $this->repo);
         $c = $this->getFullContainer();
@@ -125,7 +125,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      * @param Fixture $fix
      * @param Repo    $repo
      */
-    function do_Repo_inserts_entity_and_sets_auto_increment_key($fix, $repo)
+    public function do_Repo_inserts_entity_and_sets_auto_increment_key($fix, $repo)
     {
         $fix->createUsers();
         $fix->insertUsers(1);
@@ -148,7 +148,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     /**
      * @ test
      */
-    function Repo_updates_only_the_entity_data()
+    public function Repo_updates_only_the_entity_data()
     {
         $this->do_Repo_updates_only_the_entity_data($this->fix, $this->repo);
         $c = $this->getFullContainer();
@@ -159,7 +159,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      * @param Fixture $fix
      * @param Repo    $repo
      */
-    function do_Repo_updates_only_the_entity_data($fix, $repo)
+    public function do_Repo_updates_only_the_entity_data($fix, $repo)
     {
         $fix->createUsers();
         $fix->insertUsers(2);

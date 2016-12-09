@@ -98,7 +98,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $userList = $userRepo->collectFor(['users_id' => 2]);
         
         $postList = $userList->load('posts');
-        $this->assertEquals(2, count($postList->getRelatedEntities($userList[0])));
+        $this->assertCount(2, $postList->getRelatedEntities($userList[0]));
         foreach($postList->getRelatedEntities($userList[0]) as $post) {
             $this->assertEquals('2', $post->get('users_id'));
         }
@@ -114,8 +114,8 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $userList[0] = $user2;
         $userList[]  = $user3;
         $postList = $userList->load('posts');
-        $this->assertEquals(2, count($postList->getRelatedEntities($user2)));
-        $this->assertEquals(1, count($postList->getRelatedEntities($user3)));
+        $this->assertCount(2, $postList->getRelatedEntities($user2));
+        $this->assertCount(1, $postList->getRelatedEntities($user3));
         foreach($postList->getRelatedEntities($user2) as $post) {
             $this->assertEquals('2', $post->get('users_id'));
         }
@@ -155,10 +155,10 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $userList = new Collection($this->c->get('users'));
         $userList->setEntities([$user1]);
         $postList = $userList->load('posts');
-        $this->assertEquals(1, count($postList->getRelatedEntities($user1)));
+        $this->assertCount(1, $postList->getRelatedEntities($user1));
         $post = $postList[0];
         $tagsList = $postList->load('tags');
-        $this->assertEquals(2, count($tagsList->getRelatedEntities($post)));
+        $this->assertCount(2, $tagsList->getRelatedEntities($post));
     }
 
     /**
@@ -175,15 +175,15 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
         $list->load('posts')->load('tags');
 
         list($user1, $user2) = $list;
-        $this->assertEquals(1, count($user1->posts));
+        $this->assertCount(1, $user1->posts);
         $post10 = $user1->posts[0];
-        $this->assertEquals(2, count($post10->tags));
+        $this->assertCount(2, $post10->tags);
         $this->assertEquals('test tag', $post10->tags[0]->tag);
         $this->assertEquals('tagged', $post10->tags[1]->tag);
 
-        $this->assertEquals(2, count($user2->posts));
+        $this->assertCount(2, $user2->posts);
         $post20 = $user2->posts[0];
-        $this->assertEquals(1, count($post20->tags));
+        $this->assertCount(1, $post20->tags);
         $this->assertEquals('blogging', $post20->tags[0]->tag);
     }
 
@@ -200,12 +200,12 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
             $id = array_shift($idList);
             $this->assertEquals($id, $entity->users_id);
         }
-        $this->assertEquals(2, count($list));
+        $this->assertCount(2, $list);
         $this->assertTrue(isset($list[0]));
         $this->assertTrue(isset($list[1]));
         $this->assertFalse(isset($list[2]));
         
         unset($list[0]);
-        $this->assertEquals(1, count($list));
+        $this->assertCount(1, $list);
     }
 }
