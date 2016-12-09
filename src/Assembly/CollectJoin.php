@@ -74,7 +74,7 @@ class CollectJoin extends Collection implements CollectRelatedInterface
 
     /**
      * @param EntityInterface $fromEntity
-     * @return Collection|EntityInterface[]
+     * @return Collection
      */
     public function getRelatedEntities($fromEntity)
     {

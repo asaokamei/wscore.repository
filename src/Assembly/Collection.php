@@ -6,6 +6,7 @@ use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
+/** @noinspection PhpInconsistentReturnPointsInspection */
 class Collection implements CollectionInterface
 {
     /**
@@ -263,8 +264,10 @@ class Collection implements CollectionInterface
         }, null);
     }
 
+    /** @noinspection PhpInconsistentReturnPointsInspection */
     /**
      * use generator as iterator.
+     * @return EntityInterface[]
      */
     public function getIterator()
     {

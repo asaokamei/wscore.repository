@@ -87,7 +87,7 @@ abstract class AbstractRelation implements RelationInterface
 
     /**
      * @param array $keys
-     * @return Collection|EntityInterface[]
+     * @return Collection
      */
     public function collect($keys = [])
     {

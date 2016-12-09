@@ -165,7 +165,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $key
-     * @return null|string|Collection|EntityInterface[]
+     * @return null|string|Collection
      */
     public function get($key)
     {
@@ -312,7 +312,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $name
-     * @return null|Collection|EntityInterface[]
+     * @return null|Collection
      */
     protected function _getRelatedEntities($name)
     {
@@ -327,7 +327,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $name
-     * @return Collection|EntityInterface[]
+     * @return Collection
      * @throws \InvalidArgumentException
      */
     public function getRelatedEntities($name)
@@ -340,7 +340,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $name
-     * @return null|string|Collection|EntityInterface[]
+     * @return null|string|Collection
      */
     public function __get($name)
     {
@@ -349,7 +349,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $name
-     * @param Collection|EntityInterface[] $entities
+     * @param Collection $entities
      */
     public function setRelatedEntities($name, $entities)
     {

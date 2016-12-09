@@ -271,7 +271,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @param EntityInterface[] $entities
      * @param null|RelationInterface|JoinRelationInterface $relation
-     * @return Collection|EntityInterface[]
+     * @return Collection
      */
     public function newCollection(array $entities = [], $relation = null)
     {
@@ -285,7 +285,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
     /**
      * @param array $keys
-     * @return Collection|EntityInterface[]
+     * @return Collection
      */
     public function collectFor(array $keys)
     {
@@ -298,7 +298,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
     /**
      * @param array $keys
-     * @return Collection|EntityInterface[]
+     * @return Collection
      * @throws \InvalidArgumentException
      */
     public function collectByKey(array $keys)
@@ -312,7 +312,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
     /**
      * @param string $id
-     * @return Collection|EntityInterface[]
+     * @return Collection
      * @throws \InvalidArgumentException
      */
     public function collectById($id)
@@ -327,7 +327,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @param string $sql
      * @param array  $data
-     * @return Collection|EntityInterface[]
+     * @return Collection
      */
     public function collect($sql, array $data = [])
     {

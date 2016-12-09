@@ -98,7 +98,7 @@ interface RepositoryInterface
      * 
      * @param string $sql
      * @param array  $data
-     * @return Collection|EntityInterface[]
+     * @return Collection
      */
     public function collect($sql, array $data = []);
 
@@ -106,7 +106,7 @@ interface RepositoryInterface
      * returns a Collection for given $keys as condition.
      *
      * @param array $keys
-     * @return Collection|EntityInterface[]
+     * @return Collection
      */
     public function collectFor(array $keys);
 
@@ -115,7 +115,7 @@ interface RepositoryInterface
      * throws an InvalidArgumentException if no or more than one entity were found.
      *
      * @param array $keys
-     * @return Collection|EntityInterface[]
+     * @return Collection
      */
     public function collectByKey(array $keys);
 
@@ -125,7 +125,7 @@ interface RepositoryInterface
      * throws an InvalidArgumentException if no or more than one entity were found.
      *
      * @param string $id
-     * @return Collection|EntityInterface[]
+     * @return Collection
      * @throws \InvalidArgumentException
      */
     public function collectById($id);

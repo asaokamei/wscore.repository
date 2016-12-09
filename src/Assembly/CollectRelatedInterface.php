@@ -19,7 +19,7 @@ interface CollectRelatedInterface extends CollectionInterface
      * get the related entities for the $fromEntity.
      * 
      * @param EntityInterface $fromEntity
-     * @return Collection|EntityInterface[]
+     * @return Collection
      */
     public function getRelatedEntities($fromEntity);
 }
