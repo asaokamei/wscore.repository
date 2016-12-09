@@ -4,7 +4,7 @@ namespace WScore\Repository\Relations;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
 
-interface JoinRelationInterface extends RelationInterface
+interface JoinRelationInterface
 {
     /**
      * get keys from source entity to query join repository. 

@@ -2,7 +2,6 @@
 namespace WScore\Repository\Entity;
 
 use WScore\Repository\Assembly\Collection;
-use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Relations\RelationInterface;
 
 interface EntityInterface
@@ -101,7 +100,7 @@ interface EntityInterface
     /**
      * @param string $name
      * @param array  $args
-     * @return JoinRelationInterface|RelationInterface|mixed
+     * @return RelationInterface|mixed
      * @throws \BadMethodCallException
      */
     public function __call($name, $args);
@@ -138,7 +137,7 @@ interface EntityInterface
      * gets relation object from repository's $name method. 
      * 
      * @param string $name
-     * @return JoinRelationInterface|RelationInterface
+     * @return RelationInterface
      * @throws \InvalidArgumentException
      */
     public function getRelationObject($name);

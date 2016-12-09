@@ -27,7 +27,7 @@ interface RelationInterface
      * sets from-entity to query target repository. 
      *
      * @param EntityInterface[] ...$sourceEntity
-     * @return RelationInterface|JoinRelationInterface
+     * @return RelationInterface
      */
     public function withEntity(...$sourceEntity);
 
@@ -66,4 +66,10 @@ interface RelationInterface
      * @param EntityInterface $targetEntity
      */
     public function relate(EntityInterface $targetEntity);
+
+    /**
+     * @return JoinRelationInterface
+     * @throws \BadMethodCallException
+     */
+    public function join();
 }

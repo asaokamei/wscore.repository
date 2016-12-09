@@ -4,12 +4,13 @@ namespace WScore\Repository\Assembly;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Relations\JoinRelationInterface;
+use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
 class CollectJoin extends Collection
 {
     /**
-     * @var JoinRelationInterface
+     * @var RelationInterface
      */
     protected $relation;
     
@@ -78,7 +79,7 @@ class CollectJoin extends Collection
      */
     public function getRelatedEntities($fromEntity)
     {
-        $key = $this->relation->getJoinKeys($fromEntity);
+        $key = $this->relation->join()->getJoinKeys($fromEntity);
         $key = HelperMethods::flattenKey($key);
         if (!array_key_exists($key, $this->indexedJoin)) {
             return $this->repository->newCollection([], $this->relation);
@@ -101,7 +102,7 @@ class CollectJoin extends Collection
      */
     private function setConvertJoin($entity)
     {
-        $keys              = $this->relation->getJoinKeys($entity);
+        $keys              = $this->relation->join()->getJoinKeys($entity);
         $this->convertJoin = array_keys($keys);
     }
 
@@ -129,7 +130,7 @@ class CollectJoin extends Collection
         if (empty($joinEntities)) {
             return;
         }
-        $found = $this->relation->queryTarget(...$joinEntities)->find();
+        $found = $this->relation->join()->queryTarget(...$joinEntities)->find();
         $this->setEntities($found);
         /** @var EntityInterface[] $found */
         foreach ($found as $toEntity) {

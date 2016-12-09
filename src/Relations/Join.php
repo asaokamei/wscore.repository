@@ -182,4 +182,12 @@ class Join extends AbstractRelation implements JoinRelationInterface
             $this->joinRepo->insert($join);
         }
     }
+
+    /**
+     * @return JoinRelationInterface
+     */
+    public function join()
+    {
+        return $this;
+    }
 }

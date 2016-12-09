@@ -8,7 +8,6 @@ use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Entity\Entity;
 use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Query\QueryInterface;
-use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repo;
 
@@ -270,7 +269,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
     /**
      * @param EntityInterface[] $entities
-     * @param null|RelationInterface|JoinRelationInterface $relation
+     * @param null|RelationInterface $relation
      * @return Collection
      */
     public function newCollection(array $entities = [], $relation = null)

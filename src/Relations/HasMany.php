@@ -57,4 +57,12 @@ class HasMany extends AbstractRelation
             $targetEntity->setForeignKeys($entity, $this->convert);
         }
     }
+
+    /**
+     * @throws \BadMethodCallException
+     */
+    public function join()
+    {
+        throw new \BadMethodCallException('BelongsTo relation cannot return join part.');
+    }
 }

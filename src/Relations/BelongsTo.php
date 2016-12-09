@@ -58,4 +58,12 @@ class BelongsTo extends AbstractRelation
             $sourceEntity->setForeignKeys($targetEntity, $this->convert);
         }
     }
+
+    /**
+     * @throws \BadMethodCallException
+     */
+    public function join()
+    {
+        throw new \BadMethodCallException('BelongsTo relation cannot return join part.');
+    }
 }

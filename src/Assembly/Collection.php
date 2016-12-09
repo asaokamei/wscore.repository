@@ -15,7 +15,7 @@ class Collection implements CollectionInterface
     protected $repository;
 
     /**
-     * @var RelationInterface|JoinRelationInterface
+     * @var RelationInterface
      */
     protected $relation;
 
@@ -31,7 +31,7 @@ class Collection implements CollectionInterface
 
     /**
      * @param RepositoryInterface $repository
-     * @param null|RelationInterface|JoinRelationInterface $relation
+     * @param null|RelationInterface $relation
      */
     public function __construct($repository, $relation = null)
     {
@@ -82,9 +82,8 @@ class Collection implements CollectionInterface
     public function delete(EntityInterface $entity)
     {
         if ($this->relation) {
-            $this->relation->delete($entity);
+            $this->relation->join()->delete($entity);
         }
-        $this->relation->delete($entity);
         foreach($this->entities as $idx => $e) {
             if ($e->getKeys() === $entity->getKeys()) {
                 unset($this->entities[$idx]);
@@ -161,8 +160,8 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @param $relation
-     * @param $entities
+     * @param RelationInterface $relation
+     * @param EntityInterface[] $entities
      * @return CollectionInterface
      * @throws \InvalidArgumentException
      */

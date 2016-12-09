@@ -4,7 +4,6 @@ namespace WScore\Repository\Entity;
 use BadMethodCallException;
 use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Helpers\HelperMethods;
-use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
@@ -66,7 +65,7 @@ abstract class AbstractEntity implements EntityInterface
     protected $relatedEntities = [];
 
     /**
-     * @var RelationInterface[]|JoinRelationInterface[]
+     * @var RelationInterface[]
      */
     protected $relations = [];
 
@@ -265,7 +264,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * @param string $name
      * @param array  $args
-     * @return JoinRelationInterface|RelationInterface|mixed
+     * @return RelationInterface|mixed
      * @throws \BadMethodCallException
      */
     public function __call($name, $args)
@@ -279,7 +278,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $name
-     * @return null|JoinRelationInterface|RelationInterface
+     * @return null|RelationInterface
      */
     private function _getRelationObject($name)
     {
@@ -299,7 +298,7 @@ abstract class AbstractEntity implements EntityInterface
 
     /**
      * @param string $name
-     * @return JoinRelationInterface|RelationInterface
+     * @return RelationInterface
      * @throws \InvalidArgumentException
      */
     public function getRelationObject($name)
