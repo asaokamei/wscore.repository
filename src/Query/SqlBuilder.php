@@ -234,7 +234,7 @@ class SqlBuilder
      */
     private function getHolderName($value)
     {
-        $holder                = "holder_" . $this->value_count++;
+        $holder                = 'holder_' . $this->value_count++;
         $this->params[$holder] = $value;
 
         return ':' . $holder;
@@ -301,7 +301,7 @@ class SqlBuilder
         foreach($value as $v) {
             $list[] = $this->getHolderName($v);
         }
-        return "{$column} IN ( " . implode(', ', $list) . " )";
+        return "{$column} IN ( " . implode(', ', $list) . ' )';
     }
 
     /**

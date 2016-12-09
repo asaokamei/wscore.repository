@@ -82,7 +82,7 @@ class Repo implements ContainerInterface
      * @param null|RepositoryOptions   $options
      * @return RepositoryInterface
      */
-    public function getRepository($tableName, $primaryKeys = [], $autoIncrement = false, $options = null)
+    public function getRepository($tableName, array $primaryKeys = [], $autoIncrement = false, $options = null)
     {
         if (!$this->has($tableName)) {
             $this->set(
@@ -102,7 +102,7 @@ class Repo implements ContainerInterface
     public function belongsTo(
         $sourceRepo,
         $repo,
-        $convert = []
+        array $convert = []
     ) {
         if (is_string($sourceRepo)) {
             $sourceRepo = $this->getRepository($sourceRepo);
@@ -122,7 +122,7 @@ class Repo implements ContainerInterface
     public function hasMany(
         $sourceRepo,
         $repo,
-        $convert = []
+        array $convert = []
     ) {
         if (is_string($sourceRepo)) {
             $sourceRepo = $this->getRepository($sourceRepo);
@@ -136,7 +136,7 @@ class Repo implements ContainerInterface
     /**
      * @param RepositoryInterface|string $fromRepo
      * @param RepositoryInterface|string $toRepo
-     * @param string $joinRepo
+     * @param RepositoryInterface|string $joinRepo
      * @param array  $from_convert
      * @param array  $to_convert
      * @return Join
@@ -145,8 +145,8 @@ class Repo implements ContainerInterface
         $fromRepo,
         $toRepo,
         $joinRepo = '',
-        $from_convert = [],
-        $to_convert = []
+        array $from_convert = [],
+        array $to_convert = []
     ) {
         if (is_string($fromRepo)) {
             $fromRepo = $this->getRepository($fromRepo);
@@ -187,10 +187,10 @@ function makeJoinTableName(
  * @param string $tableName
  * @param array  $primaryKeys
  * @param bool   $autoIncrement
- * @param null   $options
+ * @param null|RepositoryOptions   $options
  * @return Repository
  */
-function makeGenericRepository($repo, $tableName, $primaryKeys = [], $autoIncrement = false, $options = null)
+function makeGenericRepository($repo, $tableName, array $primaryKeys = [], $autoIncrement = false, $options = null)
 {
     if (!$options) {
         $options = new RepositoryOptions();

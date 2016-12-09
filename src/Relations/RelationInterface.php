@@ -51,7 +51,7 @@ interface RelationInterface
      * @param array $keys
      * @return Collection
      */
-    public function collect($keys = []);
+    public function collect(array $keys = []);
 
     /**
      * count the related entities.

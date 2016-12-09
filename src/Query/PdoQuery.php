@@ -15,12 +15,12 @@ class PdoQuery implements QueryInterface
     /**
      * @var callable
      */
-    private $fetchMode = null;
+    private $fetchMode;
 
     /**
      * @var SqlBuilder
      */
-    private $builder = null;
+    private $builder;
 
     /**
      * PdoQuery constructor.
@@ -37,7 +37,7 @@ class PdoQuery implements QueryInterface
      * @param array  $data
      * @return PDOStatement
      */
-    public function execute($sql, $data = [])
+    public function execute($sql, array $data = [])
     {
         $stmt = $this->pdo->prepare($sql);
         if ($stmt instanceof PDOStatement) {
@@ -72,7 +72,7 @@ class PdoQuery implements QueryInterface
      */
     public function withTable($table, $orderDefault = null)
     {
-        $self = clone($this);
+        $self = clone $this;
         $self->builder = SqlBuilder::forge($table, $orderDefault);
         
         return $self;
@@ -83,7 +83,7 @@ class PdoQuery implements QueryInterface
      */
     public function newQuery()
     {
-        $self = clone($this);
+        $self = clone $this;
         $self->builder = clone $self->builder;
         return $self;
     }
@@ -132,7 +132,7 @@ class PdoQuery implements QueryInterface
      * @param array $keys
      * @return mixed[]|EntityInterface[]
      */
-    public function find($keys = [])
+    public function find(array $keys = [])
     {
         return $this->select($keys)->fetchAll();
     }
@@ -169,7 +169,7 @@ class PdoQuery implements QueryInterface
      * @param array $keys
      * @return PDOStatement
      */
-    public function select($keys = [])
+    public function select(array $keys = [])
     {
         $this->condition($keys);
         $this->builder->makeSelect();
@@ -183,7 +183,7 @@ class PdoQuery implements QueryInterface
      * @param array $keys
      * @return int
      */
-    public function count($keys = [])
+    public function count(array $keys = [])
     {
         $this->condition($keys);
         $this->builder->makeCount();

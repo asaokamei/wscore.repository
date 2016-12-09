@@ -61,7 +61,7 @@ abstract class AbstractEntity implements EntityInterface
     protected $repo;
 
     /**
-     * @var EntityInterface[][]
+     * @var Collection[]
      */
     protected $relatedEntities = [];
 

@@ -11,7 +11,7 @@ interface QueryInterface
      * @param array  $data
      * @return PDOStatement
      */
-    public function execute($sql, $data = []);
+    public function execute($sql, array $data = []);
 
     /**
      * sets database table name to query.
@@ -68,7 +68,7 @@ interface QueryInterface
      * @param array $keys
      * @return mixed[]|EntityInterface[]
      */
-    public function find($keys = []);
+    public function find(array $keys = []);
 
     /**
      * execute select statement with $keys as condition.
@@ -77,7 +77,7 @@ interface QueryInterface
      * @param array $keys
      * @return PDOStatement
      */
-    public function select($keys = []);
+    public function select(array $keys = []);
 
     /**
      * returns the number of rows found.
@@ -86,7 +86,7 @@ interface QueryInterface
      * @param array $keys
      * @return int
      */
-    public function count($keys = []);
+    public function count(array $keys = []);
     
     /**
      * insert a data into a database table.

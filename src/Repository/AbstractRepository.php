@@ -236,7 +236,7 @@ abstract class AbstractRepository implements RepositoryInterface
     {
         $statement = $this->query()->select($keys);
         if (!$statement) {
-            return null;
+            return [];
         }
         return $statement->fetchAll();
     }
@@ -355,7 +355,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * with the new id.
      *
      * @param EntityInterface $entity
-     * @return EntityInterface
+     * @return EntityInterface|null
      */
     public function insert(EntityInterface $entity)
     {

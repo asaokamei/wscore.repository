@@ -14,7 +14,7 @@ class Query implements QueryInterface
     public $keys;
     private $sql;
 
-    public function execute($sql, $data = [])
+    public function execute($sql, array $data = [])
     {
         $this->sql  = $sql;
         $this->data = $data;
@@ -81,7 +81,7 @@ class Query implements QueryInterface
      * @param array $keys
      * @return array
      */
-    public function find($keys = [])
+    public function find(array $keys = [])
     {
         return $this->select($keys)->fetchAll();
     }
@@ -106,7 +106,7 @@ class Query implements QueryInterface
      * @param array $keys
      * @return PDOStatement
      */
-    public function select($keys = [])
+    public function select(array $keys = [])
     {
         $this->keys = $keys;
         return new PDOStatement();
@@ -119,7 +119,7 @@ class Query implements QueryInterface
      * @param array $keys
      * @return int
      */
-    public function count($keys = [])
+    public function count(array $keys = [])
     {
         $this->keys = $keys;
         return count($keys);

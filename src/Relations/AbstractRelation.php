@@ -89,7 +89,7 @@ abstract class AbstractRelation implements RelationInterface
      * @param array $keys
      * @return Collection
      */
-    public function collect($keys = [])
+    public function collect(array $keys = [])
     {
         $query = $this->query();
         $found = $query ? $query->select($keys)->fetchAll() : [];

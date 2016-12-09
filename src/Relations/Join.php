@@ -147,7 +147,7 @@ class Join extends AbstractRelation implements JoinRelationInterface
 
     /**
      * @param EntityInterface[] ...$joinEntities
-     * @return QueryInterface
+     * @return QueryInterface|null
      */    
     public function queryTarget(...$joinEntities)
     {
