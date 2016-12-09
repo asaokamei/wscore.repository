@@ -14,7 +14,7 @@ use WScore\Repository\Repository\Repository;
 
 class RelationsTest extends \PHPUnit_Framework_TestCase
 {
-    function setup()
+    public function setup()
     {
         class_exists(Container::class);
         class_exists(Repo::class);
@@ -25,7 +25,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     /**
      * @return ContainerInterface|Repo
      */
-    function getFullContainer()
+    public function getFullContainer()
     {
         $c    = new Repo();
         $c->set(PDO::class, function () {
@@ -49,7 +49,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function retrieve_entities_using_hasOne_and_hasMany()
+    public function retrieve_entities_using_hasOne_and_hasMany()
     {
         $c = $this->getFullContainer();
         $fix = $c->get(Fixture::class);
@@ -60,15 +60,15 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
         // get users
         $users = $repo->getRepository('users');
-        $user1 = $users->findByKey(1);
-        $user2 = $users->findByKey(2);
+        $user1 = $users->findById(1);
+        $user2 = $users->findById(2);
 
         // get posts
         $posts = $repo->getRepository('posts');
-        $post1 = $posts->findByKey(1);
-        $post2 = $posts->findByKey(2);
-        $post3 = $posts->findByKey(3);
-        $post4 = $posts->findByKey(4);
+        $post1 = $posts->findById(1);
+        $post2 = $posts->findById(2);
+        $post3 = $posts->findById(3);
+        $post4 = $posts->findById(4);
         // let's check users_id in the post data...
         $this->assertEquals(1, $post1->get('users_id'));
         $this->assertEquals(2, $post2->get('users_id'));
@@ -102,7 +102,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function relate()
+    public function relate()
     {
         $c = $this->getFullContainer();
         $fix = $c->get(Fixture::class);
@@ -117,12 +117,12 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
 
         // get users
         $users = $repo->getRepository('users');
-        $user1 = $users->findByKey(1);
-        $user2 = $users->findByKey(2);
+        $user1 = $users->findById(1);
+        $user2 = $users->findById(2);
 
         // get posts
         $posts = $repo->getRepository('posts');
-        $post2 = $posts->findByKey(2); // should belong to user2
+        $post2 = $posts->findById(2); // should belong to user2
         $this->assertEquals(2, $post2->get('users_id'));
 
         /**
@@ -143,7 +143,7 @@ class RelationsTest extends \PHPUnit_Framework_TestCase
          * put $post1 as $user2's post
          */
         // put $post1 to user2
-        $post1 = $posts->findByKey(1); // should belong to user1
+        $post1 = $posts->findById(1); // should belong to user1
         $hasOne = $repo->belongsTo('posts', 'users')->withEntity($post1);
         $hasOne->relate($user2);
         $this->assertEquals(2, $post1->get('users_id'));

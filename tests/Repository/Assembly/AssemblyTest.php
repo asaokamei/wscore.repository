@@ -79,10 +79,10 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
-        $user2    = $userRepo->findByKey(2);
-        $userList = $userRepo->collectByKey(2);
+        $user2    = $userRepo->findById(2);
+        $userList = $userRepo->collectById(2);
         $postList = $userList->load('posts');
-        $this->assertEquals(2, count($postList->getRelatedEntities($user2)));
+        $this->assertCount(2, $postList->getRelatedEntities($user2));
         foreach($postList->getRelatedEntities($user2) as $post) {
             $this->assertEquals('2', $post->get('users_id'));
         }
@@ -108,8 +108,8 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
-        $user2    = $userRepo->findByKey(2);
-        $user3    = $userRepo->findByKey(3);
+        $user2    = $userRepo->findById(2);
+        $user3    = $userRepo->findById(3);
         $userList = new Collection($this->c->get('users'));
         $userList[0] = $user2;
         $userList[]  = $user3;
@@ -131,8 +131,8 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
-        $user2    = $userRepo->findByKey(2);
-        $user3    = $userRepo->findByKey(3);
+        $user2    = $userRepo->findById(2);
+        $user3    = $userRepo->findById(3);
         
         $userList = $userRepo->collectFor(['users_id' => [2,3]]);
         $userList->load('posts');
@@ -151,7 +151,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Users $userRepo */
         $userRepo = $this->c->get('users');
-        $user1    = $userRepo->findByKey(1);
+        $user1    = $userRepo->findById(1);
         $userList = new Collection($this->c->get('users'));
         $userList->setEntities([$user1]);
         $postList = $userList->load('posts');

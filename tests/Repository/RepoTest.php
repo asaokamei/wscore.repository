@@ -102,7 +102,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         $fix->insertUsers(2);
         $users = $repo->getRepository('users');
         
-        $user1 = $users->findByKey(1);
+        $user1 = $users->findById(1);
         $this->assertEquals(1, $user1->getIdValue());
         $this->assertEquals('name-1', $user1->get('name'));
         
@@ -131,7 +131,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         $fix->insertUsers(1);
         $users = $repo->getRepository('users', ['users_id'], true);
 
-        $this->assertEquals(null, $users->findByKey(2));
+        $this->assertEquals(null, $users->findById(2));
         $userN = $users->create([
             'name' => 'test-insert',
             'gender' => 'T',
@@ -140,7 +140,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         $users->insert($userN);
         $this->assertTrue($userN->isFetched());
 
-        $user2 = $users->findByKey(2);
+        $user2 = $users->findById(2);
         $this->assertEquals($userN->getKeys(), $user2->getKeys());
         $this->assertEquals($userN->get('name'), $user2->get('name'));
     }
@@ -165,15 +165,15 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         $fix->insertUsers(2);
         $users = $repo->getRepository('users');
 
-        $user2 = $users->findByKey(2);
+        $user2 = $users->findById(2);
         $user2->fill(['name' => 'test-update']);
         $users->update($user2);
 
-        $user1 = $users->findByKey(1);
+        $user1 = $users->findById(1);
         $this->assertEquals(1, $user1->getIdValue());
         $this->assertEquals('name-1', $user1->get('name'));
 
-        $user2 = $users->findByKey(2);
+        $user2 = $users->findById(2);
         $this->assertEquals(2, $user2->getIdValue());
         $this->assertEquals('test-update', $user2->get('name'));
     }
@@ -181,7 +181,7 @@ class RepoTest extends \PHPUnit_Framework_TestCase
     /**
      * @ test
      */
-    function Repo_save_insert_or_update_depending_on_entity_is_fetched()
+    public function Repo_save_insert_or_update_depending_on_entity_is_fetched()
     {
         $this->do_Repo_save_insert_or_update_depending_on_entity_is_fetched($this->fix, $this->repo);
         $c = $this->getFullContainer();
@@ -192,13 +192,13 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      * @param Fixture $fix
      * @param Repo    $repo
      */
-    function do_Repo_save_insert_or_update_depending_on_entity_is_fetched($fix, $repo)
+    public function do_Repo_save_insert_or_update_depending_on_entity_is_fetched($fix, $repo)
     {
         $fix->createUsers();
         $fix->insertUsers(1);
         $users = $repo->getRepository('users');
 
-        $user1 = $users->findByKey(1);
+        $user1 = $users->findById(1);
         $user1->fill(['name' => 'test-update']);
 
         $user2 = $users->create([
@@ -209,14 +209,14 @@ class RepoTest extends \PHPUnit_Framework_TestCase
         $user1->save();
         $user2->save();
 
-        $this->assertEquals('test-update', $users->findByKey(1)->get('name'));
-        $this->assertEquals('test-insert', $users->findByKey(2)->get('name'));
+        $this->assertEquals('test-update', $users->findById(1)->get('name'));
+        $this->assertEquals('test-insert', $users->findById(2)->get('name'));
     }
 
     /**
      * @ test
      */
-    function Repo_deletes_entity()
+    public function Repo_deletes_entity()
     {
         $this->do_Repo_deletes_entity($this->fix, $this->repo);
         $c = $this->getFullContainer();
@@ -227,17 +227,17 @@ class RepoTest extends \PHPUnit_Framework_TestCase
      * @param Fixture $fix
      * @param Repo    $repo
      */
-    function do_Repo_deletes_entity($fix, $repo)
+    public function do_Repo_deletes_entity($fix, $repo)
     {
         $fix->createUsers();
         $fix->insertUsers(3);
         $users = $repo->getRepository('users');
 
-        $user2 = $users->findByKey(2);
+        $user2 = $users->findById(2);
         $users->delete($user2);
 
-        $this->assertEquals(null, $users->findByKey(2));
-        $this->assertEquals(1, $users->findByKey(1)->getIdValue());
-        $this->assertEquals(3, $users->findByKey(3)->getIdValue());
+        $this->assertEquals(null, $users->findById(2));
+        $this->assertEquals(1, $users->findById(1)->getIdValue());
+        $this->assertEquals(3, $users->findById(3)->getIdValue());
     }
 }

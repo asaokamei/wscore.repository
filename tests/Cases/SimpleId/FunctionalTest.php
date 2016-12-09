@@ -116,7 +116,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $users = $this->repo->get('users');
         $posts = $this->repo->get('posts');
 
-        $user2 = $users->findByKey(2);
+        $user2 = $users->findById(2);
         $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user2->posts));
         $this->assertCount(2, $user2->posts);
 
@@ -125,7 +125,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $user2->save();
         $post->save();
 
-        $user2 = $users->findByKey(2);
+        $user2 = $users->findById(2);
         $this->assertCount(3, $user2->posts);
         foreach($user2->getRelatedEntities('posts') as $post) {
             $this->assertEquals(2, $post->get('user_id'));
@@ -142,7 +142,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $users = $this->repo->get('users');
         $posts = $this->repo->get('posts');
 
-        $collection = $users->collectByKey(2);
+        $collection = $users->collectById(2);
         $collection->load('posts');
         $user2 = $collection[0];
         $this->assertEquals('WScore\Repository\Assembly\Collection', get_class($user2->posts));
@@ -153,7 +153,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $user2->save();
         $post->save();
 
-        $user2 = $users->findByKey(2);
+        $user2 = $users->findById(2);
         $this->assertCount(3, $user2->posts);
         foreach($user2->getRelatedEntities('posts') as $post) {
             $this->assertEquals(2, $post->get('user_id'));
@@ -168,7 +168,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         /** @var Users $users */
         $repo  = $this->repo;
         $users = $this->repo->get('users');
-        $user1 = $users->findByKey(1);
+        $user1 = $users->findById(1);
         
         $this->assertEquals('name-1', $user1->name);
 
@@ -177,7 +177,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
             $user1->save();
         });
 
-        $user1 = $users->findByKey(1);
+        $user1 = $users->findById(1);
         $this->assertEquals('test transaction', $user1->name);
 
         try {
@@ -190,7 +190,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
         } catch (\Exception $e) {}
 
-        $user1 = $users->findByKey(1);
+        $user1 = $users->findById(1);
         $this->assertEquals('test transaction', $user1->name);
     }
 

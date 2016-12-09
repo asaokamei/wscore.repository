@@ -242,15 +242,12 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * @param array|string $keys
-     * @return EntityInterface|null
+     * @param array $keys
+     * @return EntityInterface
      * @throws \InvalidArgumentException
      */
-    public function findByKey($keys)
+    public function findByKey(array $keys)
     {
-        if (!is_array($keys)) {
-            $keys = [$this->getIdName() => $keys];
-        }
         $statement = $this->query()->select($keys);
         $entity    = $statement->fetch();
         if ($statement->fetch()) {
@@ -261,11 +258,22 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * @param string $id
+     * @return EntityInterface
+     * @throws \InvalidArgumentException
+     */
+    public function findById($id)
+    {
+        $keys = [$this->getIdName() => $id];
+        return $this->findByKey($keys);
+    }
+
+    /**
      * @param EntityInterface[] $entities
      * @param null|RelationInterface|JoinRelationInterface $relation
      * @return Collection|EntityInterface[]
      */
-    public function newCollection($entities = [], $relation = null)
+    public function newCollection(array $entities = [], $relation = null)
     {
         $collection = new Collection($this, $relation);
         if (!empty($entities)) {
@@ -289,12 +297,27 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * @param array|string $keys
+     * @param array $keys
      * @return Collection|EntityInterface[]
+     * @throws \InvalidArgumentException
      */
-    public function collectByKey($keys)
+    public function collectByKey(array $keys)
     {
         $found = $this->findByKey($keys);
+        $collection = $this->newCollection();
+        $collection->setEntities([$found]);
+
+        return $collection;
+    }
+
+    /**
+     * @param string $id
+     * @return Collection|EntityInterface[]
+     * @throws \InvalidArgumentException
+     */
+    public function collectById($id)
+    {
+        $found = $this->findById($id);
         $collection = $this->newCollection();
         $collection->setEntities([$found]);
 

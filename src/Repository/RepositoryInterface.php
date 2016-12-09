@@ -64,13 +64,25 @@ interface RepositoryInterface
     public function find(array $keys);
 
     /**
-     * returns an entity for the primary key, $key.
-     * throws an InvalidArgumentException if found more than one entity.
+     * returns an entity for the primary keys, $keys.
+     * throws an InvalidArgumentException if no or more than one entity were found.
      *
-     * @param array|string $keys
-     * @return EntityInterface|null
+     * @param array $keys
+     * @return EntityInterface
+     * @throws \InvalidArgumentException
      */
-    public function findByKey($keys);
+    public function findByKey(array $keys);
+
+    /**
+     * returns an entity for the primary key value, $id.
+     * works only for tables having only one primary key.
+     * throws an InvalidArgumentException if no or more than one entity were found.
+     *
+     * @param string $id
+     * @return EntityInterface
+     * @throws \InvalidArgumentException
+     */
+    public function findById($id);
 
     /**
      * returns a new empty Collection object for this repository.
@@ -79,7 +91,7 @@ interface RepositoryInterface
      * @param null|RelationInterface|JoinRelationInterface $relation
      * @return Collection
      */
-    public function newCollection($entities = [], $relation = null);
+    public function newCollection(array $entities = [], $relation = null);
 
     /**
      * executes an SQL statement and returns a collection. 
@@ -100,12 +112,23 @@ interface RepositoryInterface
 
     /**
      * returns a Collection for given primary Key.
-     * throws an InvalidArgumentException if found more than one entity.
+     * throws an InvalidArgumentException if no or more than one entity were found.
      *
-     * @param array|string $keys
+     * @param array $keys
      * @return Collection|EntityInterface[]
      */
-    public function collectByKey($keys);
+    public function collectByKey(array $keys);
+
+    /**
+     * returns a Collection for the primary key value, $id.
+     * works only for tables having only one primary key.
+     * throws an InvalidArgumentException if no or more than one entity were found.
+     *
+     * @param string $id
+     * @return Collection|EntityInterface[]
+     * @throws \InvalidArgumentException
+     */
+    public function collectById($id);
 
     /**
      * saves an $entity.

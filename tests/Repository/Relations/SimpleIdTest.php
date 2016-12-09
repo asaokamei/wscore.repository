@@ -26,7 +26,7 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
      */
     private $repo;
     
-    function setup()
+    public function setup()
     {
         class_exists(Container::class);
         class_exists(Repo::class);
@@ -46,7 +46,7 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
     /**
      * @return ContainerInterface|Repo
      */
-    function getFullContainer()
+    public function getFullContainer()
     {
         $c    = new Repo();
         $c->set(PDO::class, function () {
@@ -64,10 +64,10 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function test_hasOne()
+    public function test_hasOne()
     {
         $users = $this->repo->getRepository('users');
-        $user2 = $users->findByKey(2);
+        $user2 = $users->findById(2);
         $this->assertEquals(2, $user2->getIdValue());
         
         $hasMany = $this->repo->hasMany($users, 'posts', ['id' => 'user_id'])->withEntity($user2);
@@ -78,10 +78,10 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $posts[1]->get('user_id'));
     }
     
-    function test_hasMany()
+    public function test_hasMany()
     {
         $posts = $this->repo->getRepository('posts');
-        $post3 = $posts->findByKey(3);
+        $post3 = $posts->findById(3);
         $this->assertEquals(3, $post3->getIdValue());
         $this->assertEquals(2, $post3->get('user_id'));
         
@@ -92,10 +92,10 @@ class SimpleIdTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $users[0]->getIdValue());
     }
     
-    function test_join()
+    public function test_join()
     {
         $users = $this->repo->getRepository('users');
-        $user1 = $users->findByKey(1);
+        $user1 = $users->findById(1);
         $this->assertEquals(1, $user1->getIdValue());
 
         $join = $this->repo->join($users, 'posts', 'user_post', [
