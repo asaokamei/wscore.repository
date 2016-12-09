@@ -18,7 +18,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public $q;
 
-    function setup()
+    public function setup()
     {
         $this->q    = new Query();
         $this->repo = new Repository(
@@ -33,7 +33,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    function test0()
+    public function test0()
     {
         $repo = $this->repo;
         $this->assertEquals('testTable', $repo->getTable());
@@ -45,7 +45,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function query_returns_QueryInterface_instance()
+    public function query_returns_QueryInterface_instance()
     {
         $query = $this->repo->query();
         $this->assertEquals(true, $query instanceof QueryInterface);
@@ -54,7 +54,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function repository_passes_info_to_entity()
+    public function repository_passes_info_to_entity()
     {
         $repo = new Repository(
             'testTable',
@@ -77,7 +77,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function find_and_findByKey_queries_by_keys()
+    public function find_and_findByKey_queries_by_keys()
     {
         $this->repo->find(['key' => 'tested']);
         $this->assertEquals(['key' => 'tested'], $this->q->keys);
@@ -89,7 +89,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function findByKey_accepts_simple_value()
+    public function findByKey_accepts_simple_value()
     {
         $repo = new Repository(
             'testTable',
@@ -101,14 +101,14 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
             $this->q
         );
 
-        $repo->findByKey('p-value');
+        $repo->findById('p-value');
         $this->assertEquals(['p1' => 'p-value'], $this->q->keys);
     }
 
     /**
      * @test
      */
-    function create_method_creates_a_new_entity()
+    public function create_method_creates_a_new_entity()
     {
         $entity = $this->repo->create(['col1' => 'val', 'col2' => 'test', ]);
         $this->repo->insert($entity);
@@ -122,7 +122,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function createAsFetched_method_creates_an_entity_as_fetched()
+    public function createAsFetched_method_creates_an_entity_as_fetched()
     {
         $entity = $this->repo->createAsFetched(['col1' => 'val', 'col2' => 'test', ]);
         $this->repo->insert($entity);
@@ -136,7 +136,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function update_filters_columns_not_in_getColumns()
+    public function update_filters_columns_not_in_getColumns()
     {
         $repo = new Repository(
             'testTable',
@@ -160,7 +160,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function deletes_passes_primaryKeys_to_Query_instance()
+    public function deletes_passes_primaryKeys_to_Query_instance()
     {
         $repo = new Repository(
             'testTable',

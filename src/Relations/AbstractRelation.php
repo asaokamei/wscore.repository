@@ -57,7 +57,7 @@ abstract class AbstractRelation implements RelationInterface
 
     /**
      * @param EntityInterface[] ...$sourceEntity
-     * @return AbstractRelation
+     * @return RelationInterface|JoinRelationInterface
      */
     public function withEntity(...$sourceEntity)
     {

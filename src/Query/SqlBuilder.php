@@ -249,7 +249,7 @@ class SqlBuilder
         if (empty($where)) {
             return '';
         }
-        if (substr($where, 0, 2) === '( ' && substr($where, -2) == ' )') {
+        if (strpos($where, '( ') === 0 && strpos($where, ' )') === strlen($where) - 2) {
             $where = substr($where, 2);
             $where = substr($where, 0, -2);
         }

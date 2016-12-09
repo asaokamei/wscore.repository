@@ -213,7 +213,7 @@ class PdoQuery implements QueryInterface
     public function lastId($table = '', $idName = '')
     {
         $name = null;
-        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
+        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
             $name = implode( '_', [$table, $idName, 'seq' ] );
         }
 
