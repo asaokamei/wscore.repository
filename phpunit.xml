@@ -13,7 +13,7 @@
 >
     <testsuites>
         <testsuite name="testing repositories">
-            <xdirectory>./tests/Repository</xdirectory>
+            <directory>./tests/Repository</directory>
             <directory>./tests/Cases</directory>
         </testsuite>
     </testsuites>
