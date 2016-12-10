@@ -14,7 +14,7 @@ class CollectHasSome extends Collection
     private $convert = [];
 
     /**
-     * @var Collection[]|EntityInterface[][]
+     * @var EntityInterface[][]
      */
     private $indexed = [];
 

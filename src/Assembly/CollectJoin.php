@@ -4,16 +4,10 @@ namespace WScore\Repository\Assembly;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Relations\JoinRelationInterface;
-use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
 class CollectJoin extends Collection
 {
-    /**
-     * @var RelationInterface
-     */
-    protected $relation;
-    
     /**
      * @var array
      */
@@ -111,7 +105,9 @@ class CollectJoin extends Collection
      */
     private function findJoinEntities($fromEntities)
     {
-        $found = $this->relation->withEntity(...$fromEntities)->queryJoin()->find();
+        $found = $this->relation
+            ->withEntity(...$fromEntities)
+            ->join()->queryJoin()->find();
 
         /** @var EntityInterface[] $found */
         foreach ($found as $join) {        
