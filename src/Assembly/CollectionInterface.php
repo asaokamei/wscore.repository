@@ -1,9 +1,22 @@
 <?php
 namespace WScore\Repository\Assembly;
 
+use ArrayAccess;
+use BadMethodCallException;
+use Countable;
+use IteratorAggregate;
 use WScore\Repository\Entity\EntityInterface;
 
-interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countable
+/**
+ * Interface CollectionInterface
+ * 
+ * defines API for a collection of entities. 
+ * it is an Active-Collection, which can persist and relate entities, 
+ * but cannot delete entities (i.e. records) from database. 
+ *
+ * @package WScore\Repository\Assembly
+ */
+interface CollectionInterface extends IteratorAggregate, ArrayAccess, Countable
 {
     /**
      * sets entities for collection.
@@ -53,7 +66,7 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
      *
      * @param EntityInterface $fromEntity
      * @return Collection
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function getRelatedEntities($fromEntity);
 
@@ -67,13 +80,13 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
     public function add(EntityInterface $entity);
 
     /**
-     * deletes the $entity from the collection. 
+     * removes the $entity from the collection. 
      * if relation object is set, the entity is also removed 
      * from the relation (delete only works for Join relation). 
      * 
      * @param EntityInterface $entity
      */
-    public function delete(EntityInterface $entity);
+    public function remove(EntityInterface $entity);
 
     /**
      * returns a new collection with entities filtered out

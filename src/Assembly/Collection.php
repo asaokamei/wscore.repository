@@ -79,9 +79,9 @@ class Collection implements CollectionInterface
     /**
      * @param EntityInterface $entity
      */
-    public function delete(EntityInterface $entity)
+    public function remove(EntityInterface $entity)
     {
-        if ($this->relation) {
+        if ($this->relation && $this->relation instanceof JoinRelationInterface) {
             $this->relation->join()->delete($entity);
         }
         foreach($this->entities as $idx => $e) {
@@ -332,7 +332,7 @@ class Collection implements CollectionInterface
     {
         if (array_key_exists($offset, $this->entities)) {
             if ($this->relation) {
-                $this->delete($this->entities[$offset]);
+                $this->remove($this->entities[$offset]);
             }
             if (isset($this->entities[$offset])) {
                 // maybe already deleted by delete method...
