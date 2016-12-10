@@ -43,10 +43,10 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
     /**
      * gets an entity from collection for the primary key value. 
      * 
-     * @param string $keys
+     * @param string $id
      * @return null|EntityInterface
      */
-    public function getById($keys);
+    public function getById($id);
 
     /**
      * get the related entities for the $fromEntity.

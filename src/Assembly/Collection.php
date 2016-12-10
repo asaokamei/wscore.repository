@@ -108,14 +108,14 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @param string $keys
+     * @param string $id
      * @return null|EntityInterface
      * @throws \BadMethodCallException
      */    
-    public function getById($keys)
+    public function getById($id)
     {
         foreach($this->entities as $entity) {
-            if ($entity->getIdValue() === $keys) {
+            if ($entity->getIdValue() === $id) {
                 return $entity;
             }
         }

@@ -63,7 +63,7 @@ interface EntityInterface
      * returns column value. 
      * 
      * @param string $key
-     * @return null|string|Collection
+     * @return null|mixed|Collection
      */
     public function get($key);
     
@@ -107,7 +107,7 @@ interface EntityInterface
 
     /**
      * @param string $name
-     * @return null|string|Collection
+     * @return null|mixed|Collection
      */
     public function __get($name);
 
