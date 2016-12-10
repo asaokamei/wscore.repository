@@ -4,6 +4,13 @@ namespace WScore\Repository\Relations;
 use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
 
+/**
+ * Interface JoinRelationInterface
+ * 
+ * defines additional API for a join-relation on top of RelationInterface. 
+ *
+ * @package WScore\Repository\Relations
+ */
 interface JoinRelationInterface
 {
     /**

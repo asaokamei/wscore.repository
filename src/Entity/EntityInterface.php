@@ -4,6 +4,14 @@ namespace WScore\Repository\Entity;
 use WScore\Repository\Assembly\Collection;
 use WScore\Repository\Relations\RelationInterface;
 
+/**
+ * Interface EntityInterface
+ * 
+ * defines API of an entity object to be persisted to a database 
+ * using RepositoryInterface. 
+ *
+ * @package WScore\Repository\Entity
+ */
 interface EntityInterface
 {
 

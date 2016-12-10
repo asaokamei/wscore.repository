@@ -6,6 +6,13 @@ use WScore\Repository\Entity\EntityInterface;
 use WScore\Repository\Query\QueryInterface;
 use WScore\Repository\Repository\RepositoryInterface;
 
+/**
+ * Interface RelationInterface
+ * 
+ * defines API for relation object that is used to relate entities. 
+ *
+ * @package WScore\Repository\Relations
+ */
 interface RelationInterface
 {
     /**
