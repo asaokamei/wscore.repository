@@ -38,7 +38,7 @@ interface CollectionInterface extends \IteratorAggregate, \ArrayAccess, \Countab
      * @param array $keys
      * @return null|EntityInterface
      */
-    public function getByKeys(array $keys);
+    public function get(array $keys);
 
     /**
      * gets an entity from collection for the primary key value. 

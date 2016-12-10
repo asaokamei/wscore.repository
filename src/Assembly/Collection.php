@@ -96,7 +96,7 @@ class Collection implements CollectionInterface
      * @param array $keys
      * @return null|EntityInterface
      */
-    public function getByKeys(array $keys)
+    public function get(array $keys)
     {
         foreach($this->entities as $entity) {
             /** @noinspection TypeUnsafeComparisonInspection */
