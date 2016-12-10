@@ -26,11 +26,6 @@ interface CollectionInterface extends IteratorAggregate, ArrayAccess, Countable
     public function setEntities($entities);
 
     /**
-     * @return EntityInterface[]
-     */
-    public function toArray();
-
-    /**
      * saves entities to database. 
      */
     public function save();

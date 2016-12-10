@@ -65,7 +65,7 @@ class CollectHasSome extends Collection
      */
     private function findEntities(array $entities)
     {
-        $found = $this->relation->withEntity(...$entities)->collect()->toArray();
+        $found = $this->relation->withEntity(...$entities)->collect()->get([]);
         $this->setEntities($found);
         $this->indexFound($found);
     }

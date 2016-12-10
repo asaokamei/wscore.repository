@@ -2,6 +2,7 @@
 namespace WScore\Repository\Assembly;
 
 use WScore\Repository\Entity\EntityInterface;
+use WScore\Repository\Helpers\HelperMethods;
 use WScore\Repository\Relations\JoinRelationInterface;
 use WScore\Repository\Relations\RelationInterface;
 use WScore\Repository\Repository\RepositoryInterface;
@@ -48,14 +49,6 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @return EntityInterface[]
-     */
-    public function toArray()
-    {
-        return $this->entities;
-    }
-
-    /**
      * 
      */    
     public function save()
@@ -94,17 +87,22 @@ class Collection implements CollectionInterface
 
     /**
      * @param array $keys
-     * @return null|EntityInterface
+     * @return null|EntityInterface[]
      */
     public function get(array $keys)
     {
+        if (empty($keys)) {
+            return $this->entities;
+        }
+        $found = [];
         foreach($this->entities as $entity) {
+            $has = HelperMethods::filterDataByKeys($entity->toArray(), array_flip($keys));
             /** @noinspection TypeUnsafeComparisonInspection */
-            if ($entity->getKeys() == $keys) {
-                return $entity;
+            if ($has == $keys) {
+                $found[] = $entity;
             }
         }
-        return null;
+        return $found;
     }
 
     /**
