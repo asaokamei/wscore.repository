@@ -84,6 +84,9 @@ class Repo implements ContainerInterface
      */
     public function getRepository($tableName, array $primaryKeys = [], $autoIncrement = false, $options = null)
     {
+        if ($tableName instanceof RepositoryInterface) {
+            return $tableName;
+        }
         if (!$this->has($tableName)) {
             $this->set(
                 $tableName,
@@ -95,72 +98,59 @@ class Repo implements ContainerInterface
 
     /**
      * @param RepositoryInterface|string $sourceRepo
-     * @param RepositoryInterface|string $repo
-     * @param array               $convert
+     * @param RepositoryInterface|string $targetRepo
+     * @param array                      $convert
      * @return BelongsTo
      */
     public function belongsTo(
         $sourceRepo,
-        $repo,
+        $targetRepo,
         array $convert = []
     ) {
-        if (is_string($sourceRepo)) {
-            $sourceRepo = $this->getRepository($sourceRepo);
-        }
-        if (is_string($repo)) {
-            $repo = $this->getRepository($repo);
-        }
-        return new BelongsTo($sourceRepo, $repo, $convert);
+        $sourceRepo = $this->getRepository($sourceRepo);
+        $targetRepo = $this->getRepository($targetRepo);
+
+        return new BelongsTo($sourceRepo, $targetRepo, $convert);
     }
 
     /**
      * @param RepositoryInterface|string $sourceRepo
-     * @param RepositoryInterface|string $repo
-     * @param array               $convert
+     * @param RepositoryInterface|string $targetRepo
+     * @param array                      $convert
      * @return HasMany
      */
     public function hasMany(
         $sourceRepo,
-        $repo,
+        $targetRepo,
         array $convert = []
     ) {
-        if (is_string($sourceRepo)) {
-            $sourceRepo = $this->getRepository($sourceRepo);
-        }
-        if (is_string($repo)) {
-            $repo = $this->getRepository($repo);
-        }
-        return new HasMany($sourceRepo, $repo, $convert);
+        $sourceRepo = $this->getRepository($sourceRepo);
+        $targetRepo = $this->getRepository($targetRepo);
+
+        return new HasMany($sourceRepo, $targetRepo, $convert);
     }
 
     /**
-     * @param RepositoryInterface|string $fromRepo
-     * @param RepositoryInterface|string $toRepo
+     * @param RepositoryInterface|string $sourceRepo
+     * @param RepositoryInterface|string $targetRepo
      * @param RepositoryInterface|string $joinRepo
-     * @param array  $from_convert
-     * @param array  $to_convert
+     * @param array                      $from_convert
+     * @param array                      $to_convert
      * @return Join
      */
     public function join(
-        $fromRepo,
-        $toRepo,
+        $sourceRepo,
+        $targetRepo,
         $joinRepo = '',
         array $from_convert = [],
         array $to_convert = []
     ) {
-        if (is_string($fromRepo)) {
-            $fromRepo = $this->getRepository($fromRepo);
-        }
-        if (is_string($toRepo)) {
-            $toRepo = $this->getRepository($toRepo);
-        }
-        if (!$joinRepo) {
-            $joinRepo = makeJoinTableName($toRepo, $fromRepo);
-        }
-        if (is_string($joinRepo)) {
-            $joinRepo = $this->getRepository($joinRepo);
-        }
-        return new Join($fromRepo, $toRepo, $joinRepo, $from_convert, $to_convert);
+        $sourceRepo = $this->getRepository($sourceRepo);
+        $targetRepo = $this->getRepository($targetRepo);
+        $joinRepo   = $joinRepo ?: makeJoinTableName($targetRepo, $sourceRepo);
+        $joinRepo   = $this->getRepository($joinRepo);
+
+        return new Join($sourceRepo, $targetRepo, $joinRepo, $from_convert, $to_convert);
     }
 }
 
