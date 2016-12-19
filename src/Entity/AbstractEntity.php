@@ -310,6 +310,9 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
+     * gets related entities using relation object.
+     * the retrieved entities (i.e. collection) is cached in the entity.
+     *
      * @param string $name
      * @return null|Collection
      */
@@ -319,7 +322,8 @@ abstract class AbstractEntity implements EntityInterface
             return $this->relatedEntities[$name];
         }
         if ($relation = $this->_getRelationObject($name)) {
-            return $relation->collect();
+            $this->relatedEntities[$name] = $relation->collect();
+            return $this->relatedEntities[$name];
         }
         return null;
     }
